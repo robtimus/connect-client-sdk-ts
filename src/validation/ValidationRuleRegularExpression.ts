@@ -10,7 +10,7 @@ export class ValidationRuleRegularExpression implements ValidationRule<api.Regul
 
   constructor(readonly definition: api.RegularExpressionValidator) {
     this.regularExpression = definition.regularExpression;
-    this.regexp = new RegExp(this.regularExpression);
+    this.regexp = new RegExp(`^${this.regularExpression}$`);
   }
 
   validate(request: ValidatableRequest, fieldId: string): boolean {

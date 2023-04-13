@@ -13,6 +13,6 @@ export type ValidationResult = { valid: true } | { valid: false; errors: Validat
 
 export interface ValidationRule<T> {
   readonly id: string;
-  readonly definition: T;
+  readonly definition: Readonly<T>;
   validate(request: ValidatableRequest, fieldId: string): boolean;
 }

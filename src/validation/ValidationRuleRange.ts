@@ -20,7 +20,10 @@ export class ValidationRuleRange implements ValidationRule<api.RangeValidator>, 
 
   validateValue(value: string | number): boolean {
     if (typeof value !== "number") {
-      value = parseInt(value, 10);
+      // parseInt doesn't return NaN when value starts with a valid number
+      // Number(value) doesn't necessarily use base10
+      // Combine both to get the desired result
+      value = isNaN(Number(value)) ? NaN : parseInt(value, 10);
     }
     return !isNaN(value) && this.minValue <= value && value <= this.maxValue;
   }

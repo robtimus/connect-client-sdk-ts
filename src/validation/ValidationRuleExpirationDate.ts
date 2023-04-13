@@ -2,7 +2,7 @@ import { ValidatableRequest, ValidationRule } from ".";
 import { api } from "../communicator/model";
 
 // value is mmYY or mmYYYY
-const DATE_FORMAT_REGEXP = /\d{4}|\d{6}$/g;
+const DATE_FORMAT_REGEXP = /^(\d{4}|\d{6})$/;
 
 export class ValidationRuleExpirationDate implements ValidationRule<api.EmptyValidator>, api.EmptyValidator {
   static readonly ID: string = "expirationDate";
@@ -36,11 +36,11 @@ export class ValidationRuleExpirationDate implements ValidationRule<api.EmptyVal
 
     // For comparison, set the current year & month and the maximum allowed expiration date.
     const now = new Date();
-    now.setDate(1);
+    const minExpirationDate = new Date(now.getFullYear(), now.getMonth(), 1);
     const maxExpirationDate = new Date(now.getFullYear() + 25, 11, 1);
 
     // The card is still valid if it expires this month.
-    return expirationDate >= now && expirationDate <= maxExpirationDate;
+    return minExpirationDate <= expirationDate && expirationDate <= maxExpirationDate;
   }
 }
 

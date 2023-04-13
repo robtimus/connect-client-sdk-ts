@@ -6,7 +6,7 @@ export class ValidationRuleTermsAndConditions implements ValidationRule<api.Empt
 
   readonly id = ValidationRuleTermsAndConditions.ID;
 
-  constructor(readonly definition: api.EmptyValidator) {}
+  constructor(readonly definition: Readonly<api.EmptyValidator>) {}
 
   validate(request: ValidatableRequest, fieldId: string): boolean {
     const value = request.getUnmaskedValue(fieldId);

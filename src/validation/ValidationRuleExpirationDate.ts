@@ -9,7 +9,7 @@ export class ValidationRuleExpirationDate implements ValidationRule<api.EmptyVal
 
   readonly id = ValidationRuleExpirationDate.ID;
 
-  constructor(readonly definition: api.EmptyValidator) {}
+  constructor(readonly definition: Readonly<api.EmptyValidator>) {}
 
   validate(request: ValidatableRequest, fieldId: string): boolean {
     const value = request.getUnmaskedValue(fieldId);

@@ -7,7 +7,7 @@ export class ValidationRuleFixedList implements ValidationRule<api.FixedListVali
   readonly id = ValidationRuleFixedList.ID;
   readonly allowedValues: string[];
 
-  constructor(readonly definition: api.FixedListValidator) {
+  constructor(readonly definition: Readonly<api.FixedListValidator>) {
     this.allowedValues = definition.allowedValues;
   }
 

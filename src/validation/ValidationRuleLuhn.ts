@@ -11,7 +11,7 @@ export class ValidationRuleLuhn implements ValidationRule<api.EmptyValidator>, a
 
   readonly id = ValidationRuleLuhn.ID;
 
-  constructor(readonly definition: api.EmptyValidator) {}
+  constructor(readonly definition: Readonly<api.EmptyValidator>) {}
 
   validate(request: ValidatableRequest, fieldId: string): boolean {
     const value = request.getUnmaskedValue(fieldId);

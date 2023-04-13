@@ -8,7 +8,7 @@ export class ValidationRuleLength implements ValidationRule<api.LengthValidator>
   readonly minLength: number;
   readonly maxLength: number;
 
-  constructor(readonly definition: api.LengthValidator) {
+  constructor(readonly definition: Readonly<api.LengthValidator>) {
     this.minLength = definition.minLength;
     this.maxLength = definition.maxLength;
   }

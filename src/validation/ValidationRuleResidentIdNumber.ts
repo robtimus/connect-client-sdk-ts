@@ -17,7 +17,7 @@ export class ValidationRuleResidentIdNumber implements ValidationRule<api.EmptyV
 
   readonly id = ValidationRuleResidentIdNumber.ID;
 
-  constructor(readonly definition: api.EmptyValidator) {}
+  constructor(readonly definition: Readonly<api.EmptyValidator>) {}
 
   validate(request: ValidatableRequest, fieldId: string): boolean {
     const value = request.getUnmaskedValue(fieldId);

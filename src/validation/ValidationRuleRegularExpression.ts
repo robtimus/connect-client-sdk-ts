@@ -8,7 +8,7 @@ export class ValidationRuleRegularExpression implements ValidationRule<api.Regul
   readonly regularExpression: string;
   private readonly regexp: RegExp;
 
-  constructor(readonly definition: api.RegularExpressionValidator) {
+  constructor(readonly definition: Readonly<api.RegularExpressionValidator>) {
     this.regularExpression = definition.regularExpression;
     this.regexp = new RegExp(`^${this.regularExpression}$`);
   }

@@ -8,7 +8,7 @@ export class ValidationRuleRange implements ValidationRule<api.RangeValidator>, 
   readonly minValue: number;
   readonly maxValue: number;
 
-  constructor(readonly definition: api.RangeValidator) {
+  constructor(readonly definition: Readonly<api.RangeValidator>) {
     this.minValue = definition.minValue;
     this.maxValue = definition.maxValue;
   }

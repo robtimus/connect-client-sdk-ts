@@ -7,7 +7,7 @@ export class ValidationRuleBoletoBancarioRequiredness implements ValidationRule<
   readonly id = ValidationRuleBoletoBancarioRequiredness.ID;
   readonly fiscalNumberLength: number;
 
-  constructor(readonly definition: api.BoletoBancarioRequirednessValidator) {
+  constructor(readonly definition: Readonly<api.BoletoBancarioRequirednessValidator>) {
     this.fiscalNumberLength = definition.fiscalNumberLength;
   }
 

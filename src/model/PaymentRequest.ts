@@ -110,12 +110,12 @@ export class PaymentRequest implements ValidatableRequest {
 
     const accountOnFile = this.accountOnFile;
     const hasValueInAof = (fieldId: string): boolean => {
-      if (accountOnFile?.paymentProductId !== paymentProduct?.id) {
+      if (accountOnFile?.paymentProductId !== paymentProduct.id) {
         // the account-on-file does not belong to the payment product; ignore it
         return false;
       }
-      const attribute = accountOnFile?.findAttribute(fieldId);
-      return !!attribute && attribute.mustWriteReason !== "MUST_WRITE";
+      const attribute = accountOnFile.findAttribute(fieldId);
+      return !!attribute && attribute.status !== "MUST_WRITE";
     };
     for (const field of paymentProduct.fields) {
       if (field.dataRestrictions.isRequired && !this.getValue(field.id) && !hasValueInAof(field.id)) {

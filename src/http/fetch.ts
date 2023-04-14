@@ -2,7 +2,7 @@ import { HttpClient, HttpRequest, HttpResponse } from ".";
 import { URLBuilder } from "./util";
 
 async function toHttpResonse(response: Response): Promise<HttpResponse> {
-  const contentType = response.headers["Content-Type"];
+  const contentType = response.headers.get("Content-Type") || undefined;
   if (contentType && /json/.test(contentType)) {
     const json = await response.json();
     return {

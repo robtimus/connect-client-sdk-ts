@@ -1,3 +1,7 @@
+/**
+ * @group unit:model
+ */
+
 import { AccountOnFile, PaymentProduct } from "../../../src/model";
 import { toAccountOnFile } from "../../../src/model/AccountOnFile";
 import { toPaymentProduct } from "../../../src/model/PaymentProduct";

@@ -33,7 +33,7 @@ class PaymentProductFieldDataRestrictionsImpl implements PaymentProductFieldData
     if (rule) {
       return rule;
     }
-    throw new Error(`could not find ValidationRule for type ${id}`);
+    throw new Error(`could not find ValidationRule with id ${id}`);
   }
 }
 

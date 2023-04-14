@@ -203,8 +203,8 @@ export interface KeyValuePair {
 
 export interface LabelTemplateElement {
   readonly attributeKey: string;
-  readonly mask: string;
-  readonly wildcardMask: string;
+  readonly mask?: string;
+  readonly wildcardMask?: string;
 }
 
 export interface MaskedString {
@@ -276,7 +276,7 @@ export interface PaymentProductFieldDisplayHints {
   readonly placeholderLabel?: string;
   readonly preferredInputType?: string;
   readonly tooltip?: PaymentProductFieldTooltip;
-  readonly wildcardMask: string;
+  readonly wildcardMask?: string;
 }
 
 export interface PaymentProductFieldFormElement {

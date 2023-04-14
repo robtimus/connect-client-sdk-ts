@@ -50,6 +50,7 @@ class BasicPaymentProductImpl implements BasicPaymentProduct {
     this.allowsRecurring = json.allowsRecurring;
     this.allowsTokenization = json.allowsTokenization;
     this.autoTokenized = json.autoTokenized;
+    this.authenticationIndicator = json.authenticationIndicator;
     this.canBeIframed = json.canBeIframed;
     this.deviceFingerprintEnabled = json.deviceFingerprintEnabled;
     this.displayHints = json.displayHints;

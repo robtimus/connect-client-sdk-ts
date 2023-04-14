@@ -1,5 +1,5 @@
 /**
- * @group unit:masking
+ * @group unit:util
  */
 
 import { applyMask, removeMask } from "../../../src/util/masking";

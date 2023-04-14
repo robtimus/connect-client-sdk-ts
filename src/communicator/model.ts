@@ -53,7 +53,7 @@ export namespace api {
 
   export interface LabelTemplateElement {
     attributeKey: string;
-    mask: string;
+    mask?: string;
   }
 
   export interface PaymentProduct {

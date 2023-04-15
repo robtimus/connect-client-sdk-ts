@@ -1,12 +1,4 @@
-import { v4 as uuidv4 } from "uuid";
-import {
-  ApplePayClient,
-  Device,
-  DeviceInformation,
-  GooglePayClient,
-  MobilePaymentProductSession302SpecificInput,
-  MobilePaymentProductSession302SpecificOutput,
-} from "../../src/model";
+import { ApplePayClient, Device, DeviceInformation, GooglePayClient } from "../../src/model";
 import { HttpClient, HttpRequest, HttpResponse } from "../../src/http";
 import { URLBuilder } from "../../src/http/util";
 import { JOSEEncryptor } from "../../src/crypto";
@@ -41,7 +33,7 @@ export function cloneResponse(response: HttpResponse) {
 }
 
 interface RequestHandler {
-  readonly url: string | RegExp;
+  readonly url: string;
   readonly response: HttpResponse;
   readonly requestValidator?: RequestValidator;
 }
@@ -50,12 +42,7 @@ class RequestMatcher {
   readonly handlers: RequestHandler[] = [];
 
   findHandler(url: string): RequestHandler | undefined {
-    return this.handlers.find((handler) => {
-      if (typeof handler.url === "string") {
-        return url.startsWith(handler.url);
-      }
-      return handler.url.test(url);
-    });
+    return this.handlers.find((handler) => url.startsWith(handler.url));
   }
 }
 
@@ -136,50 +123,7 @@ class MockHttpClient implements HttpClient {
   }
 }
 
-class MockApplePayClient implements ApplePayClient {
-  async createPayment(
-    sessionFactory: (input: MobilePaymentProductSession302SpecificInput) => Promise<MobilePaymentProductSession302SpecificOutput>
-  ): Promise<ApplePayJS.ApplePayPaymentToken> {
-    return sessionFactory({}).then((output) => ({
-      paymentData: output.sessionObject,
-      paymentMethod: {
-        displayName: "VISA",
-        network: "1",
-        paymentPass: {
-          activationState: "activated",
-          primaryAccountIdentifier: "PAI",
-          primaryAccountNumberSuffix: "PANS",
-          deviceAccountIdentifier: "DAI",
-        },
-        type: "credit",
-      },
-      transactionIdentifier: "TI",
-    }));
-  }
-}
-
-class MockGooglePayClient implements GooglePayClient {
-  prefetchPaymentData(): Promise<void> {
-    return Promise.resolve();
-  }
-
-  createPayment(): Promise<google.payments.api.PaymentData> {
-    return Promise.resolve({
-      apiVersion: 2,
-      apiVersionMinor: 0,
-      paymentMethodData: {
-        tokenizationData: {
-          token: "token",
-          type: "PAYMENT_GATEWAY",
-        },
-        type: "CARD",
-      },
-    });
-  }
-}
-
 export class MockDevice implements Device {
-  private readonly id = uuidv4();
   private readonly httpClient = new MockHttpClient();
   private joseEncryptor?: JOSEEncryptor;
   private applePayClient: Promise<ApplePayClient | undefined> = Promise.resolve(undefined);
@@ -217,23 +161,15 @@ export class MockDevice implements Device {
     return this.googlePayClient;
   }
 
-  mockGet(url: string | RegExp, response: HttpResponse, requestValidator?: RequestValidator): MockDevice {
+  mockGet(url: string, response: HttpResponse, requestValidator?: RequestValidator): MockDevice {
     return this.mockMethod("GET", url, response, requestValidator);
   }
 
-  mockDelete(url: string | RegExp, response: HttpResponse, requestValidator?: RequestValidator): MockDevice {
-    return this.mockMethod("DELETE", url, response, requestValidator);
-  }
-
-  mockPost(url: string | RegExp, response: HttpResponse, requestValidator?: RequestValidator): MockDevice {
+  mockPost(url: string, response: HttpResponse, requestValidator?: RequestValidator): MockDevice {
     return this.mockMethod("POST", url, response, requestValidator);
   }
 
-  mockPut(url: string | RegExp, response: HttpResponse, requestValidator?: RequestValidator): MockDevice {
-    return this.mockMethod("PUT", url, response, requestValidator);
-  }
-
-  private mockMethod(method: string, url: string | RegExp, response: HttpResponse, requestValidator?: RequestValidator): MockDevice {
+  private mockMethod(method: string, url: string, response: HttpResponse, requestValidator?: RequestValidator): MockDevice {
     const matcher = this.httpClient.matchers[method] || new RequestMatcher();
     this.httpClient.matchers[method] = matcher;
     matcher.handlers.push({
@@ -244,14 +180,11 @@ export class MockDevice implements Device {
     return this;
   }
 
-  mockJOSEEncryptor(joseEncryptor?: JOSEEncryptor): MockDevice {
-    this.joseEncryptor = joseEncryptor;
-    return this;
-  }
-
   mockApplePayClient(applePayClient?: true | "throw" | ApplePayClient): MockDevice {
     if (applePayClient === true) {
-      this.applePayClient = Promise.resolve(new MockApplePayClient());
+      this.applePayClient = Promise.resolve({
+        createPayment: jest.fn(),
+      });
     } else if (applePayClient === "throw") {
       this.applePayClient = Promise.reject("cannot provide Apple Pay client");
     } else {
@@ -262,7 +195,10 @@ export class MockDevice implements Device {
 
   mockGooglePayClient(googlePayClient?: true | "throw" | GooglePayClient): MockDevice {
     if (googlePayClient === true) {
-      this.googlePayClient = Promise.resolve(new MockGooglePayClient());
+      this.googlePayClient = Promise.resolve({
+        prefetchPaymentData: jest.fn(),
+        createPayment: jest.fn(),
+      });
     } else if (googlePayClient === "throw") {
       this.googlePayClient = Promise.reject("cannot provide Google Pay client");
     } else {
@@ -273,9 +209,5 @@ export class MockDevice implements Device {
 
   capturedRequests(): CapturedHttpRequest[] {
     return this.httpClient.requests;
-  }
-
-  toString() {
-    return `MockDevice[${this.id}]`;
   }
 }

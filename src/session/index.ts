@@ -393,9 +393,14 @@ export class Session {
     const paymentContext: api.PaymentContext = {
       amountOfMoney: this.paymentContext.amountOfMoney,
       countryCode: this.paymentContext.countryCode,
-      isInstallments: this.paymentContext.isInstallments,
-      isRecurring: this.paymentContext.isRecurring,
     };
+    if (this.paymentContext.isInstallments !== undefined) {
+      paymentContext.isInstallments = this.paymentContext.isInstallments;
+    }
+    if (this.paymentContext.isRecurring !== undefined) {
+      paymentContext.isRecurring = this.paymentContext.isRecurring;
+    }
+
     const request: api.GetIINDetailsRequest = {
       bin: partialCreditCardNumber.length >= 8 ? partialCreditCardNumber.substring(0, 8) : partialCreditCardNumber.substring(0, 6),
       paymentContext,

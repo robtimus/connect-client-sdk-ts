@@ -6,7 +6,15 @@ import { v4 as uuidv4 } from "uuid";
 import { Session } from "../../src/session";
 import { MockDevice, notImplementedResponse } from "./mock";
 import { api } from "../../src/communicator/model";
-import { CustomerDetailsRequest, DeviceFingerprintRequest, MobilePaymentProductSession302SpecificInput, PaymentContext, SessionDetails } from "../../src/model";
+import {
+  ApplePayClient,
+  CustomerDetailsRequest,
+  DeviceFingerprintRequest,
+  GooglePayClient,
+  MobilePaymentProductSession302SpecificInput,
+  PaymentContext,
+  SessionDetails,
+} from "../../src/model";
 import { PP_APPLE_PAY, PP_BANCONTACT, PP_GOOGLE_PAY } from "../../src/model/PaymentProduct";
 import { HttpResponse } from "../../src/http";
 
@@ -247,6 +255,9 @@ describe("Session", () => {
     jest.spyOn(console, "debug").mockImplementation(() => {
       /* do nothing */
     });
+    jest.spyOn(console, "error").mockImplementation(() => {
+      /* do nothing */
+    });
   });
 
   test("updatePaymentContext", () => {
@@ -301,7 +312,7 @@ describe("Session", () => {
       expect(async () => await session.getEncryptor()).not.toThrow();
     });
 
-    test("retrieve error", async () => {
+    test("HTTP error", async () => {
       // don't mock anything -> will lead to an error response
       const session = new Session(sessionDetails, minimalPaymentContext, new MockDevice());
       const onSuccess = jest.fn();
@@ -331,7 +342,7 @@ describe("Session", () => {
       expect(result).toStrictEqual(publicKey);
     });
 
-    test("retrieve error", async () => {
+    test("HTTP error", async () => {
       // don't mock anything -> will lead to an error response
       const session = new Session(sessionDetails, minimalPaymentContext, new MockDevice());
       const onSuccess = jest.fn();
@@ -378,7 +389,7 @@ describe("Session", () => {
       expect(result).toStrictEqual(thirdPartyStatusResponse);
     });
 
-    test("retrieve error", async () => {
+    test("HTTP error", async () => {
       const paymentId = uuidv4();
       // don't mock anything -> will lead to an error response
       const session = new Session(sessionDetails, minimalPaymentContext, new MockDevice());
@@ -495,7 +506,7 @@ describe("Session", () => {
         });
 
         describe("Apple Pay and Google Pay enabled", () => {
-          test("minimal context", async () => {
+          test("minimal payment context", async () => {
             const device = new MockDevice()
               .mockGet(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products?`, {
                 statusCode: 200,
@@ -522,7 +533,7 @@ describe("Session", () => {
             expect(result.paymentItems[3].accountsOnFile).toStrictEqual([]);
           });
 
-          test("full context", async () => {
+          test("full payment context", async () => {
             const device = new MockDevice()
               .mockGet(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products?`, {
                 statusCode: 200,
@@ -557,7 +568,7 @@ describe("Session", () => {
         });
       });
 
-      test("retrieve error", async () => {
+      test("HTTP error", async () => {
         // don't mock anything -> will lead to an error response
         const session = new Session(sessionDetails, minimalPaymentContext, new MockDevice());
         const onSuccess = jest.fn();
@@ -675,7 +686,7 @@ describe("Session", () => {
         });
 
         describe("Apple Pay and Google Pay enabled", () => {
-          test("minimal context", async () => {
+          test("minimal payment context", async () => {
             const device = new MockDevice()
               .mockGet(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products?`, {
                 statusCode: 200,
@@ -704,7 +715,7 @@ describe("Session", () => {
             expect(result.paymentItems[2].accountsOnFile).toStrictEqual([]);
           });
 
-          test("full context", async () => {
+          test("full payment context", async () => {
             const device = new MockDevice()
               .mockGet(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products?`, {
                 statusCode: 200,
@@ -798,7 +809,7 @@ describe("Session", () => {
 
   describe("getBasicPaymentProductGroups", () => {
     describe("success", () => {
-      test("minimal context", async () => {
+      test("minimal payment context", async () => {
         const device = new MockDevice().mockGet(
           `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/productgroups?`,
           {
@@ -822,7 +833,7 @@ describe("Session", () => {
         }
       });
 
-      test("full context", async () => {
+      test("full payment context", async () => {
         const device = new MockDevice().mockGet(
           `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/productgroups?`,
           {
@@ -849,7 +860,7 @@ describe("Session", () => {
       });
     });
 
-    test("retrieve error", async () => {
+    test("HTTP error", async () => {
       // don't mock anything -> will lead to an error response
       const session = new Session(sessionDetails, minimalPaymentContext, new MockDevice());
       const onSuccess = jest.fn();
@@ -905,7 +916,7 @@ describe("Session", () => {
 
   describe("getPaymentProductGroup", () => {
     describe("success", () => {
-      test("minimal context", async () => {
+      test("minimal payment context", async () => {
         const device = new MockDevice().mockGet(
           `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/productgroups/cards?`,
           {
@@ -925,7 +936,7 @@ describe("Session", () => {
         expect(result.id).toBe("cards");
       });
 
-      test("full context", async () => {
+      test("full payment context", async () => {
         const device = new MockDevice().mockGet(
           `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/productgroups/cards?`,
           {
@@ -970,7 +981,7 @@ describe("Session", () => {
       });
     });
 
-    test("retrieve error", async () => {
+    test("HTTP error", async () => {
       // don't mock anything -> will lead to an error response
       const session = new Session(sessionDetails, minimalPaymentContext, new MockDevice());
       const onSuccess = jest.fn();
@@ -1060,7 +1071,7 @@ describe("Session", () => {
       expect(result).toStrictEqual(deviceFingerprintResponse);
     });
 
-    test("retrieve error", async () => {
+    test("HTTP error", async () => {
       // don't mock anything -> will lead to an error response
       const session = new Session(sessionDetails, minimalPaymentContext, new MockDevice());
       const onSuccess = jest.fn();
@@ -1092,7 +1103,7 @@ describe("Session", () => {
 
   describe("getBasicPaymentProducts", () => {
     describe("success", () => {
-      test("minimal context", async () => {
+      test("minimal payment context", async () => {
         const device = new MockDevice()
           .mockGet(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products?`, {
             statusCode: 200,
@@ -1120,7 +1131,7 @@ describe("Session", () => {
         expect(result.paymentProducts[3].accountsOnFile).toStrictEqual([]);
       });
 
-      describe("full context", () => {
+      describe("full payment context", () => {
         test("Apple Pay and Google Pay not enabled", async () => {
           const device = new MockDevice().mockGet(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products?`, {
             statusCode: 200,
@@ -1296,7 +1307,7 @@ describe("Session", () => {
       expect(json.paymentProducts[1].displayHints.logo).toBe(`${sessionDetails.assetUrl}/320.png`);
     });
 
-    test("retrieve error", async () => {
+    test("HTTP error", async () => {
       // don't mock anything -> will lead to an error response
       const session = new Session(sessionDetails, minimalPaymentContext, new MockDevice());
       const onSuccess = jest.fn();
@@ -1378,7 +1389,7 @@ describe("Session", () => {
     }
 
     describe("success", () => {
-      describe("minimal context", () => {
+      describe("minimal payment context", () => {
         test("Apple Pay", async () => {
           const device = new MockDevice().mockGet(
             `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products/${PP_APPLE_PAY}?`,
@@ -1468,7 +1479,7 @@ describe("Session", () => {
         });
       });
 
-      describe("full context", () => {
+      describe("full payment context", () => {
         describe("Apple Pay", () => {
           test("not enabled", async () => {
             const device = new MockDevice().mockGet(
@@ -1636,7 +1647,7 @@ describe("Session", () => {
       });
     });
 
-    test("retrieve error", async () => {
+    test("HTTP error", async () => {
       // don't mock anything -> will lead to an error response
       const session = new Session(sessionDetails, minimalPaymentContext, new MockDevice());
       const onSuccess = jest.fn();
@@ -1649,7 +1660,7 @@ describe("Session", () => {
     });
 
     describe("caching", () => {
-      describe("minimal context", () => {
+      describe("minimal payment context", () => {
         test("Apple Pay", async () => {
           const device = new MockDevice().mockGet(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products/${PP_APPLE_PAY}?`, {
             statusCode: 200,
@@ -1692,7 +1703,7 @@ describe("Session", () => {
         });
       });
 
-      describe("full context", () => {
+      describe("full payment context", () => {
         describe("Apple Pay", () => {
           test("not enabled", async () => {
             const device = new MockDevice().mockGet(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products/${PP_APPLE_PAY}?`, {
@@ -1875,7 +1886,7 @@ describe("Session", () => {
     };
 
     describe("success", () => {
-      test("minimal context", async () => {
+      test("minimal payment context", async () => {
         const device = new MockDevice().mockGet(
           `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products/1/directory?`,
           {
@@ -1894,7 +1905,7 @@ describe("Session", () => {
         expect(result).toStrictEqual(directory);
       });
 
-      test("full context", async () => {
+      test("full payment context", async () => {
         const device = new MockDevice().mockGet(
           `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products/1/directory?`,
           {
@@ -1914,7 +1925,7 @@ describe("Session", () => {
       });
     });
 
-    test("retrieve error", async () => {
+    test("HTTP error", async () => {
       // don't mock anything -> will lead to an error response
       const session = new Session(sessionDetails, minimalPaymentContext, new MockDevice());
       const onSuccess = jest.fn();
@@ -2019,7 +2030,7 @@ describe("Session", () => {
       expect(result).toStrictEqual(customerDetails);
     });
 
-    test("retrieve error", async () => {
+    test("HTTP error", async () => {
       // don't mock anything -> will lead to an error response
       const session = new Session(sessionDetails, minimalPaymentContext, new MockDevice());
       const onSuccess = jest.fn();
@@ -2110,7 +2121,7 @@ describe("Session", () => {
       expect(result).toStrictEqual(deviceFingerprintResponse);
     });
 
-    test("retrieve error", async () => {
+    test("HTTP error", async () => {
       // don't mock anything -> will lead to an error response
       const session = new Session(sessionDetails, minimalPaymentContext, new MockDevice());
       const onSuccess = jest.fn();
@@ -2146,7 +2157,7 @@ describe("Session", () => {
     };
 
     describe("success", () => {
-      test("minimal context", async () => {
+      test("minimal payment context", async () => {
         const device = new MockDevice().mockGet(
           `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products/1/networks?`,
           {
@@ -2166,7 +2177,7 @@ describe("Session", () => {
         expect(result).toStrictEqual(networksResponse);
       });
 
-      test("full context", async () => {
+      test("full payment context", async () => {
         const device = new MockDevice().mockGet(
           `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products/1/networks?`,
           {
@@ -2188,7 +2199,7 @@ describe("Session", () => {
       });
     });
 
-    test("retrieve error", async () => {
+    test("HTTP error", async () => {
       // don't mock anything -> will lead to an error response
       const session = new Session(sessionDetails, minimalPaymentContext, new MockDevice());
       const onSuccess = jest.fn();
@@ -2310,7 +2321,7 @@ describe("Session", () => {
       expect(result).toStrictEqual(new Error("no paymentProductSession302SpecificOutput returned"));
     });
 
-    test("retrieve error", async () => {
+    test("HTTP error", async () => {
       // don't mock anything -> will lead to an error response
       const session = new Session(sessionDetails, minimalPaymentContext, new MockDevice());
       const onSuccess = jest.fn();
@@ -2356,7 +2367,7 @@ describe("Session", () => {
       expect(result).toStrictEqual(convertAmountResponse);
     });
 
-    test("retrieve error", async () => {
+    test("HTTP error", async () => {
       // don't mock anything -> will lead to an error response
       const session = new Session(sessionDetails, minimalPaymentContext, new MockDevice());
       const onSuccess = jest.fn();
@@ -2400,5 +2411,488 @@ describe("Session", () => {
         expect(device.capturedRequests()).toHaveLength(4);
       });
     });
+  });
+
+  describe("getIINDetails", () => {
+    test("not enough digits", async () => {
+      const session = new Session(sessionDetails, minimalPaymentContext, new MockDevice());
+      const onSuccess = jest.fn();
+      const result = await session
+        .getIINDetails("12345")
+        .then(onSuccess)
+        .catch((reason) => reason);
+      expect(onSuccess).not.toBeCalled();
+      expect(result).toStrictEqual(new Error("not enough digits"));
+    });
+
+    describe("allowed in context", () => {
+      const iinDetailsResponse: api.GetIINDetailsResponse = {
+        countryCode: "NL",
+        paymentProductId: 1,
+        isAllowedInContext: true,
+      };
+
+      test("minimal payment context", async () => {
+        const device = new MockDevice().mockPost(
+          `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/services/getIINdetails`,
+          {
+            statusCode: 200,
+            contentType: "application/json",
+            body: JSON.parse(JSON.stringify(iinDetailsResponse)),
+          },
+          (request) =>
+            expect(request.body).toStrictEqual({
+              bin: "123456",
+              paymentContext: {
+                amountOfMoney: fullPaymentContext.amountOfMoney,
+                countryCode: fullPaymentContext.countryCode,
+              },
+            })
+        );
+        const session = new Session(sessionDetails, minimalPaymentContext, device);
+        const result = await session.getIINDetails("1234567");
+        expect(result).toStrictEqual(Object.assign({ status: "SUPPORTED" }, iinDetailsResponse));
+      });
+
+      test("full payment context", async () => {
+        const device = new MockDevice().mockPost(
+          `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/services/getIINdetails`,
+          {
+            statusCode: 200,
+            contentType: "application/json",
+            body: JSON.parse(JSON.stringify(iinDetailsResponse)),
+          },
+          (request) =>
+            expect(request.body).toStrictEqual({
+              bin: "12345678",
+              paymentContext: {
+                amountOfMoney: fullPaymentContext.amountOfMoney,
+                countryCode: fullPaymentContext.countryCode,
+                isInstallments: fullPaymentContext.isInstallments,
+                isRecurring: fullPaymentContext.isRecurring,
+              },
+            })
+        );
+        const session = new Session(sessionDetails, fullPaymentContext, device);
+        const result = await session.getIINDetails("1234567890");
+        expect(result).toStrictEqual(Object.assign({ status: "SUPPORTED" }, iinDetailsResponse));
+      });
+    });
+
+    test("not allowed in context", async () => {
+      const iinDetailsResponse: api.GetIINDetailsResponse = {
+        countryCode: "NL",
+        paymentProductId: 1,
+        isAllowedInContext: false,
+      };
+      const device = new MockDevice().mockPost(
+        `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/services/getIINdetails`,
+        {
+          statusCode: 200,
+          contentType: "application/json",
+          body: JSON.parse(JSON.stringify(iinDetailsResponse)),
+        },
+        (request) =>
+          expect(request.body).toStrictEqual({
+            bin: "123456",
+            paymentContext: {
+              amountOfMoney: fullPaymentContext.amountOfMoney,
+              countryCode: fullPaymentContext.countryCode,
+            },
+          })
+      );
+      const session = new Session(sessionDetails, minimalPaymentContext, device);
+      const result = await session.getIINDetails("123456");
+      expect(result).toStrictEqual(Object.assign({ status: "UNSUPPORTED" }, iinDetailsResponse));
+    });
+
+    test("not known", async () => {
+      const errorResponse: api.ErrorResponse = {
+        errorId: uuidv4(),
+        errors: [],
+      };
+      const device = new MockDevice().mockPost(
+        `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/services/getIINdetails`,
+        {
+          statusCode: 404,
+          contentType: "application/json",
+          body: JSON.parse(JSON.stringify(errorResponse)),
+        },
+        (request) =>
+          expect(request.body).toStrictEqual({
+            bin: "123456",
+            paymentContext: {
+              amountOfMoney: fullPaymentContext.amountOfMoney,
+              countryCode: fullPaymentContext.countryCode,
+            },
+          })
+      );
+      const session = new Session(sessionDetails, minimalPaymentContext, device);
+      const result = await session.getIINDetails("123456");
+      expect(result).toStrictEqual(Object.assign({ status: "UNKNOWN" }, errorResponse));
+    });
+
+    describe("allowedInContext not set", () => {
+      const iinDetailsResponse: api.GetIINDetailsResponse = {
+        countryCode: "NL",
+        paymentProductId: 1,
+      };
+
+      test("product found", async () => {
+        const device = new MockDevice()
+          .mockPost(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/services/getIINdetails`, {
+            statusCode: 200,
+            contentType: "application/json",
+            body: JSON.parse(JSON.stringify(iinDetailsResponse)),
+          })
+          .mockGet(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products/1?`, {
+            statusCode: 200,
+            contentType: "application/json",
+            body: JSON.parse(JSON.stringify(products.paymentProducts[0])),
+          });
+        const session = new Session(sessionDetails, minimalPaymentContext, device);
+        const result = await session.getIINDetails("123456");
+        expect(result).toStrictEqual(Object.assign({ status: "SUPPORTED" }, iinDetailsResponse));
+      });
+
+      test("product not found", async () => {
+        const device = new MockDevice()
+          .mockPost(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/services/getIINdetails`, {
+            statusCode: 200,
+            contentType: "application/json",
+            body: JSON.parse(JSON.stringify(iinDetailsResponse)),
+          })
+          .mockGet(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products/1?`, {
+            statusCode: 404,
+            contentType: "application/json",
+            body: {},
+          });
+        const session = new Session(sessionDetails, minimalPaymentContext, device);
+        const result = await session.getIINDetails("123456");
+        expect(result).toStrictEqual(Object.assign({ status: "UNSUPPORTED" }, iinDetailsResponse));
+      });
+
+      test("product HTTP error", async () => {
+        const device = new MockDevice().mockPost(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/services/getIINdetails`, {
+          statusCode: 200,
+          contentType: "application/json",
+          body: JSON.parse(JSON.stringify(iinDetailsResponse)),
+        });
+        const session = new Session(sessionDetails, minimalPaymentContext, device);
+        const result = await session.getIINDetails("123456");
+        expect(result).toStrictEqual(Object.assign({ status: "UNSUPPORTED" }, iinDetailsResponse));
+      });
+    });
+
+    test("HTTP error", async () => {
+      // don't mock anything -> will lead to an error response
+      const session = new Session(sessionDetails, minimalPaymentContext, new MockDevice());
+      const onSuccess = jest.fn();
+      const result = await session
+        .getIINDetails("123456")
+        .then(onSuccess)
+        .catch((reason) => reason);
+      expect(onSuccess).not.toBeCalled();
+      expect(result).toStrictEqual(notImplementedResponse());
+    });
+
+    describe("caching", () => {
+      const iinDetailsResponse: api.GetIINDetailsResponse = {
+        countryCode: "NL",
+        paymentProductId: 1,
+        isAllowedInContext: true,
+      };
+
+      test("minimal payment context", async () => {
+        const device = new MockDevice().mockPost(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/services/getIINdetails`, {
+          statusCode: 200,
+          contentType: "application/json",
+          body: JSON.parse(JSON.stringify(iinDetailsResponse)),
+        });
+        const session = new Session(sessionDetails, minimalPaymentContext, device);
+        const result1 = await session.getIINDetails("1234567");
+        const result2 = await session.getIINDetails("123456");
+        expect(result2).toStrictEqual(result1);
+        expect(device.capturedRequests()).toHaveLength(1);
+      });
+
+      test("full payment context", async () => {
+        const device = new MockDevice().mockPost(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/services/getIINdetails`, {
+          statusCode: 200,
+          contentType: "application/json",
+          body: JSON.parse(JSON.stringify(iinDetailsResponse)),
+        });
+        const session = new Session(sessionDetails, fullPaymentContext, device);
+        const result1 = await session.getIINDetails("1234567890");
+        const result2 = await session.getIINDetails("12345678");
+        expect(result2).toStrictEqual(result1);
+        expect(device.capturedRequests()).toHaveLength(1);
+      });
+
+      test("payment context update", async () => {
+        const device = new MockDevice().mockPost(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/services/getIINdetails`, {
+          statusCode: 200,
+          contentType: "application/json",
+          body: JSON.parse(JSON.stringify(iinDetailsResponse)),
+        });
+        const session = new Session(sessionDetails, minimalPaymentContext, device);
+        await session.getIINDetails("1234567");
+        session.updatePaymentContext(fullPaymentContext);
+        await session.getIINDetails("1234567");
+        expect(device.capturedRequests()).toHaveLength(2);
+      });
+
+      test("different BIN", async () => {
+        const device = new MockDevice().mockPost(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/services/getIINdetails`, {
+          statusCode: 200,
+          contentType: "application/json",
+          body: JSON.parse(JSON.stringify(iinDetailsResponse)),
+        });
+        const session = new Session(sessionDetails, minimalPaymentContext, device);
+        await session.getIINDetails("1234567");
+        await session.getIINDetails("12345678");
+        expect(device.capturedRequests()).toHaveLength(2);
+      });
+    });
+  });
+
+  describe("getPrivacyPolicy", () => {
+    describe("success", () => {
+      const privacyPolicyResponse: api.GetPrivacyPolicyResponse = {
+        htmlContent: "<span>foo</span>",
+      };
+
+      test("minimal payment context", async () => {
+        const device = new MockDevice().mockGet(
+          `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/services/privacypolicy`,
+          {
+            statusCode: 200,
+            contentType: "application/json",
+            body: JSON.parse(JSON.stringify(privacyPolicyResponse)),
+          },
+          (request) => expect(request.params).toStrictEqual({})
+        );
+        const session = new Session(sessionDetails, minimalPaymentContext, device);
+        const result = await session.getPrivacyPolicy();
+        expect(result).toStrictEqual(privacyPolicyResponse);
+      });
+
+      test("full payment context", async () => {
+        const device = new MockDevice().mockGet(
+          `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/services/privacypolicy`,
+          {
+            statusCode: 200,
+            contentType: "application/json",
+            body: JSON.parse(JSON.stringify(privacyPolicyResponse)),
+          },
+          (request) =>
+            expect(request.params).toStrictEqual({
+              paymentProductId: 1,
+              locale: fullPaymentContext.locale,
+            })
+        );
+        const session = new Session(sessionDetails, fullPaymentContext, device);
+        const result = await session.getPrivacyPolicy(1);
+        expect(result).toStrictEqual(privacyPolicyResponse);
+      });
+    });
+
+    test("HTTP error", async () => {
+      // don't mock anything -> will lead to an error response
+      const session = new Session(sessionDetails, minimalPaymentContext, new MockDevice());
+      const onSuccess = jest.fn();
+      const result = await session
+        .getPrivacyPolicy()
+        .then(onSuccess)
+        .catch((reason) => reason);
+      expect(onSuccess).not.toBeCalled();
+      expect(result).toStrictEqual(notImplementedResponse());
+    });
+
+    describe("caching", () => {
+      const privacyPolicyResponse: api.GetPrivacyPolicyResponse = {
+        htmlContent: "<span>foo</span>",
+      };
+
+      test("minimal payment context", async () => {
+        const device = new MockDevice().mockGet(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/services/privacypolicy`, {
+          statusCode: 200,
+          contentType: "application/json",
+          body: JSON.parse(JSON.stringify(privacyPolicyResponse)),
+        });
+        const session = new Session(sessionDetails, minimalPaymentContext, device);
+        const result1 = await session.getPrivacyPolicy();
+        const result2 = await session.getPrivacyPolicy();
+        expect(result2).toStrictEqual(result1);
+        expect(device.capturedRequests()).toHaveLength(1);
+      });
+
+      test("full payment context", async () => {
+        const device = new MockDevice().mockGet(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/services/privacypolicy`, {
+          statusCode: 200,
+          contentType: "application/json",
+          body: JSON.parse(JSON.stringify(privacyPolicyResponse)),
+        });
+        const session = new Session(sessionDetails, fullPaymentContext, device);
+        const result1 = await session.getPrivacyPolicy();
+        const result2 = await session.getPrivacyPolicy();
+        expect(result2).toStrictEqual(result1);
+        expect(device.capturedRequests()).toHaveLength(1);
+      });
+
+      test("payment context update", async () => {
+        const device = new MockDevice().mockGet(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/services/privacypolicy`, {
+          statusCode: 200,
+          contentType: "application/json",
+          body: JSON.parse(JSON.stringify(privacyPolicyResponse)),
+        });
+        const session = new Session(sessionDetails, minimalPaymentContext, device);
+        await session.getPrivacyPolicy();
+        session.updatePaymentContext(fullPaymentContext);
+        await session.getPrivacyPolicy();
+        expect(device.capturedRequests()).toHaveLength(2);
+      });
+
+      test("different product", async () => {
+        const device = new MockDevice().mockGet(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/services/privacypolicy`, {
+          statusCode: 200,
+          contentType: "application/json",
+          body: JSON.parse(JSON.stringify(privacyPolicyResponse)),
+        });
+        const session = new Session(sessionDetails, minimalPaymentContext, device);
+        await session.getPrivacyPolicy();
+        await session.getPrivacyPolicy(1);
+        expect(device.capturedRequests()).toHaveLength(2);
+      });
+    });
+  });
+
+  describe("createApplePayPayment", () => {
+    test("Apple Pay not enabled", async () => {
+      const device = new MockDevice().mockApplePayClient(true);
+      const session = new Session(sessionDetails, minimalPaymentContext, device);
+      const onSuccess = jest.fn();
+      const result = await session
+        .createApplePayPayment({ networks: ["1"] })
+        .then(onSuccess)
+        .catch((reason) => reason);
+      expect(result).toStrictEqual(new Error("Apple Pay client is not available"));
+    });
+
+    test("Apple Pay enabled", async () => {
+      const createSessionResponse: api.CreatePaymentProductSessionResponse = {
+        paymentProductSession302SpecificOutput: {
+          sessionObject: uuidv4(),
+        },
+      };
+      const onSession = jest.fn();
+      const applePayClient: ApplePayClient = {
+        createPayment: (sessionFactory) => {
+          return sessionFactory({}).then(onSession);
+        },
+      };
+      const device = new MockDevice()
+        .mockPost(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products/302/sessions`, {
+          statusCode: 200,
+          contentType: "application/json",
+          body: JSON.parse(JSON.stringify(createSessionResponse)),
+        })
+        .mockApplePayClient(applePayClient);
+      const session = new Session(sessionDetails, fullPaymentContext, device);
+      await session.createApplePayPayment({ networks: ["1"] });
+      expect(onSession).toHaveBeenCalledWith(createSessionResponse.paymentProductSession302SpecificOutput);
+    });
+  });
+
+  describe("prefetchGooglePayPaymentData", () => {
+    test("Google Pay not enabled", async () => {
+      const device = new MockDevice().mockGooglePayClient(true);
+      const session = new Session(sessionDetails, minimalPaymentContext, device);
+      const onSuccess = jest.fn();
+      const result = await session
+        .prefetchGooglePayPaymentData({
+          gateway: "GW",
+          networks: ["VISA"],
+        })
+        .then(onSuccess)
+        .catch((reason) => reason);
+      expect(result).toStrictEqual(new Error("Google Pay client is not available"));
+    });
+
+    test("Google Pay enabled", async () => {
+      const googlePayClient: GooglePayClient = {
+        prefetchPaymentData: jest.fn(),
+        createPayment: jest.fn(),
+      };
+      const device = new MockDevice().mockGooglePayClient(googlePayClient);
+      const session = new Session(sessionDetails, fullPaymentContext, device);
+      await session.prefetchGooglePayPaymentData({
+        gateway: "GW",
+        networks: ["VISA"],
+      });
+      expect(googlePayClient.prefetchPaymentData).toHaveBeenCalled();
+    });
+  });
+
+  describe("createGooglePayPayment", () => {
+    test("Google Pay not enabled", async () => {
+      const device = new MockDevice().mockGooglePayClient(true);
+      const session = new Session(sessionDetails, minimalPaymentContext, device);
+      const onSuccess = jest.fn();
+      const result = await session
+        .createGooglePayPayment({
+          gateway: "GW",
+          networks: ["VISA"],
+        })
+        .then(onSuccess)
+        .catch((reason) => reason);
+      expect(result).toStrictEqual(new Error("Google Pay client is not available"));
+    });
+
+    test("Google Pay enabled", async () => {
+      const googlePayClient: GooglePayClient = {
+        prefetchPaymentData: jest.fn(),
+        createPayment: jest.fn(),
+      };
+      const device = new MockDevice().mockGooglePayClient(googlePayClient);
+      const session = new Session(sessionDetails, fullPaymentContext, device);
+      await session.createGooglePayPayment({ gateway: "GW", networks: ["VISA"] });
+      expect(googlePayClient.createPayment).toHaveBeenCalled();
+    });
+  });
+
+  test("URLs have trailing slash", async () => {
+    const device = new MockDevice().mockGet(
+      `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products/1?`,
+      {
+        statusCode: 200,
+        contentType: "application/json",
+        body: JSON.parse(JSON.stringify(products.paymentProducts[0])),
+      },
+      (request) =>
+        expect(request.params).toStrictEqual({
+          countryCode: minimalPaymentContext.countryCode,
+          currencyCode: minimalPaymentContext.amountOfMoney.currencyCode,
+          amount: minimalPaymentContext.amountOfMoney.amount,
+        })
+    );
+    const session = new Session(
+      {
+        assetUrl: sessionDetails.assetUrl + "/",
+        clientApiUrl: sessionDetails.clientApiUrl + "/",
+        clientSessionId: sessionDetails.clientSessionId,
+        customerId: sessionDetails.customerId,
+      },
+      minimalPaymentContext,
+      device
+    );
+    const result = await session.getPaymentProduct(1);
+    expect(result.id).toBe(1);
+    expect(result.fields).toHaveLength(4);
+    expect(result.fields[0].id).toBe("cvv");
+    expect(result.fields[1].id).toBe("cardHolder");
+    expect(result.fields[2].id).toBe("cardNumber");
+    expect(result.fields[2].displayHints?.tooltip?.image).toBe(`${sessionDetails.assetUrl}/card.png`);
+    expect(result.fields[3].id).toBe("expirationDate");
   });
 });

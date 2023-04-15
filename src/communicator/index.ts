@@ -226,7 +226,7 @@ export class Communicator {
       .header("Authorization", createAuthorization(this.config))
       .send()
       .then((response) => {
-        if (response.statusCode % 100 === 2) {
+        if (response.statusCode / 100 === 2) {
           let status: api.GetIINDetailsSuccessStatus | undefined;
           const json = response.body as api.GetIINDetailsResponse;
           if (json.isAllowedInContext === true) {

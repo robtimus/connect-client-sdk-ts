@@ -1,5 +1,5 @@
 import { newApplePayClient } from "../applePay";
-import { JOSEEncryptor, encryptionNotEnabled } from "../crypto";
+import { JOSEEncryptor } from "../crypto";
 import { newGooglePayClient } from "../googlePay";
 import { HttpClient } from "../http";
 import { fetchHttpClient } from "../http/fetch";
@@ -19,7 +19,7 @@ import {
 const httpClient: HttpClient = window["fetch"] ? fetchHttpClient : xhrHttpClient;
 
 class Browser implements Device {
-  constructor(private readonly joseEncryptor: JOSEEncryptor) {}
+  constructor(private readonly joseEncryptor?: JOSEEncryptor) {}
 
   getPlatformIdentifier(): string {
     return window.navigator.userAgent;
@@ -42,7 +42,7 @@ class Browser implements Device {
     return httpClient;
   }
 
-  getJOSEEncryptor(): JOSEEncryptor {
+  getJOSEEncryptor(): JOSEEncryptor | undefined {
     return this.joseEncryptor;
   }
 
@@ -66,5 +66,5 @@ class Browser implements Device {
 Object.freeze(Browser.prototype);
 
 export function browser(joseEncryptor?: JOSEEncryptor): Device {
-  return new Browser(joseEncryptor || encryptionNotEnabled);
+  return new Browser(joseEncryptor);
 }

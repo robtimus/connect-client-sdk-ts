@@ -152,8 +152,11 @@ export class Session {
   }
 
   async getEncryptor(): Promise<Encryptor> {
-    const publicKey = await this.getPublicKey();
-    return new Encryptor(this.sessionDetails.clientSessionId, publicKey, this.device);
+    const cacheKey = "Encryptor";
+    return getValue(this.cache, cacheKey, async () => {
+      const publicKey = await this.getPublicKey();
+      return new Encryptor(this.sessionDetails.clientSessionId, publicKey, this.device);
+    });
   }
 
   async getPublicKey(): Promise<PublicKey> {

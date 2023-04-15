@@ -8,7 +8,7 @@ export interface Device {
   getPlatformIdentifier(): string;
   getDeviceInformation(): DeviceInformation;
   getHttpClient(): HttpClient;
-  getJOSEEncryptor(): JOSEEncryptor;
+  getJOSEEncryptor(): JOSEEncryptor | undefined;
   getApplePayClient(
     applePaySpecificInput: ApplePaySpecificInput,
     applePaySpecificData: PaymentProduct302SpecificData,

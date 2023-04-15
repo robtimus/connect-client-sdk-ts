@@ -79,9 +79,13 @@ export class Encryptor {
     if (!validationResult.valid) {
       throw validationResult.errors;
     }
+    const joseEncryptor = this.device.getJOSEEncryptor();
+    if (!joseEncryptor) {
+      throw new Error("encryption not supported");
+    }
     const encryptedCustomerInput = createEncryptedCustomerInput(this.clientSessionId, paymentRequest, this.device);
     const payload = JSON.stringify(encryptedCustomerInput);
-    return this.device.getJOSEEncryptor().encrypt(payload, this.publicKey.keyId, this.publicKey.publicKey);
+    return joseEncryptor.encrypt(payload, this.publicKey.keyId, this.publicKey.publicKey);
   }
 }
 

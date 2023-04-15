@@ -56,7 +56,8 @@ async function getValue<T>(cache: Record<string, unknown>, key: string, valueSup
 }
 
 function prefixWithAssetURL(url: string, assetURL: string): string {
-  return `${assetURL}/${url}`.replace(/\/\/+/g, "/");
+  const baseUrl = assetURL.endsWith("/") ? assetURL : assetURL + "/";
+  return baseUrl + url;
 }
 
 function updateItem<T extends api.PaymentProduct | api.PaymentProductGroup>(item: T, assetURL: string) {
@@ -112,8 +113,8 @@ function productNotFoundError(): HttpResponse {
 }
 
 export class Session {
-  private readonly cache: Record<string, unknown> = {};
   private readonly communicator: Communicator;
+  private readonly responseCache: Record<string, unknown> = {};
   private providedPaymentItem?: PaymentItem;
   private paymentProductAvailability: Record<number, boolean | undefined> = {};
   private applePayClient?: Promise<ApplePayClient | undefined>;
@@ -132,6 +133,9 @@ export class Session {
     // Invalidate the Apple Pay and Google Pay clients
     this.applePayClient = undefined;
     this.googlePayClient = undefined;
+    // Invalide the Apple Pay and Google Pay availability
+    delete this.paymentProductAvailability[PP_APPLE_PAY];
+    delete this.paymentProductAvailability[PP_GOOGLE_PAY];
     return this;
   }
 
@@ -152,16 +156,13 @@ export class Session {
   }
 
   async getEncryptor(): Promise<Encryptor> {
-    const cacheKey = "Encryptor";
-    return getValue(this.cache, cacheKey, async () => {
-      const publicKey = await this.getPublicKey();
-      return new Encryptor(this.sessionDetails.clientSessionId, publicKey, this.device);
-    });
+    const publicKey = await this.getPublicKey();
+    return new Encryptor(this.sessionDetails.clientSessionId, publicKey, this.device);
   }
 
   async getPublicKey(): Promise<PublicKey> {
     const cacheKey = "PublicKey";
-    return getValue(this.cache, cacheKey, () => this.communicator.getPublicKey());
+    return getValue(this.responseCache, cacheKey, () => this.communicator.getPublicKey());
   }
 
   async getThirdPartyStatus(paymentId: string): Promise<ThirdPartyStatus> {
@@ -188,11 +189,12 @@ export class Session {
       hide: ["fields"],
     };
     const cacheKey = constructCacheKey("BasicPaymentProductGroups", params.countryCode, params.currencyCode, params.locale, params.amount, params.isRecurring);
-    return getValue(this.cache, cacheKey, async () => {
+    const json = await getValue(this.responseCache, cacheKey, async () => {
       const json = await this.communicator.getPaymentProductGroups(params);
       updateItems(json.paymentProductGroups, this.sessionDetails.assetUrl);
-      return toBasicPaymentProductGroups(json);
+      return json;
     });
+    return toBasicPaymentProductGroups(json);
   }
 
   async getPaymentProductGroup(paymentProductGroupId: string): Promise<PaymentProductGroup> {
@@ -208,11 +210,12 @@ export class Session {
       isRecurring: this.paymentContext.isRecurring,
     };
     const cacheKey = constructCacheKey(`PaymentProductGroup:${paymentProductGroupId}`, params.countryCode, params.currencyCode, params.locale, params.amount, params.isRecurring);
-    return getValue(this.cache, cacheKey, async () => {
+    const json = await getValue(this.responseCache, cacheKey, async () => {
       const json = await this.communicator.getPaymentProductGroup(paymentProductGroupId, params);
       updateItem(json, this.sessionDetails.assetUrl);
-      return toPaymentProductGroup(json);
+      return json;
     });
+    return toPaymentProductGroup(json);
   }
 
   async getPaymentProductGroupDeviceFingerprint(paymentProductGroupId: string, request: DeviceFingerprintRequest): Promise<DeviceFingerprintResult> {
@@ -230,49 +233,47 @@ export class Session {
       hide: ["fields"],
     };
     const cacheKey = constructCacheKey("BasicPaymentProducts", params.countryCode, params.currencyCode, params.locale, params.amount, params.isRecurring);
-    return getValue(this.cache, cacheKey, async () => {
+    const json = await getValue(this.responseCache, cacheKey, async () => {
       const json = await this.communicator.getPaymentProducts(params);
-      const checks: Promise<void>[] = [];
-
-      const applePayProduct = json.paymentProducts.find((product) => product.id === PP_APPLE_PAY);
-      if (applePayProduct && this.paymentProductAvailability[applePayProduct.id] === undefined) {
-        checks.push(
-          this.isApplePayAvailable(applePayProduct.paymentProduct302SpecificData).then((result) => {
-            this.paymentProductAvailability[applePayProduct.id] = result;
-            console.debug(`Apple Pay is available: ${result}`);
-          })
-        );
-      }
-      const googlePayProduct = json.paymentProducts.find((product) => product.id === PP_GOOGLE_PAY);
-      if (googlePayProduct && this.paymentProductAvailability[googlePayProduct.id] === undefined) {
-        checks.push(
-          this.isGooglePayAvailable(googlePayProduct.paymentProduct320SpecificData).then((result) => {
-            this.paymentProductAvailability[googlePayProduct.id] = result;
-            console.debug(`Google Pay is available: ${result}`);
-          })
-        );
-      }
-
-      await Promise.all(checks);
-
-      const originalJson = JSON.parse(JSON.stringify(json));
-      json.paymentProducts = json.paymentProducts.filter((p) => this.paymentProductAvailability[p.id] !== false);
-      if (json.paymentProducts.length === 0) {
-        throw {
-          message: "No payment products available",
-          json: originalJson,
-        };
-      }
       updateItems(json.paymentProducts, this.sessionDetails.assetUrl);
-      return toBasicPaymentProducts(json);
+      return json;
     });
+
+    const checks: Promise<void>[] = [];
+    const applePayProduct = json.paymentProducts.find((product) => product.id === PP_APPLE_PAY);
+    if (applePayProduct && this.paymentProductAvailability[applePayProduct.id] === undefined) {
+      checks.push(
+        this.isApplePayAvailable(applePayProduct.paymentProduct302SpecificData).then((result) => {
+          this.paymentProductAvailability[applePayProduct.id] = result;
+          console.debug(`Apple Pay is available: ${result}`);
+        })
+      );
+    }
+    const googlePayProduct = json.paymentProducts.find((product) => product.id === PP_GOOGLE_PAY);
+    if (googlePayProduct && this.paymentProductAvailability[googlePayProduct.id] === undefined) {
+      checks.push(
+        this.isGooglePayAvailable(googlePayProduct.paymentProduct320SpecificData).then((result) => {
+          this.paymentProductAvailability[googlePayProduct.id] = result;
+          console.debug(`Google Pay is available: ${result}`);
+        })
+      );
+    }
+    await Promise.all(checks);
+
+    const filteredJson: api.PaymentProducts = {
+      paymentProducts: json.paymentProducts.filter((p) => this.paymentProductAvailability[p.id] !== false),
+    };
+
+    if (filteredJson.paymentProducts.length === 0) {
+      throw {
+        message: "No payment products available",
+        json: json,
+      };
+    }
+    return toBasicPaymentProducts(filteredJson);
   }
 
   async getPaymentProduct(paymentProductId: number): Promise<PaymentProduct> {
-    if (this.paymentProductAvailability[paymentProductId] === false) {
-      throw productNotFoundError();
-    }
-
     if (this.providedPaymentItem?.id === paymentProductId) {
       return this.providedPaymentItem as PaymentProduct;
     }
@@ -301,36 +302,36 @@ export class Session {
       params.isRecurring,
       params.forceBasicFlow
     );
-    return getValue(this.cache, cacheKey, async () => {
+    const json = await getValue(this.responseCache, cacheKey, async () => {
       const json = await this.communicator.getPaymentProduct(paymentProductId, params);
-      if (paymentProductId === PP_APPLE_PAY && this.paymentProductAvailability[paymentProductId] === undefined) {
-        const available = await this.isApplePayAvailable(json.paymentProduct302SpecificData);
-        this.paymentProductAvailability[paymentProductId] = available;
-        console.debug(`Apple Pay is available: ${available}`);
-        if (available) {
-          updateItem(json, this.sessionDetails.assetUrl);
-          return toPaymentProduct(json);
-        }
-        throw productNotFoundError();
-      }
-      if (paymentProductId === PP_GOOGLE_PAY && this.paymentProductAvailability[paymentProductId] === undefined) {
-        const available = await this.isGooglePayAvailable(json.paymentProduct320SpecificData);
-        this.paymentProductAvailability[paymentProductId] = available;
-        console.debug(`Google Pay is available: ${available}`);
-        if (available) {
-          updateItem(json, this.sessionDetails.assetUrl);
-          return toPaymentProduct(json);
-        }
-        throw productNotFoundError();
-      }
-
-      if (this.paymentProductAvailability[paymentProductId] === false) {
-        throw productNotFoundError();
-      }
-
       updateItem(json, this.sessionDetails.assetUrl);
-      return toPaymentProduct(json);
+      return json;
     });
+
+    if (paymentProductId === PP_APPLE_PAY && this.paymentProductAvailability[paymentProductId] === undefined) {
+      const available = await this.isApplePayAvailable(json.paymentProduct302SpecificData);
+      this.paymentProductAvailability[paymentProductId] = available;
+      console.debug(`Apple Pay is available: ${available}`);
+      if (available) {
+        return toPaymentProduct(json);
+      }
+      throw productNotFoundError();
+    }
+    if (paymentProductId === PP_GOOGLE_PAY && this.paymentProductAvailability[paymentProductId] === undefined) {
+      const available = await this.isGooglePayAvailable(json.paymentProduct320SpecificData);
+      this.paymentProductAvailability[paymentProductId] = available;
+      console.debug(`Google Pay is available: ${available}`);
+      if (available) {
+        return toPaymentProduct(json);
+      }
+      throw productNotFoundError();
+    }
+
+    if (this.paymentProductAvailability[paymentProductId] === false) {
+      throw productNotFoundError();
+    }
+
+    return toPaymentProduct(json);
   }
 
   async getPaymentProductDirectory(paymentProductId: number): Promise<Directory> {
@@ -339,12 +340,12 @@ export class Session {
       currencyCode: this.paymentContext.amountOfMoney.currencyCode,
     };
     const cacheKey = constructCacheKey(`Directory:${paymentProductId}`, params.countryCode, params.currencyCode);
-    return getValue(this.cache, cacheKey, () => this.communicator.getPaymentProductDirectory(paymentProductId, params));
+    return getValue(this.responseCache, cacheKey, () => this.communicator.getPaymentProductDirectory(paymentProductId, params));
   }
 
   async getCustomerDetails(paymentProductId: number, request: CustomerDetailsRequest): Promise<CustomerDetailsResult> {
     const cacheKey = constructCacheKeyWithValues(`CustomerDetails:${paymentProductId}`, [request.countryCode], request.values);
-    return getValue(this.cache, cacheKey, () => this.communicator.getCustomerDetails(paymentProductId, request));
+    return getValue(this.responseCache, cacheKey, () => this.communicator.getCustomerDetails(paymentProductId, request));
   }
 
   async getPaymentProductDeviceFingerprint(paymentProductId: number, request: DeviceFingerprintRequest): Promise<DeviceFingerprintResult> {
@@ -360,7 +361,7 @@ export class Session {
       isRecurring: this.paymentContext.isRecurring,
     };
     const cacheKey = constructCacheKey(`PaymentProductNetworks:${paymentProductId}`, params.countryCode, params.currencyCode, params.amount, params.isRecurring);
-    return getValue(this.cache, cacheKey, () => this.communicator.getPaymentProductNetworks(paymentProductId, params));
+    return getValue(this.responseCache, cacheKey, () => this.communicator.getPaymentProductNetworks(paymentProductId, params));
   }
 
   async createApplePaySession(applePaySpecificInput: MobilePaymentProductSession302SpecificInput): Promise<MobilePaymentProductSession302SpecificOutput> {
@@ -381,7 +382,7 @@ export class Session {
       amount,
     };
     const cacheKey = constructCacheKey("ConvertAmount", amount, source, target);
-    return getValue(this.cache, cacheKey, () => this.communicator.convertAmount(params));
+    return getValue(this.responseCache, cacheKey, () => this.communicator.convertAmount(params));
   }
 
   async getIINDetails(partialCreditCardNumber: string): Promise<IINDetailsResult> {
@@ -408,25 +409,23 @@ export class Session {
       paymentContext.isInstallments,
       paymentContext.isRecurring
     );
-    return getValue(this.cache, cacheKey, async () => {
-      const json = await this.communicator.getIINDetails(request);
-      if (json.status === "UNKNOWN") {
-        return json;
+    const json = await getValue(this.responseCache, cacheKey, () => this.communicator.getIINDetails(request));
+    if (json.status === "UNKNOWN") {
+      return json;
+    }
+    let status: IINDetailsSuccessStatus;
+    if (json.status) {
+      status = json.status;
+    } else {
+      // This should not happen because a payment context is always provided. Query the product anyway.
+      try {
+        await this.getPaymentProduct(json.paymentProductId);
+        status = "SUPPORTED";
+      } catch (e) {
+        status = "UNSUPPORTED";
       }
-      let status: IINDetailsSuccessStatus;
-      if (json.status) {
-        status = json.status;
-      } else {
-        // This should not happen because a payment context is always provided. Query the product anyway.
-        try {
-          await this.getPaymentProduct(json.paymentProductId);
-          status = "SUPPORTED";
-        } catch (e) {
-          status = "UNSUPPORTED";
-        }
-      }
-      return Object.assign(json, { status });
-    });
+    }
+    return Object.assign(json, { status });
   }
 
   async getPrivacyPolicy(paymentProductId?: number): Promise<PrivacyPolicyResult> {
@@ -435,7 +434,7 @@ export class Session {
       paymentProductId,
     };
     const cacheKey = constructCacheKey("PrivacyPolicy:", paymentProductId, params.locale);
-    return getValue(this.cache, cacheKey, () => this.communicator.getPrivacyPolicy(params));
+    return getValue(this.responseCache, cacheKey, () => this.communicator.getPrivacyPolicy(params));
   }
 
   async createApplePayPayment(applePaySpecificData: PaymentProduct302SpecificData): Promise<ApplePayJS.ApplePayPaymentToken> {

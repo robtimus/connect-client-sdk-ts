@@ -11,7 +11,8 @@ interface Metadata {
 }
 
 function createURL(config: CommunicatorConfiguration, apiVersion: string, path: string): string {
-  return `${config.clientApiUrl}/${apiVersion}/${config.customerId}/${path}`.replace(/\/\/+/g, "/");
+  const baseUrl = config.clientApiUrl.endsWith("/") ? config.clientApiUrl : config.clientApiUrl + "/";
+  return `${baseUrl}${apiVersion}/${config.customerId}/${path}`;
 }
 
 function createClientMetaInfo(device: Device): string {
@@ -30,7 +31,7 @@ function createAuthorization(config: CommunicatorConfiguration): string {
 }
 
 function processResponse<T>(response: HttpResponse): Promise<T> {
-  if (response.statusCode % 100 === 2) {
+  if (response.statusCode / 100 === 2) {
     return Promise.resolve(response.body as T);
   }
   return Promise.reject(response);

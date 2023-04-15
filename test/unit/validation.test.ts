@@ -59,6 +59,12 @@ const product: PaymentProduct = toPaymentProduct({
 });
 
 describe("validation", () => {
+  beforeEach(() => {
+    jest.spyOn(console, "warn").mockImplementation(() => {
+      /* do nothing */
+    });
+  });
+
   describe("Boleto Bancario requiredness", () => {
     const rule = new ValidationRuleBoletoBancarioRequiredness({
       fiscalNumberLength: 10,

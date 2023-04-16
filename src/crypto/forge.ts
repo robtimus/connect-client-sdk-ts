@@ -4,10 +4,6 @@ import { JOSEEncryptor } from ".";
 const CEK_KEY_LENGTH = 512;
 const IV_LENGTH = 128;
 
-function base64UrlEncode(str: string): string {
-  return forge.util.encode64(str).split("=")[0].replace(/\+/g, "-").replace(/\//g, "_");
-}
-
 function createProtectedHeader(keyId: string): string {
   return JSON.stringify({
     alg: "RSA-OAEP",
@@ -18,7 +14,7 @@ function createProtectedHeader(keyId: string): string {
 
 function decodePemPublicKey(publickeyB64Encoded: string): forge.pki.rsa.PublicKey {
   // step 1: base64decode
-  const publickeyB64Decoded = forge.util.decode64(publickeyB64Encoded);
+  const publickeyB64Decoded = atob(publickeyB64Encoded);
   // create a bytebuffer with these bytes
   const buffer2 = forge.util.createBuffer(publickeyB64Decoded, "raw");
   // convert DER to ASN1 object
@@ -71,7 +67,7 @@ function calculateHMAC(macKey: string, encodededProtectedHeader: string, initial
 class ForgeJOSEEncryptor implements JOSEEncryptor {
   encrypt(payload: string, keyId: string, publicKey: string): Promise<string> {
     const protectedHeader = createProtectedHeader(keyId);
-    const encodededProtectedHeader = base64UrlEncode(protectedHeader);
+    const encodededProtectedHeader = btoa(protectedHeader);
 
     // Create ContentEncryptionKey, is a random byte[]
     const CEK = forge.random.getBytesSync(CEK_KEY_LENGTH / 8);
@@ -79,7 +75,7 @@ class ForgeJOSEEncryptor implements JOSEEncryptor {
 
     // Encrypt the contentEncryptionKey with the GC gateway publickey and encode it with Base64 encoding
     const encryptedContentEncryptionKey = encryptContentEncryptionKey(CEK, rsaPublicKey);
-    const encodedEncryptedContentEncryptionKey = base64UrlEncode(encryptedContentEncryptionKey);
+    const encodedEncryptedContentEncryptionKey = btoa(encryptedContentEncryptionKey);
 
     // Split the contentEncryptionKey in ENC_KEY and MAC_KEY for using hmac
     const macKey = CEK.substring(0, CEK_KEY_LENGTH / 2 / 8);
@@ -87,11 +83,11 @@ class ForgeJOSEEncryptor implements JOSEEncryptor {
 
     // Create Initialization Vector
     const initializationVector = forge.random.getBytesSync(IV_LENGTH / 8);
-    const encodededinitializationVector = base64UrlEncode(initializationVector);
+    const encodededinitializationVector = btoa(initializationVector);
 
     // Encrypt content with ContentEncryptionKey and Initialization Vector
     const cipherText = encryptPayload(payload, encKey, initializationVector);
-    const encodedCipherText = base64UrlEncode(cipherText);
+    const encodedCipherText = btoa(cipherText);
 
     // Create Additional Authenticated Data  and Additional Authenticated Data Length
     const al = calculateAdditionalAuthenticatedDataLength(encodededProtectedHeader);
@@ -101,9 +97,9 @@ class ForgeJOSEEncryptor implements JOSEEncryptor {
 
     // Truncate HMAC Value to Create Authentication Tag
     const authenticationTag = calculatedHmac.substring(0, calculatedHmac.length / 2);
-    const encodedAuthenticationTag = base64UrlEncode(authenticationTag);
+    const encodedAuthenticationTag = btoa(authenticationTag);
 
-    return Promise.resolve(`${encodededProtectedHeader}.${encodedEncryptedContentEncryptionKey}.${encodededinitializationVector}.${encodedCipherText}.${encodedAuthenticationTag}`);
+    return Promise.resolve([encodededProtectedHeader, encodedEncryptedContentEncryptionKey, encodededinitializationVector, encodedCipherText, encodedAuthenticationTag].join("."));
   }
 }
 

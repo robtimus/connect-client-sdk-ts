@@ -180,6 +180,11 @@ export class MockDevice implements Device {
     return this;
   }
 
+  mockJOSEEncryptor(joseEncryptor?: JOSEEncryptor): MockDevice {
+    this.joseEncryptor = joseEncryptor;
+    return this;
+  }
+
   mockApplePayClient(applePayClient?: true | "throw" | ApplePayClient): MockDevice {
     if (applePayClient === true) {
       this.applePayClient = Promise.resolve({

@@ -2,7 +2,6 @@
  * @group unit:model
  */
 
-import { AccountOnFile, PaymentProduct } from "../../../src/model";
 import { toAccountOnFile } from "../../../src/model/AccountOnFile";
 import { toPaymentProduct } from "../../../src/model/PaymentProduct";
 import { PaymentRequest } from "../../../src/model/PaymentRequest";
@@ -13,7 +12,7 @@ const fieldIdWithoutMask = "cardNumber";
 const fieldIdWithMask = "expirationDate";
 const optionalField = "cardHolderName";
 
-const product: PaymentProduct = toPaymentProduct({
+const product = toPaymentProduct({
   allowsInstallments: false,
   allowsRecurring: false,
   allowsTokenization: false,
@@ -309,7 +308,7 @@ describe("PaymentRequest", () => {
     });
 
     test("account on file set", () => {
-      const accountOnFile: AccountOnFile = toAccountOnFile({
+      const accountOnFile = toAccountOnFile({
         attributes: [],
         displayHints: {
           labelTemplate: [],
@@ -328,7 +327,7 @@ describe("PaymentRequest", () => {
   });
 
   describe("setAccountOnFile", () => {
-    const accountOnFile: AccountOnFile = toAccountOnFile({
+    const accountOnFile = toAccountOnFile({
       attributes: [
         {
           key: fieldIdWithoutMask,
@@ -471,7 +470,7 @@ describe("PaymentRequest", () => {
     });
 
     describe("non-matching account on file set", () => {
-      const accountOnFile: AccountOnFile = toAccountOnFile({
+      const accountOnFile = toAccountOnFile({
         attributes: [
           {
             key: fieldIdWithoutMask,
@@ -558,7 +557,7 @@ describe("PaymentRequest", () => {
     });
 
     describe("matching account on file set", () => {
-      const accountOnFile: AccountOnFile = toAccountOnFile({
+      const accountOnFile = toAccountOnFile({
         attributes: [
           {
             key: fieldIdWithoutMask,

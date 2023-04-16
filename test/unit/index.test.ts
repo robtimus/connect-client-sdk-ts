@@ -1,5 +1,5 @@
 /**
- * @group unit:model
+ * @group unit:module
  */
 
 test("module can be loaded", () => {

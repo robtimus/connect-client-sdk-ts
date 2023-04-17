@@ -16,7 +16,11 @@ import {
   PaymentProduct320SpecificData,
 } from "../model";
 
-const httpClient: HttpClient = window["fetch"] ? fetchHttpClient : xhrHttpClient;
+export interface BrowserOptions {
+  joseEncryptor?: JOSEEncryptor;
+}
+
+const httpClient: HttpClient = typeof fetch !== "undefined" ? fetchHttpClient : xhrHttpClient;
 
 class Browser implements Device {
   constructor(private readonly joseEncryptor?: JOSEEncryptor) {}
@@ -65,6 +69,6 @@ class Browser implements Device {
 
 Object.freeze(Browser.prototype);
 
-export function browser(joseEncryptor?: JOSEEncryptor): Device {
-  return new Browser(joseEncryptor);
+export function browser(options: BrowserOptions = {}): Device {
+  return new Browser(options.joseEncryptor);
 }

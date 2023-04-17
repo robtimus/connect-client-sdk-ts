@@ -75,7 +75,7 @@ export function newApplePayClient(
   applePaySpecificData: PaymentProduct302SpecificData,
   context: PaymentContext
 ): ApplePayClient | undefined {
-  if (!!window["ApplePaySession"] && ApplePaySession.canMakePayments()) {
+  if (typeof ApplePaySession !== "undefined" && ApplePaySession.canMakePayments()) {
     return new ApplePayClientImpl(applePaySpecificInput, applePaySpecificData, context);
   }
   return undefined;

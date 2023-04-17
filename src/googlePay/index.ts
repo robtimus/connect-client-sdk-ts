@@ -5,7 +5,7 @@ function getPaymentsClient(googlePaySpecificData: PaymentProduct320SpecificData,
     console.warn("No Google Pay networks available");
     return undefined;
   }
-  if (!window.google) {
+  if (typeof google === "undefined") {
     console.warn("The Google Pay API script was not loaded. See https://developers.google.com/pay/api/web/guides/tutorial#js-load");
     return undefined;
   }
@@ -129,6 +129,8 @@ class GooglePayClientImpl implements GooglePayClient {
     return this.client.loadPaymentData(constructPaymentDataRequest(this.googlePaySpecificInput, this.googlePaySpecificData, this.context));
   }
 }
+
+Object.freeze(GooglePayClientImpl.prototype);
 
 export async function newGooglePayClient(
   googlePaySpecificInput: GooglePaySpecificInput,

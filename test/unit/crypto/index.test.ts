@@ -2,10 +2,17 @@
  * @group unit:validation
  */
 
+// Allow crypto to be used without needing to import it in the SubtleCrypto module
+import * as crypto from "crypto";
+Object.defineProperty(globalThis, "crypto", {
+  value: crypto,
+});
+
 import { v4 as uuidv4 } from "uuid";
 import { JWE, JWK } from "node-jose";
 import { JOSEEncryptor } from "../../../src/crypto";
 import { forgeEncryptor } from "../../../src/crypto/forge";
+import { subtleCryptoEncryptor } from "../../../src/crypto/SubtleCrypto";
 
 function testJOSEEncryptor(joseEncryptor: JOSEEncryptor): void {
   describe("encrypt", () => {
@@ -51,4 +58,8 @@ function testJOSEEncryptor(joseEncryptor: JOSEEncryptor): void {
 
 describe("forge", () => {
   testJOSEEncryptor(forgeEncryptor);
+});
+
+describe("crypto.subtle", () => {
+  testJOSEEncryptor(subtleCryptoEncryptor);
 });

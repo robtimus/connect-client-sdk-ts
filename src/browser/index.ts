@@ -1,4 +1,5 @@
 import { JOSEEncryptor } from "../crypto";
+import { subtleCryptoEncryptor } from "../crypto/SubtleCrypto";
 import { HttpClient } from "../http";
 import { fetchHttpClient } from "../http/fetch";
 import {
@@ -20,10 +21,18 @@ export interface BrowserOptions {
   joseEncryptor?: JOSEEncryptor;
 }
 
-const httpClient: HttpClient = typeof fetch !== "undefined" ? fetchHttpClient : xhrHttpClient;
+export class Browser implements Device {
+  private readonly httpClient: HttpClient;
+  private readonly joseEncryptor?: JOSEEncryptor;
 
-class Browser implements Device {
-  constructor(private readonly joseEncryptor?: JOSEEncryptor) {}
+  constructor(options: BrowserOptions = {}) {
+    this.httpClient = typeof fetch !== "undefined" ? fetchHttpClient : xhrHttpClient;
+    if (options.joseEncryptor) {
+      this.joseEncryptor = options.joseEncryptor;
+    } else if (typeof crypto !== "undefined" && typeof crypto.getRandomValues !== "undefined" && typeof crypto.subtle !== "undefined") {
+      this.joseEncryptor = subtleCryptoEncryptor;
+    }
+  }
 
   getPlatformIdentifier(): string {
     return window.navigator.userAgent;
@@ -43,7 +52,7 @@ class Browser implements Device {
   }
 
   getHttpClient(): HttpClient {
-    return httpClient;
+    return this.httpClient;
   }
 
   getJOSEEncryptor(): JOSEEncryptor | undefined {
@@ -68,7 +77,3 @@ class Browser implements Device {
 }
 
 Object.freeze(Browser.prototype);
-
-export function browser(options: BrowserOptions = {}): Device {
-  return new Browser(options.joseEncryptor);
-}

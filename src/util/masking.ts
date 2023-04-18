@@ -1,4 +1,4 @@
-import { MaskedString } from "../model";
+import { MaskedString } from "../model/types";
 
 function fillBuffer(index: number, offset: number, buffer: string[], tempMask: string[], valuec: string[]): void {
   if (index + offset < valuec.length && index < tempMask.length) {

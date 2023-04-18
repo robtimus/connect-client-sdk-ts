@@ -9,7 +9,7 @@ import {
   PaymentProduct863SpecificData,
   PaymentProductDisplayHints,
   PaymentProductField,
-} from ".";
+} from "./types";
 import { api } from "../communicator/model";
 import { toAccountOnFile } from "./AccountOnFile";
 import { toPaymentProductField } from "./PaymentProductField";

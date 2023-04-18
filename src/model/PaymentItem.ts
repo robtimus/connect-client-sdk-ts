@@ -1,4 +1,4 @@
-import { AccountOnFile, BasicPaymentItem, BasicPaymentItems, BasicPaymentProductGroups, BasicPaymentProducts } from ".";
+import { AccountOnFile, BasicPaymentItem, BasicPaymentItems, BasicPaymentProductGroups, BasicPaymentProducts } from "./types";
 
 function listPaymentItems(products: BasicPaymentProducts, groups?: BasicPaymentProductGroups): BasicPaymentItem[] {
   if (!groups) {

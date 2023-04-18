@@ -1,4 +1,4 @@
-import { AccountOnFile, AccountOnFileAttribute, AccountOnFileDisplayHints, MaskedString } from ".";
+import { AccountOnFile, AccountOnFileAttribute, AccountOnFileDisplayHints, MaskedString } from "./types";
 import { api } from "../communicator/model";
 import { applyMask } from "../util/masking";
 import { toAccountOnFileDisplayHints } from "./AccountOnFileDisplayHints";

@@ -1,4 +1,4 @@
-import { AccountOnFileDisplayHints, LabelTemplateElement } from ".";
+import { AccountOnFileDisplayHints, LabelTemplateElement } from "./types";
 import { api } from "../communicator/model";
 import { toLabelTemplateElement } from "./LabelTemplateElement";
 

@@ -1,4 +1,4 @@
-import { MaskedString, PaymentProductField, PaymentProductFieldDataRestrictions, PaymentProductFieldDisplayHints } from ".";
+import { MaskedString, PaymentProductField, PaymentProductFieldDataRestrictions, PaymentProductFieldDisplayHints } from "./types";
 import { api } from "../communicator/model";
 import { applyMask, removeMask } from "../util/masking";
 import { toPaymentProductFieldDataRestrictions } from "./PaymentProductFieldDataRestrictions";

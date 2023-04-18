@@ -1,4 +1,4 @@
-import { PaymentProductFieldDisplayHints } from ".";
+import { PaymentProductFieldDisplayHints } from "./types";
 import { api } from "../communicator/model";
 
 export function toPaymentProductFieldDisplayHints(json: api.PaymentProductFieldDisplayHints): PaymentProductFieldDisplayHints {

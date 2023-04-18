@@ -1,4 +1,4 @@
-import { GooglePayClient, GooglePaySpecificInput, PaymentContext, PaymentProduct320SpecificData } from "../model";
+import { GooglePayClient, GooglePaySpecificInput, PaymentContext, PaymentProduct320SpecificData } from "../model/types";
 
 function getPaymentsClient(googlePaySpecificData: PaymentProduct320SpecificData, context: PaymentContext): google.payments.api.PaymentsClient | undefined {
   if (googlePaySpecificData.networks.length === 0) {

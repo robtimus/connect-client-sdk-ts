@@ -1,4 +1,4 @@
-import { AccountOnFile, PaymentProduct } from ".";
+import { AccountOnFile, PaymentProduct } from "./types";
 import { ValidatableRequest, ValidationError, ValidationResult } from "../validation";
 
 export class PaymentRequest implements ValidatableRequest {

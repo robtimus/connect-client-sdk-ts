@@ -14,7 +14,7 @@ import {
   PaymentContext,
   PaymentProduct302SpecificData,
   PaymentProduct320SpecificData,
-} from "../model";
+} from "../model/types";
 
 export interface BrowserOptions {
   joseEncryptor?: JOSEEncryptor;

@@ -1,5 +1,5 @@
 export * from "./http";
-export * from "./model";
+export * from "./model/types";
 export * from "./model/PaymentRequest";
 export * from "./validation";
 export * from "./session";

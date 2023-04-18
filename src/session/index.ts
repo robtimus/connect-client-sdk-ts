@@ -32,7 +32,7 @@ import {
   PublicKey,
   SessionDetails,
   ThirdPartyStatus,
-} from "../model";
+} from "../model/types";
 import { toBasicPaymentItems } from "../model/PaymentItem";
 import { PP_APPLE_PAY, PP_BANCONTACT, PP_GOOGLE_PAY, toBasicPaymentProducts, toPaymentProduct } from "../model/PaymentProduct";
 import { toBasicPaymentProductGroups, toPaymentProductGroup } from "../model/PaymentProductGroup";

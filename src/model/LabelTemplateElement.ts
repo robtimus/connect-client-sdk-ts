@@ -1,4 +1,4 @@
-import { LabelTemplateElement } from ".";
+import { LabelTemplateElement } from "./types";
 import { api } from "../communicator/model";
 
 export function toLabelTemplateElement(json: api.LabelTemplateElement): LabelTemplateElement {

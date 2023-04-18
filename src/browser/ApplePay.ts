@@ -5,7 +5,7 @@ import {
   MobilePaymentProductSession302SpecificOutput,
   PaymentContext,
   PaymentProduct302SpecificData,
-} from "../model/types";
+} from "../model";
 
 class ApplePayClientImpl implements ApplePayClient {
   constructor(

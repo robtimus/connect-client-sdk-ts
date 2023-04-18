@@ -1,9 +1,6 @@
-import { newApplePayClient } from "../applePay";
 import { JOSEEncryptor } from "../crypto";
-import { newGooglePayClient } from "../googlePay";
 import { HttpClient } from "../http";
 import { fetchHttpClient } from "../http/fetch";
-import { xhrHttpClient } from "../http/xhr";
 import {
   ApplePayClient,
   ApplePaySpecificInput,
@@ -14,7 +11,10 @@ import {
   PaymentContext,
   PaymentProduct302SpecificData,
   PaymentProduct320SpecificData,
-} from "../model/types";
+} from "../model";
+import { newApplePayClient } from "./ApplePay";
+import { newGooglePayClient } from "./GooglePay";
+import { xhrHttpClient } from "./xhr";
 
 export interface BrowserOptions {
   joseEncryptor?: JOSEEncryptor;

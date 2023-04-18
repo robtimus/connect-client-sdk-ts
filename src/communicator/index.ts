@@ -1,6 +1,6 @@
 import { HttpResponse } from "../http";
 import { sdkIdentifier } from "../metadata";
-import { Device } from "../model/types";
+import { Device } from "../model";
 import { CommunicatorConfiguration, api } from "./model";
 
 interface Metadata {

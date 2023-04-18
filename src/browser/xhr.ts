@@ -1,5 +1,5 @@
-import { HttpClient, HttpRequest, HttpResponse } from ".";
-import { URLBuilder } from "./util";
+import { HttpClient, HttpRequest, HttpResponse } from "../http";
+import { URLBuilder } from "../http/util";
 
 function xhr(): XMLHttpRequest {
   if (typeof XMLHttpRequest !== "undefined" && (window.location.protocol !== "file:" || !window.ActiveXObject)) {

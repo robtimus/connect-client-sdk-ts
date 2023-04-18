@@ -63,7 +63,6 @@ async function encryptPayload(payload: string, encKey: string, initializationVec
     false,
     ["encrypt"]
   );
-  console.log("enc key:", key);
   return crypto.subtle
     .encrypt(
       {

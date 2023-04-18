@@ -1,6 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { Device } from "../model/types";
-import { KeyValuePair, PublicKey } from "../model/types";
+import { Device, KeyValuePair, PublicKey } from "../model";
 import { PaymentRequest } from "../model/PaymentRequest";
 
 interface BrowserData {

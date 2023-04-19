@@ -5,8 +5,8 @@ export interface ValidatableRequest {
 }
 
 export interface ValidationError {
-  fieldId: string;
-  ruleId: string;
+  readonly fieldId: string;
+  readonly ruleId: string;
 }
 
 export type ValidationResult = { valid: true } | { valid: false; errors: ValidationError[] };

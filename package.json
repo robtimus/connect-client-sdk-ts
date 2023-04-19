@@ -45,6 +45,7 @@
     "jest-each": "^29.5.0",
     "jest-junit": "^15.0.0",
     "jest-runner-groups": "^2.2.0",
+    "mock-xmlhttprequest": "^8.2.0",
     "node-jose": "^2.2.0",
     "prettier": "^2.8.7",
     "ts-jest": "^29.1.0",

@@ -1,6 +1,10 @@
 import { HttpClient, HttpRequest, HttpResponse } from "../http";
 import { URLBuilder } from "../http/util";
 
+export interface XhrOptions {
+  readonly timeout?: number;
+}
+
 function xhr(): XMLHttpRequest {
   if (typeof XMLHttpRequest !== "undefined" && (window.location.protocol !== "file:" || !window.ActiveXObject)) {
     return new XMLHttpRequest();
@@ -44,7 +48,7 @@ class XhrHttpRequest implements HttpRequest {
   private readonly headers: Record<string, string> = {};
   private readonly body?: string;
 
-  constructor(private readonly method: string, url: string, body?: object) {
+  constructor(private readonly options: XhrOptions, private readonly method: string, url: string, body?: object) {
     this.urlBuilder = new URLBuilder(url);
     this.body = body ? JSON.stringify(body) : undefined;
   }
@@ -63,11 +67,11 @@ class XhrHttpRequest implements HttpRequest {
   }
   send(): Promise<HttpResponse> {
     return new Promise<HttpResponse>((resolve, reject) => {
-      const url = this.urlBuilder.queryParam("cacheBust=", new Date().getTime()).build();
+      const url = this.urlBuilder.queryParam("cacheBust", new Date().getTime()).build();
 
       const request = xhr();
       request.onreadystatechange = () => {
-        if (request.readyState === 4) {
+        if (request.readyState === 4 && request.status !== 0) {
           try {
             resolve(toHttpResponse(request));
           } catch (e) {
@@ -78,6 +82,9 @@ class XhrHttpRequest implements HttpRequest {
       request.onabort = (event) => reject(event);
       request.onerror = (event) => reject(event);
       request.ontimeout = (event) => reject(event);
+      if (this.options.timeout) {
+        request.timeout = this.options.timeout;
+      }
 
       request.open(this.method, url, true);
       for (const name in this.headers) {
@@ -94,20 +101,24 @@ class XhrHttpRequest implements HttpRequest {
 Object.freeze(XhrHttpRequest.prototype);
 
 class XhrHttpClient implements HttpClient {
+  constructor(private readonly options: XhrOptions) {}
+
   get(url: string): HttpRequest {
-    return new XhrHttpRequest("GET", url);
+    return new XhrHttpRequest(this.options, "GET", url);
   }
   delete(url: string): HttpRequest {
-    return new XhrHttpRequest("DELETE", url);
+    return new XhrHttpRequest(this.options, "DELETE", url);
   }
   post(url: string, body?: object): HttpRequest {
-    return new XhrHttpRequest("POST", url, body);
+    return new XhrHttpRequest(this.options, "POST", url, body);
   }
   put(url: string, body?: object): HttpRequest {
-    return new XhrHttpRequest("PUT", url, body);
+    return new XhrHttpRequest(this.options, "PUT", url, body);
   }
 }
 
 Object.freeze(XhrHttpClient.prototype);
 
-export const xhrHttpClient: HttpClient = new XhrHttpClient();
+export function xhrHttpClient(options: XhrOptions = {}): HttpClient {
+  return new XhrHttpClient(options);
+}

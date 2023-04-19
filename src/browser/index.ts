@@ -18,7 +18,8 @@ import { newGooglePayClient } from "./GooglePay";
 import { xhrHttpClient } from "./xhr";
 
 export interface BrowserOptions {
-  joseEncryptor?: JOSEEncryptor;
+  readonly httpClient?: HttpClient;
+  readonly joseEncryptor?: JOSEEncryptor;
 }
 
 export class Browser implements Device {
@@ -26,7 +27,14 @@ export class Browser implements Device {
   private readonly joseEncryptor?: JOSEEncryptor;
 
   constructor(options: BrowserOptions = {}) {
-    this.httpClient = typeof fetch !== "undefined" ? fetchHttpClient : xhrHttpClient;
+    if (options.httpClient) {
+      this.httpClient = options.httpClient;
+    } else if (typeof fetch !== "undefined") {
+      this.httpClient = fetchHttpClient;
+    } else {
+      this.httpClient = xhrHttpClient();
+    }
+
     if (options.joseEncryptor) {
       this.joseEncryptor = options.joseEncryptor;
     } else if (typeof crypto !== "undefined" && typeof crypto.getRandomValues !== "undefined" && typeof crypto.subtle !== "undefined") {

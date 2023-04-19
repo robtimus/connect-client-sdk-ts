@@ -65,25 +65,25 @@ export interface GooglePayClient {
 // Payment product specific inputs
 
 export interface PaymentProductSpecificInputs {
-  bancontact?: BancontactSpecificInput;
-  applePay?: ApplePaySpecificInput;
-  googlePay?: GooglePaySpecificInput;
+  readonly bancontact?: BancontactSpecificInput;
+  readonly applePay?: ApplePaySpecificInput;
+  readonly googlePay?: GooglePaySpecificInput;
 }
 
 export interface BancontactSpecificInput {
-  forceBasicFlow: boolean;
+  readonly forceBasicFlow: boolean;
 }
 
 export interface ApplePaySpecificInput {
-  merchantName: string;
-  acquirerCountry?: string;
+  readonly merchantName: string;
+  readonly acquirerCountry?: string;
 }
 
 export interface GooglePaySpecificInput {
-  merchantId: string;
-  gatewayMerchantId: string;
-  merchantName?: string;
-  acquirerCountry?: string;
+  readonly merchantId: string;
+  readonly gatewayMerchantId: string;
+  readonly merchantName?: string;
+  readonly acquirerCountry?: string;
 }
 
 // Crypto
@@ -304,8 +304,8 @@ export interface ValueMappingElement {
 // Products / Product Groups - customer details
 
 export interface CustomerDetailsRequest {
-  countryCode: string;
-  values: KeyValuePair[];
+  readonly countryCode: string;
+  readonly values: KeyValuePair[];
 }
 
 export interface CustomerDetailsResult {
@@ -406,16 +406,16 @@ export interface PrivacyPolicyResult {
 // Errors
 
 export interface APIError {
-  category: string;
-  code: string;
-  httpStatusCode: number;
-  id: string;
-  message: string;
-  propertyName: string;
-  requestId: string;
+  readonly category: string;
+  readonly code: string;
+  readonly httpStatusCode: number;
+  readonly id: string;
+  readonly message: string;
+  readonly propertyName: string;
+  readonly requestId: string;
 }
 
 export interface ErrorResponse {
-  errorId: string;
-  errors: APIError[];
+  readonly errorId: string;
+  readonly errors: APIError[];
 }

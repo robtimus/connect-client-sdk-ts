@@ -17,6 +17,8 @@ import {
 } from "../../src/model";
 import { PP_APPLE_PAY, PP_BANCONTACT, PP_GOOGLE_PAY } from "../../src/model/PaymentProduct";
 import { HttpResponse } from "../../src/http";
+import { CapturedHttpRequest } from "./mock";
+import { sdkIdentifier } from "../../src/metadata";
 
 describe("Session", () => {
   const sessionDetails: SessionDetails = {
@@ -260,6 +262,21 @@ describe("Session", () => {
     });
   });
 
+  function expectRequest(request: CapturedHttpRequest, params: Record<string, string | number | boolean | string[] | number[] | boolean[] | undefined> = {}, body?: object): void {
+    expect(request.headers["Authorization"]).toBe(`GCS v1Client:${sessionDetails.clientSessionId}`);
+    expect(request.headers["X-GCS-ClientMetaInfo"]).toBeTruthy;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const clientMetaInfo = JSON.parse(atob(request.headers["X-GCS-ClientMetaInfo"]!));
+    expect(clientMetaInfo).toStrictEqual({
+      screenSize: "1920x1200",
+      platformIdentifier: "MockDevice",
+      sdkIdentifier,
+      sdkCreator: "robtimus",
+    });
+    expect(request.params).toStrictEqual(params);
+    expect(request.body).toStrictEqual(body);
+  }
+
   test("updatePaymentContext", () => {
     const session = new Session(sessionDetails, minimalPaymentContext, new MockDevice());
     expect(session.getPaymentContext()).toBe(minimalPaymentContext);
@@ -303,11 +320,15 @@ describe("Session", () => {
         publicKey:
           "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkiJlGL1QjUnGDLpMNBtZPYVtOU121jfFcV4WrZayfw9Ib/1AtPBHP/0ZPocdA23zDh6aB+QiOQEkHZlfnelBNnEzEu4ibda3nDdjSrKveSiQPyB5X+u/IS3CR48B/g4QJ+mcMV9hoFt6Hx3R99A0HWMs4um8elQsgB11MsLmGb1SuLo0S1pgL3EcckXfBDNMUBMQ9EtLC9zQW6Y0kx6GFXHgyjNb4yixXfjo194jfhei80sVQ49Y/SHBt/igATGN1l18IBDtO0eWmWeBckwbNkpkPLAvJfsfa3JpaxbXwg3rTvVXLrIRhvMYqTsQmrBIJDl7F6igPD98Y1FydbKe5QIDAQAB",
       };
-      const device = new MockDevice().mockGet(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/crypto/publickey`, {
-        statusCode: 200,
-        contentType: "application/json",
-        body: JSON.parse(JSON.stringify(publicKey)),
-      });
+      const device = new MockDevice().mockGet(
+        `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/crypto/publickey`,
+        {
+          statusCode: 200,
+          contentType: "application/json",
+          body: JSON.parse(JSON.stringify(publicKey)),
+        },
+        expectRequest
+      );
       const session = new Session(sessionDetails, minimalPaymentContext, device);
       expect(async () => await session.getEncryptor()).not.toThrow();
     });
@@ -332,11 +353,15 @@ describe("Session", () => {
         publicKey:
           "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkiJlGL1QjUnGDLpMNBtZPYVtOU121jfFcV4WrZayfw9Ib/1AtPBHP/0ZPocdA23zDh6aB+QiOQEkHZlfnelBNnEzEu4ibda3nDdjSrKveSiQPyB5X+u/IS3CR48B/g4QJ+mcMV9hoFt6Hx3R99A0HWMs4um8elQsgB11MsLmGb1SuLo0S1pgL3EcckXfBDNMUBMQ9EtLC9zQW6Y0kx6GFXHgyjNb4yixXfjo194jfhei80sVQ49Y/SHBt/igATGN1l18IBDtO0eWmWeBckwbNkpkPLAvJfsfa3JpaxbXwg3rTvVXLrIRhvMYqTsQmrBIJDl7F6igPD98Y1FydbKe5QIDAQAB",
       };
-      const device = new MockDevice().mockGet(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/crypto/publickey`, {
-        statusCode: 200,
-        contentType: "application/json",
-        body: JSON.parse(JSON.stringify(publicKey)),
-      });
+      const device = new MockDevice().mockGet(
+        `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/crypto/publickey`,
+        {
+          statusCode: 200,
+          contentType: "application/json",
+          body: JSON.parse(JSON.stringify(publicKey)),
+        },
+        expectRequest
+      );
       const session = new Session(sessionDetails, minimalPaymentContext, device);
       const result = await session.getPublicKey();
       expect(result).toStrictEqual(publicKey);
@@ -379,11 +404,15 @@ describe("Session", () => {
       const thirdPartyStatusResponse: api.ThirdPartyStatusResponse = {
         thirdPartyStatus: "WAITING",
       };
-      const device = new MockDevice().mockGet(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/payments/${paymentId}/thirdpartystatus`, {
-        statusCode: 200,
-        contentType: "application/json",
-        body: JSON.parse(JSON.stringify(thirdPartyStatusResponse)),
-      });
+      const device = new MockDevice().mockGet(
+        `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/payments/${paymentId}/thirdpartystatus`,
+        {
+          statusCode: 200,
+          contentType: "application/json",
+          body: JSON.parse(JSON.stringify(thirdPartyStatusResponse)),
+        },
+        expectRequest
+      );
       const session = new Session(sessionDetails, minimalPaymentContext, device);
       const result = await session.getThirdPartyStatus(paymentId);
       expect(result).toStrictEqual(thirdPartyStatusResponse);
@@ -818,7 +847,7 @@ describe("Session", () => {
             body: JSON.parse(JSON.stringify(groups)),
           },
           (request) =>
-            expect(request.params).toStrictEqual({
+            expectRequest(request, {
               countryCode: minimalPaymentContext.countryCode,
               currencyCode: minimalPaymentContext.amountOfMoney.currencyCode,
               amount: minimalPaymentContext.amountOfMoney.amount,
@@ -842,7 +871,7 @@ describe("Session", () => {
             body: JSON.parse(JSON.stringify(groups)),
           },
           (request) =>
-            expect(request.params).toStrictEqual({
+            expectRequest(request, {
               countryCode: fullPaymentContext.countryCode,
               currencyCode: fullPaymentContext.amountOfMoney.currencyCode,
               amount: fullPaymentContext.amountOfMoney.amount,
@@ -925,7 +954,7 @@ describe("Session", () => {
             body: JSON.parse(JSON.stringify(groups.paymentProductGroups[0])),
           },
           (request) =>
-            expect(request.params).toStrictEqual({
+            expectRequest(request, {
               countryCode: minimalPaymentContext.countryCode,
               currencyCode: minimalPaymentContext.amountOfMoney.currencyCode,
               amount: minimalPaymentContext.amountOfMoney.amount,
@@ -945,7 +974,7 @@ describe("Session", () => {
             body: JSON.parse(JSON.stringify(groups.paymentProductGroups[0])),
           },
           (request) =>
-            expect(request.params).toStrictEqual({
+            expectRequest(request, {
               countryCode: fullPaymentContext.countryCode,
               currencyCode: fullPaymentContext.amountOfMoney.currencyCode,
               amount: fullPaymentContext.amountOfMoney.amount,
@@ -1064,7 +1093,7 @@ describe("Session", () => {
           contentType: "application/json",
           body: JSON.parse(JSON.stringify(deviceFingerprintResponse)),
         },
-        (request) => expect(request.body).toStrictEqual(deviceFingerprintRequest)
+        (request) => expectRequest(request, {}, deviceFingerprintRequest)
       );
       const session = new Session(sessionDetails, minimalPaymentContext, device);
       const result = await session.getPaymentProductGroupDeviceFingerprint("cards", deviceFingerprintRequest);
@@ -1105,11 +1134,21 @@ describe("Session", () => {
     describe("success", () => {
       test("minimal payment context", async () => {
         const device = new MockDevice()
-          .mockGet(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products?`, {
-            statusCode: 200,
-            contentType: "application/json",
-            body: JSON.parse(JSON.stringify(products)),
-          })
+          .mockGet(
+            `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products?`,
+            {
+              statusCode: 200,
+              contentType: "application/json",
+              body: JSON.parse(JSON.stringify(products)),
+            },
+            (request) =>
+              expectRequest(request, {
+                countryCode: minimalPaymentContext.countryCode,
+                currencyCode: minimalPaymentContext.amountOfMoney.currencyCode,
+                amount: minimalPaymentContext.amountOfMoney.amount,
+                hide: ["fields"],
+              })
+          )
           // enable both clients; the lack of necessary PP specific inputs will filter out Apple Pay and Google Pay
           .mockApplePayClient(true)
           .mockGooglePayClient(true);
@@ -1133,11 +1172,23 @@ describe("Session", () => {
 
       describe("full payment context", () => {
         test("Apple Pay and Google Pay not enabled", async () => {
-          const device = new MockDevice().mockGet(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products?`, {
-            statusCode: 200,
-            contentType: "application/json",
-            body: JSON.parse(JSON.stringify(products)),
-          });
+          const device = new MockDevice().mockGet(
+            `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products?`,
+            {
+              statusCode: 200,
+              contentType: "application/json",
+              body: JSON.parse(JSON.stringify(products)),
+            },
+            (request) =>
+              expectRequest(request, {
+                countryCode: fullPaymentContext.countryCode,
+                currencyCode: fullPaymentContext.amountOfMoney.currencyCode,
+                amount: fullPaymentContext.amountOfMoney.amount,
+                locale: fullPaymentContext.locale,
+                isRecurring: fullPaymentContext.isRecurring,
+                hide: ["fields"],
+              })
+          );
           const session = new Session(sessionDetails, fullPaymentContext, device);
           const result = await session.getBasicPaymentProducts();
           expect(result.paymentProducts).toHaveLength(4);
@@ -1399,7 +1450,7 @@ describe("Session", () => {
               body: JSON.parse(JSON.stringify(products.paymentProducts.find((product) => product.id === PP_APPLE_PAY))),
             },
             (request) =>
-              expect(request.params).toStrictEqual({
+              expectRequest(request, {
                 countryCode: minimalPaymentContext.countryCode,
                 currencyCode: minimalPaymentContext.amountOfMoney.currencyCode,
                 amount: minimalPaymentContext.amountOfMoney.amount,
@@ -1420,7 +1471,7 @@ describe("Session", () => {
               body: JSON.parse(JSON.stringify(products.paymentProducts.find((product) => product.id === PP_BANCONTACT))),
             },
             (request) =>
-              expect(request.params).toStrictEqual({
+              expectRequest(request, {
                 countryCode: minimalPaymentContext.countryCode,
                 currencyCode: minimalPaymentContext.amountOfMoney.currencyCode,
                 amount: minimalPaymentContext.amountOfMoney.amount,
@@ -1440,7 +1491,7 @@ describe("Session", () => {
               body: JSON.parse(JSON.stringify(products.paymentProducts.find((product) => product.id === PP_GOOGLE_PAY))),
             },
             (request) =>
-              expect(request.params).toStrictEqual({
+              expectRequest(request, {
                 countryCode: minimalPaymentContext.countryCode,
                 currencyCode: minimalPaymentContext.amountOfMoney.currencyCode,
                 amount: minimalPaymentContext.amountOfMoney.amount,
@@ -1461,7 +1512,7 @@ describe("Session", () => {
               body: JSON.parse(JSON.stringify(products.paymentProducts[0])),
             },
             (request) =>
-              expect(request.params).toStrictEqual({
+              expectRequest(request, {
                 countryCode: minimalPaymentContext.countryCode,
                 currencyCode: minimalPaymentContext.amountOfMoney.currencyCode,
                 amount: minimalPaymentContext.amountOfMoney.amount,
@@ -1490,7 +1541,7 @@ describe("Session", () => {
                 body: JSON.parse(JSON.stringify(products.paymentProducts.find((product) => product.id === PP_APPLE_PAY))),
               },
               (request) =>
-                expect(request.params).toStrictEqual({
+                expectRequest(request, {
                   countryCode: fullPaymentContext.countryCode,
                   currencyCode: fullPaymentContext.amountOfMoney.currencyCode,
                   amount: fullPaymentContext.amountOfMoney.amount,
@@ -1514,7 +1565,7 @@ describe("Session", () => {
                   body: JSON.parse(JSON.stringify(products.paymentProducts.find((product) => product.id === PP_APPLE_PAY))),
                 },
                 (request) =>
-                  expect(request.params).toStrictEqual({
+                  expectRequest(request, {
                     countryCode: fullPaymentContext.countryCode,
                     currencyCode: fullPaymentContext.amountOfMoney.currencyCode,
                     amount: fullPaymentContext.amountOfMoney.amount,
@@ -1538,7 +1589,7 @@ describe("Session", () => {
               body: JSON.parse(JSON.stringify(products.paymentProducts.find((product) => product.id === PP_BANCONTACT))),
             },
             (request) =>
-              expect(request.params).toStrictEqual({
+              expectRequest(request, {
                 countryCode: fullPaymentContext.countryCode,
                 currencyCode: fullPaymentContext.amountOfMoney.currencyCode,
                 amount: fullPaymentContext.amountOfMoney.amount,
@@ -1562,7 +1613,7 @@ describe("Session", () => {
                 body: JSON.parse(JSON.stringify(products.paymentProducts.find((product) => product.id === PP_GOOGLE_PAY))),
               },
               (request) =>
-                expect(request.params).toStrictEqual({
+                expectRequest(request, {
                   countryCode: fullPaymentContext.countryCode,
                   currencyCode: fullPaymentContext.amountOfMoney.currencyCode,
                   amount: fullPaymentContext.amountOfMoney.amount,
@@ -1586,7 +1637,7 @@ describe("Session", () => {
                   body: JSON.parse(JSON.stringify(products.paymentProducts.find((product) => product.id === PP_GOOGLE_PAY))),
                 },
                 (request) =>
-                  expect(request.params).toStrictEqual({
+                  expectRequest(request, {
                     countryCode: fullPaymentContext.countryCode,
                     currencyCode: fullPaymentContext.amountOfMoney.currencyCode,
                     amount: fullPaymentContext.amountOfMoney.amount,
@@ -1610,7 +1661,7 @@ describe("Session", () => {
               body: JSON.parse(JSON.stringify(products.paymentProducts[0])),
             },
             (request) =>
-              expect(request.params).toStrictEqual({
+              expectRequest(request, {
                 countryCode: fullPaymentContext.countryCode,
                 currencyCode: fullPaymentContext.amountOfMoney.currencyCode,
                 amount: fullPaymentContext.amountOfMoney.amount,
@@ -1895,7 +1946,7 @@ describe("Session", () => {
             body: JSON.parse(JSON.stringify(directory)),
           },
           (request) =>
-            expect(request.params).toStrictEqual({
+            expectRequest(request, {
               countryCode: minimalPaymentContext.countryCode,
               currencyCode: minimalPaymentContext.amountOfMoney.currencyCode,
             })
@@ -1914,7 +1965,7 @@ describe("Session", () => {
             body: JSON.parse(JSON.stringify(directory)),
           },
           (request) =>
-            expect(request.params).toStrictEqual({
+            expectRequest(request, {
               countryCode: fullPaymentContext.countryCode,
               currencyCode: fullPaymentContext.amountOfMoney.currencyCode,
             })
@@ -2023,7 +2074,7 @@ describe("Session", () => {
           contentType: "application/json",
           body: JSON.parse(JSON.stringify(customerDetails)),
         },
-        (request) => expect(request.body).toStrictEqual(customerDetailsRequest)
+        (request) => expectRequest(request, {}, customerDetailsRequest)
       );
       const session = new Session(sessionDetails, minimalPaymentContext, device);
       const result = await session.getCustomerDetails(1, customerDetailsRequest);
@@ -2114,7 +2165,7 @@ describe("Session", () => {
           contentType: "application/json",
           body: JSON.parse(JSON.stringify(deviceFingerprintResponse)),
         },
-        (request) => expect(request.body).toStrictEqual(deviceFingerprintRequest)
+        (request) => expectRequest(request, {}, deviceFingerprintRequest)
       );
       const session = new Session(sessionDetails, minimalPaymentContext, device);
       const result = await session.getPaymentProductDeviceFingerprint(1, deviceFingerprintRequest);
@@ -2166,7 +2217,7 @@ describe("Session", () => {
             body: JSON.parse(JSON.stringify(networksResponse)),
           },
           (request) =>
-            expect(request.params).toStrictEqual({
+            expectRequest(request, {
               countryCode: minimalPaymentContext.countryCode,
               currencyCode: minimalPaymentContext.amountOfMoney.currencyCode,
               amount: minimalPaymentContext.amountOfMoney.amount,
@@ -2186,7 +2237,7 @@ describe("Session", () => {
             body: JSON.parse(JSON.stringify(networksResponse)),
           },
           (request) =>
-            expect(request.params).toStrictEqual({
+            expectRequest(request, {
               countryCode: fullPaymentContext.countryCode,
               currencyCode: fullPaymentContext.amountOfMoney.currencyCode,
               amount: fullPaymentContext.amountOfMoney.amount,
@@ -2288,9 +2339,13 @@ describe("Session", () => {
           body: JSON.parse(JSON.stringify(createSessionResponse)),
         },
         (request) =>
-          expect(request.body).toStrictEqual({
-            paymentProductSession302SpecificInput: applePaySpecificInput,
-          })
+          expectRequest(
+            request,
+            {},
+            {
+              paymentProductSession302SpecificInput: applePaySpecificInput,
+            }
+          )
       );
       const session = new Session(sessionDetails, minimalPaymentContext, device);
       const result = await session.createApplePaySession(applePaySpecificInput);
@@ -2307,9 +2362,13 @@ describe("Session", () => {
           body: JSON.parse(JSON.stringify(createSessionResponse)),
         },
         (request) =>
-          expect(request.body).toStrictEqual({
-            paymentProductSession302SpecificInput: applePaySpecificInput,
-          })
+          expectRequest(
+            request,
+            {},
+            {
+              paymentProductSession302SpecificInput: applePaySpecificInput,
+            }
+          )
       );
       const session = new Session(sessionDetails, minimalPaymentContext, device);
       const onSuccess = jest.fn();
@@ -2357,11 +2416,20 @@ describe("Session", () => {
       const convertAmountResponse: api.ConvertAmountResponse = {
         convertedAmount: 1234,
       };
-      const device = new MockDevice().mockGet(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/services/convert/amount`, {
-        statusCode: 200,
-        contentType: "application/json",
-        body: JSON.parse(JSON.stringify(convertAmountResponse)),
-      });
+      const device = new MockDevice().mockGet(
+        `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/services/convert/amount`,
+        {
+          statusCode: 200,
+          contentType: "application/json",
+          body: JSON.parse(JSON.stringify(convertAmountResponse)),
+        },
+        (request) =>
+          expectRequest(request, {
+            amount: 1000,
+            source: "EUR",
+            target: "USD",
+          })
+      );
       const session = new Session(sessionDetails, minimalPaymentContext, device);
       const result = await session.convertAmount(1000, "EUR", "USD");
       expect(result).toStrictEqual(convertAmountResponse);
@@ -2441,13 +2509,17 @@ describe("Session", () => {
             body: JSON.parse(JSON.stringify(iinDetailsResponse)),
           },
           (request) =>
-            expect(request.body).toStrictEqual({
-              bin: "123456",
-              paymentContext: {
-                amountOfMoney: fullPaymentContext.amountOfMoney,
-                countryCode: fullPaymentContext.countryCode,
-              },
-            })
+            expectRequest(
+              request,
+              {},
+              {
+                bin: "123456",
+                paymentContext: {
+                  amountOfMoney: fullPaymentContext.amountOfMoney,
+                  countryCode: fullPaymentContext.countryCode,
+                },
+              }
+            )
         );
         const session = new Session(sessionDetails, minimalPaymentContext, device);
         const result = await session.getIINDetails("1234567");
@@ -2463,15 +2535,19 @@ describe("Session", () => {
             body: JSON.parse(JSON.stringify(iinDetailsResponse)),
           },
           (request) =>
-            expect(request.body).toStrictEqual({
-              bin: "12345678",
-              paymentContext: {
-                amountOfMoney: fullPaymentContext.amountOfMoney,
-                countryCode: fullPaymentContext.countryCode,
-                isInstallments: fullPaymentContext.isInstallments,
-                isRecurring: fullPaymentContext.isRecurring,
-              },
-            })
+            expectRequest(
+              request,
+              {},
+              {
+                bin: "12345678",
+                paymentContext: {
+                  amountOfMoney: fullPaymentContext.amountOfMoney,
+                  countryCode: fullPaymentContext.countryCode,
+                  isInstallments: fullPaymentContext.isInstallments,
+                  isRecurring: fullPaymentContext.isRecurring,
+                },
+              }
+            )
         );
         const session = new Session(sessionDetails, fullPaymentContext, device);
         const result = await session.getIINDetails("1234567890");
@@ -2493,13 +2569,17 @@ describe("Session", () => {
           body: JSON.parse(JSON.stringify(iinDetailsResponse)),
         },
         (request) =>
-          expect(request.body).toStrictEqual({
-            bin: "123456",
-            paymentContext: {
-              amountOfMoney: fullPaymentContext.amountOfMoney,
-              countryCode: fullPaymentContext.countryCode,
-            },
-          })
+          expectRequest(
+            request,
+            {},
+            {
+              bin: "123456",
+              paymentContext: {
+                amountOfMoney: fullPaymentContext.amountOfMoney,
+                countryCode: fullPaymentContext.countryCode,
+              },
+            }
+          )
       );
       const session = new Session(sessionDetails, minimalPaymentContext, device);
       const result = await session.getIINDetails("123456");
@@ -2519,13 +2599,17 @@ describe("Session", () => {
           body: JSON.parse(JSON.stringify(errorResponse)),
         },
         (request) =>
-          expect(request.body).toStrictEqual({
-            bin: "123456",
-            paymentContext: {
-              amountOfMoney: fullPaymentContext.amountOfMoney,
-              countryCode: fullPaymentContext.countryCode,
-            },
-          })
+          expectRequest(
+            request,
+            {},
+            {
+              bin: "123456",
+              paymentContext: {
+                amountOfMoney: fullPaymentContext.amountOfMoney,
+                countryCode: fullPaymentContext.countryCode,
+              },
+            }
+          )
       );
       const session = new Session(sessionDetails, minimalPaymentContext, device);
       const result = await session.getIINDetails("123456");
@@ -2670,7 +2754,7 @@ describe("Session", () => {
             contentType: "application/json",
             body: JSON.parse(JSON.stringify(privacyPolicyResponse)),
           },
-          (request) => expect(request.params).toStrictEqual({})
+          (request) => expectRequest(request)
         );
         const session = new Session(sessionDetails, minimalPaymentContext, device);
         const result = await session.getPrivacyPolicy();
@@ -2686,7 +2770,7 @@ describe("Session", () => {
             body: JSON.parse(JSON.stringify(privacyPolicyResponse)),
           },
           (request) =>
-            expect(request.params).toStrictEqual({
+            expectRequest(request, {
               paymentProductId: 1,
               locale: fullPaymentContext.locale,
             })

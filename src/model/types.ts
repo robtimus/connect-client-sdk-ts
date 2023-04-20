@@ -58,6 +58,7 @@ export interface ApplePayClient {
 }
 
 export interface GooglePayClient {
+  createButton(options: google.payments.api.ButtonOptions): HTMLElement;
   prefetchPaymentData(): Promise<void>;
   createPayment(): Promise<google.payments.api.PaymentData>;
 }

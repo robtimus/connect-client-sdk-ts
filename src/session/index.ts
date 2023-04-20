@@ -467,13 +467,21 @@ export class Session {
     return getValue(this.cache, cacheKey, () => this.device.getApplePayClient(applePaySpecificInput, applePaySpecificData, this.paymentContext));
   }
 
-  private async isApplePayAvailable(applePaySpecificData?: PaymentProduct302SpecificData): Promise<boolean> {
+  async isApplePayAvailable(applePaySpecificData?: PaymentProduct302SpecificData): Promise<boolean> {
     return this.getApplePayClient(applePaySpecificData)
       .then((client) => !!client)
       .catch((reason) => {
         console.error("Apple Pay is not available", reason);
         return false;
       });
+  }
+
+  async createGooglePayButton(googlePaySpecificData: PaymentProduct320SpecificData, options: google.payments.api.ButtonOptions): Promise<HTMLElement> {
+    const client = await this.getGooglePayClient(googlePaySpecificData);
+    if (!client) {
+      throw new Error("Google Pay client is not available");
+    }
+    return client.createButton(options);
   }
 
   async prefetchGooglePayPaymentData(googlePaySpecificData: PaymentProduct320SpecificData): Promise<void> {
@@ -503,7 +511,7 @@ export class Session {
     return getValue(this.cache, cacheKey, () => this.device.getGooglePayClient(googlePaySpecificInput, googlePaySpecificData, this.paymentContext));
   }
 
-  private async isGooglePayAvailable(googlePaySpecificData?: PaymentProduct320SpecificData): Promise<boolean> {
+  async isGooglePayAvailable(googlePaySpecificData?: PaymentProduct320SpecificData): Promise<boolean> {
     return this.getGooglePayClient(googlePaySpecificData)
       .then((client) => !!client)
       .catch((reason) => {

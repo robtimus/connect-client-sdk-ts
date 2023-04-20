@@ -38,16 +38,20 @@ function constructTokenizationSpecification(input: GooglePaySpecificInput, data:
   };
 }
 
+function constructAllowedPaymentMethods(data: PaymentProduct320SpecificData): google.payments.api.IsReadyToPayPaymentMethodSpecification[] {
+  return [
+    {
+      type: "CARD",
+      parameters: constructCardParameters(data),
+    },
+  ];
+}
+
 function constructIsReadyToPayRequest(data: PaymentProduct320SpecificData): google.payments.api.IsReadyToPayRequest {
   return {
     apiVersion: API_VERSION,
     apiVersionMinor: API_VERSION_MINOR,
-    allowedPaymentMethods: [
-      {
-        type: "CARD",
-        parameters: constructCardParameters(data),
-      },
-    ],
+    allowedPaymentMethods: constructAllowedPaymentMethods(data),
   };
 }
 
@@ -114,6 +118,12 @@ class GooglePayClientImpl implements GooglePayClient {
     private readonly googlePaySpecificData: PaymentProduct320SpecificData,
     private readonly context: PaymentContext
   ) {}
+
+  createButton(options: google.payments.api.ButtonOptions): HTMLElement {
+    options = Object.assign({}, options);
+    options.allowedPaymentMethods = options.allowedPaymentMethods || constructAllowedPaymentMethods(this.googlePaySpecificData);
+    return this.client.createButton(options);
+  }
 
   async prefetchPaymentData(): Promise<void> {
     const request = constructPrefetchPaymentDataRequest(this.googlePaySpecificInput, this.googlePaySpecificData, this.context);

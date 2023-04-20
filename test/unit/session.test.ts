@@ -2927,6 +2927,47 @@ describe("Session", () => {
     });
   });
 
+  describe("createGooglePayButton", () => {
+    test("Google Pay not enabled", async () => {
+      const device = new MockDevice().mockGooglePayClient(true);
+      const session = new Session(sessionDetails, minimalPaymentContext, device);
+      const onSuccess = jest.fn();
+      const result = await session
+        .createGooglePayButton(
+          {
+            gateway: "GW",
+            networks: ["VISA"],
+          },
+          {
+            onClick: jest.fn,
+          }
+        )
+        .then(onSuccess)
+        .catch((reason) => reason);
+      expect(result).toStrictEqual(new Error("Google Pay client is not available"));
+    });
+
+    test("Google Pay enabled", async () => {
+      const googlePayClient: GooglePayClient = {
+        createButton: jest.fn(),
+        prefetchPaymentData: jest.fn(),
+        createPayment: jest.fn(),
+      };
+      const device = new MockDevice().mockGooglePayClient(googlePayClient);
+      const session = new Session(sessionDetails, fullPaymentContext, device);
+      await session.createGooglePayButton(
+        {
+          gateway: "GW",
+          networks: ["VISA"],
+        },
+        {
+          onClick: jest.fn,
+        }
+      );
+      expect(googlePayClient.createButton).toHaveBeenCalled();
+    });
+  });
+
   describe("prefetchGooglePayPaymentData", () => {
     test("Google Pay not enabled", async () => {
       const device = new MockDevice().mockGooglePayClient(true);
@@ -2944,6 +2985,7 @@ describe("Session", () => {
 
     test("Google Pay enabled", async () => {
       const googlePayClient: GooglePayClient = {
+        createButton: jest.fn(),
         prefetchPaymentData: jest.fn(),
         createPayment: jest.fn(),
       };
@@ -2974,6 +3016,7 @@ describe("Session", () => {
 
     test("Google Pay enabled", async () => {
       const googlePayClient: GooglePayClient = {
+        createButton: jest.fn(),
         prefetchPaymentData: jest.fn(),
         createPayment: jest.fn(),
       };

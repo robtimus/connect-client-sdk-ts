@@ -201,6 +201,7 @@ export class MockDevice implements Device {
   mockGooglePayClient(googlePayClient?: true | "throw" | GooglePayClient): MockDevice {
     if (googlePayClient === true) {
       this.googlePayClient = Promise.resolve({
+        createButton: jest.fn(),
         prefetchPaymentData: jest.fn(),
         createPayment: jest.fn(),
       });

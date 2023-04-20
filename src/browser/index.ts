@@ -49,8 +49,8 @@ export class Browser implements Device {
   getDeviceInformation(): DeviceInformation {
     return {
       timezoneOffsetUtcMinutes: new Date().getTimezoneOffset(),
-      locale: navigator.language,
-      javaEnabled: navigator.javaEnabled(),
+      locale: window.navigator.language,
+      javaEnabled: window.navigator.javaEnabled(),
       colorDepth: screen.colorDepth,
       screenHeight: screen.height,
       screenWidth: screen.width,

@@ -45,14 +45,23 @@ function constructCacheKeyWithValues(base: string, params: unknown[], values: Ke
   return base + ":" + params.map((value) => `<${value}`).join(";") + "values:" + values.map((value) => `${value.key}=${value.value}`).join(";");
 }
 
+const UNDEFINED_VALUE = "<undefined>";
+
 async function getValue<T>(cache: Record<string, unknown>, key: string, valueSupplier: () => Promise<T>): Promise<T> {
   const existing = cache[key];
   if (existing) {
-    return existing as T;
+    return (existing !== UNDEFINED_VALUE ? existing : undefined) as T;
   }
   const value = await valueSupplier();
-  cache[key] = value;
+  cache[key] = value !== undefined ? value : UNDEFINED_VALUE;
   return value;
+}
+
+function clearCache(cache: Record<string, unknown>, filter: (key: string) => boolean): void {
+  const keys = Object.keys(cache).filter(filter);
+  for (const key of keys) {
+    delete cache[key];
+  }
 }
 
 function prefixWithAssetURL(url: string, assetURL: string): string {
@@ -114,11 +123,9 @@ function productNotFoundError(): HttpResponse {
 
 export class Session {
   private readonly communicator: Communicator;
-  private readonly responseCache: Record<string, unknown> = {};
+  private readonly cache: Record<string, unknown> = {};
   private providedPaymentItem?: PaymentItem;
   private paymentProductAvailability: Record<number, boolean | undefined> = {};
-  private applePayClient?: Promise<ApplePayClient | undefined>;
-  private googlePayClient?: Promise<GooglePayClient | undefined>;
 
   constructor(private readonly sessionDetails: SessionDetails, private paymentContext: PaymentContext, private readonly device: Device) {
     this.communicator = new Communicator(sessionDetails, device);
@@ -130,9 +137,8 @@ export class Session {
 
   updatePaymentContext(paymentContext: Partial<PaymentContext>): Session {
     this.paymentContext = Object.assign({}, this.paymentContext, paymentContext);
-    // Invalidate the Apple Pay and Google Pay clients
-    this.applePayClient = undefined;
-    this.googlePayClient = undefined;
+    // Invalidate cached Apple Pay and Google Pay clients
+    clearCache(this.cache, (key) => key.startsWith("ApplePayClient") || key.startsWith("GooglePayClient"));
     // Invalide the Apple Pay and Google Pay availability
     delete this.paymentProductAvailability[PP_APPLE_PAY];
     delete this.paymentProductAvailability[PP_GOOGLE_PAY];
@@ -162,7 +168,7 @@ export class Session {
 
   async getPublicKey(): Promise<PublicKey> {
     const cacheKey = "PublicKey";
-    return getValue(this.responseCache, cacheKey, () => this.communicator.getPublicKey());
+    return getValue(this.cache, cacheKey, () => this.communicator.getPublicKey());
   }
 
   async getThirdPartyStatus(paymentId: string): Promise<ThirdPartyStatus> {
@@ -189,7 +195,7 @@ export class Session {
       hide: ["fields"],
     };
     const cacheKey = constructCacheKey("BasicPaymentProductGroups", params.countryCode, params.currencyCode, params.locale, params.amount, params.isRecurring);
-    const json = await getValue(this.responseCache, cacheKey, async () => {
+    const json = await getValue(this.cache, cacheKey, async () => {
       const json = await this.communicator.getPaymentProductGroups(params);
       updateItems(json.paymentProductGroups, this.sessionDetails.assetUrl);
       return json;
@@ -210,7 +216,7 @@ export class Session {
       isRecurring: this.paymentContext.isRecurring,
     };
     const cacheKey = constructCacheKey(`PaymentProductGroup:${paymentProductGroupId}`, params.countryCode, params.currencyCode, params.locale, params.amount, params.isRecurring);
-    const json = await getValue(this.responseCache, cacheKey, async () => {
+    const json = await getValue(this.cache, cacheKey, async () => {
       const json = await this.communicator.getPaymentProductGroup(paymentProductGroupId, params);
       updateItem(json, this.sessionDetails.assetUrl);
       return json;
@@ -233,7 +239,7 @@ export class Session {
       hide: ["fields"],
     };
     const cacheKey = constructCacheKey("BasicPaymentProducts", params.countryCode, params.currencyCode, params.locale, params.amount, params.isRecurring);
-    const json = await getValue(this.responseCache, cacheKey, async () => {
+    const json = await getValue(this.cache, cacheKey, async () => {
       const json = await this.communicator.getPaymentProducts(params);
       updateItems(json.paymentProducts, this.sessionDetails.assetUrl);
       return json;
@@ -302,7 +308,7 @@ export class Session {
       params.isRecurring,
       params.forceBasicFlow
     );
-    const json = await getValue(this.responseCache, cacheKey, async () => {
+    const json = await getValue(this.cache, cacheKey, async () => {
       const json = await this.communicator.getPaymentProduct(paymentProductId, params);
       updateItem(json, this.sessionDetails.assetUrl);
       return json;
@@ -340,12 +346,12 @@ export class Session {
       currencyCode: this.paymentContext.amountOfMoney.currencyCode,
     };
     const cacheKey = constructCacheKey(`Directory:${paymentProductId}`, params.countryCode, params.currencyCode);
-    return getValue(this.responseCache, cacheKey, () => this.communicator.getPaymentProductDirectory(paymentProductId, params));
+    return getValue(this.cache, cacheKey, () => this.communicator.getPaymentProductDirectory(paymentProductId, params));
   }
 
   async getCustomerDetails(paymentProductId: number, request: CustomerDetailsRequest): Promise<CustomerDetailsResult> {
     const cacheKey = constructCacheKeyWithValues(`CustomerDetails:${paymentProductId}`, [request.countryCode], request.values);
-    return getValue(this.responseCache, cacheKey, () => this.communicator.getCustomerDetails(paymentProductId, request));
+    return getValue(this.cache, cacheKey, () => this.communicator.getCustomerDetails(paymentProductId, request));
   }
 
   async getPaymentProductDeviceFingerprint(paymentProductId: number, request: DeviceFingerprintRequest): Promise<DeviceFingerprintResult> {
@@ -361,7 +367,7 @@ export class Session {
       isRecurring: this.paymentContext.isRecurring,
     };
     const cacheKey = constructCacheKey(`PaymentProductNetworks:${paymentProductId}`, params.countryCode, params.currencyCode, params.amount, params.isRecurring);
-    return getValue(this.responseCache, cacheKey, () => this.communicator.getPaymentProductNetworks(paymentProductId, params));
+    return getValue(this.cache, cacheKey, () => this.communicator.getPaymentProductNetworks(paymentProductId, params));
   }
 
   async createApplePaySession(applePaySpecificInput: MobilePaymentProductSession302SpecificInput): Promise<MobilePaymentProductSession302SpecificOutput> {
@@ -382,7 +388,7 @@ export class Session {
       amount,
     };
     const cacheKey = constructCacheKey("ConvertAmount", amount, source, target);
-    return getValue(this.responseCache, cacheKey, () => this.communicator.convertAmount(params));
+    return getValue(this.cache, cacheKey, () => this.communicator.convertAmount(params));
   }
 
   async getIINDetails(partialCreditCardNumber: string): Promise<IINDetailsResult> {
@@ -414,7 +420,7 @@ export class Session {
       paymentContext.isInstallments,
       paymentContext.isRecurring
     );
-    const json = await getValue(this.responseCache, cacheKey, () => this.communicator.getIINDetails(request));
+    const json = await getValue(this.cache, cacheKey, () => this.communicator.getIINDetails(request));
     if (json.status === "UNKNOWN") {
       return json;
     }
@@ -439,7 +445,7 @@ export class Session {
       paymentProductId,
     };
     const cacheKey = constructCacheKey("PrivacyPolicy:", paymentProductId, params.locale);
-    return getValue(this.responseCache, cacheKey, () => this.communicator.getPrivacyPolicy(params));
+    return getValue(this.cache, cacheKey, () => this.communicator.getPrivacyPolicy(params));
   }
 
   async createApplePayPayment(applePaySpecificData: PaymentProduct302SpecificData): Promise<ApplePayJS.ApplePayPaymentToken> {
@@ -451,14 +457,14 @@ export class Session {
   }
 
   private async getApplePayClient(applePaySpecificData?: PaymentProduct302SpecificData): Promise<ApplePayClient | undefined> {
-    if (!this.applePayClient) {
-      const applePaySpecificInput = this.paymentContext.paymentProductSpecificInputs?.applePay;
-      if (!applePaySpecificInput || !applePaySpecificData) {
-        return undefined;
-      }
-      this.applePayClient = this.device.getApplePayClient(applePaySpecificInput, applePaySpecificData, this.paymentContext);
+    const applePaySpecificInput = this.paymentContext.paymentProductSpecificInputs?.applePay;
+    if (!applePaySpecificInput || !applePaySpecificData) {
+      return undefined;
     }
-    return this.applePayClient;
+    // Don't include applePaySpecificInput or the payment context in the cache key
+    // When the payment context is updated the ApplePayClient cache entries are cleared
+    const cacheKey = constructCacheKey("ApplePayClient", applePaySpecificData.networks);
+    return getValue(this.cache, cacheKey, () => this.device.getApplePayClient(applePaySpecificInput, applePaySpecificData, this.paymentContext));
   }
 
   private async isApplePayAvailable(applePaySpecificData?: PaymentProduct302SpecificData): Promise<boolean> {
@@ -487,14 +493,14 @@ export class Session {
   }
 
   private async getGooglePayClient(googlePaySpecificData?: PaymentProduct320SpecificData): Promise<GooglePayClient | undefined> {
-    if (!this.googlePayClient) {
-      const googlePaySpecificInput = this.paymentContext.paymentProductSpecificInputs?.googlePay;
-      if (!googlePaySpecificInput || !googlePaySpecificData) {
-        return undefined;
-      }
-      this.googlePayClient = this.device.getGooglePayClient(googlePaySpecificInput, googlePaySpecificData, this.paymentContext);
+    const googlePaySpecificInput = this.paymentContext.paymentProductSpecificInputs?.googlePay;
+    if (!googlePaySpecificInput || !googlePaySpecificData) {
+      return undefined;
     }
-    return this.googlePayClient;
+    // Don't include googlePaySpecificInput or the payment context in the cache key
+    // When the payment context is updated the GooglePayClient cache entries are cleared
+    const cacheKey = constructCacheKey("GooglePayClient", googlePaySpecificData.gateway, googlePaySpecificData.networks);
+    return getValue(this.cache, cacheKey, () => this.device.getGooglePayClient(googlePaySpecificInput, googlePaySpecificData, this.paymentContext));
   }
 
   private async isGooglePayAvailable(googlePaySpecificData?: PaymentProduct320SpecificData): Promise<boolean> {

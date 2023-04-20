@@ -2886,6 +2886,45 @@ describe("Session", () => {
       await session.createApplePayPayment({ networks: ["1"] });
       expect(onSession).toHaveBeenCalledWith(createSessionResponse.paymentProductSession302SpecificOutput);
     });
+
+    describe("caching", () => {
+      test("Apple Pay not enabled", async () => {
+        const device = new MockDevice();
+        const spy = jest.spyOn(device, "getApplePayClient");
+        const session = new Session(sessionDetails, fullPaymentContext, device);
+        await session.createApplePayPayment({ networks: ["1"] }).catch(jest.fn());
+        await session.createApplePayPayment({ networks: ["1"] }).catch(jest.fn());
+        expect(spy).toBeCalledTimes(1);
+      });
+
+      test("Apple Pay enabled", async () => {
+        const device = new MockDevice().mockApplePayClient(true);
+        const spy = jest.spyOn(device, "getApplePayClient");
+        const session = new Session(sessionDetails, fullPaymentContext, device);
+        await session.createApplePayPayment({ networks: ["1"] }).catch(jest.fn());
+        await session.createApplePayPayment({ networks: ["1"] }).catch(jest.fn());
+        expect(spy).toBeCalledTimes(1);
+      });
+
+      test("payment context update", async () => {
+        const device = new MockDevice().mockApplePayClient(true);
+        const spy = jest.spyOn(device, "getApplePayClient");
+        const session = new Session(sessionDetails, fullPaymentContext, device);
+        await session.createApplePayPayment({ networks: ["1"] }).catch(jest.fn());
+        session.updatePaymentContext({});
+        await session.createApplePayPayment({ networks: ["1"] }).catch(jest.fn());
+        expect(spy).toBeCalledTimes(2);
+      });
+
+      test("different data", async () => {
+        const device = new MockDevice().mockApplePayClient(true);
+        const spy = jest.spyOn(device, "getApplePayClient");
+        const session = new Session(sessionDetails, fullPaymentContext, device);
+        await session.createApplePayPayment({ networks: ["1"] }).catch(jest.fn());
+        await session.createApplePayPayment({ networks: ["2"] }).catch(jest.fn());
+        expect(spy).toBeCalledTimes(2);
+      });
+    });
   });
 
   describe("prefetchGooglePayPaymentData", () => {
@@ -2942,6 +2981,46 @@ describe("Session", () => {
       const session = new Session(sessionDetails, fullPaymentContext, device);
       await session.createGooglePayPayment({ gateway: "GW", networks: ["VISA"] });
       expect(googlePayClient.createPayment).toHaveBeenCalled();
+    });
+
+    describe("caching", () => {
+      test("Google Pay not enabled", async () => {
+        const device = new MockDevice();
+        const spy = jest.spyOn(device, "getGooglePayClient");
+        const session = new Session(sessionDetails, fullPaymentContext, device);
+        await session.createGooglePayPayment({ gateway: "GW", networks: ["VISA"] }).catch(jest.fn());
+        await session.createGooglePayPayment({ gateway: "GW", networks: ["VISA"] }).catch(jest.fn());
+        expect(spy).toBeCalledTimes(1);
+      });
+
+      test("Google Pay enabled", async () => {
+        const device = new MockDevice().mockGooglePayClient(true);
+        const spy = jest.spyOn(device, "getGooglePayClient");
+        const session = new Session(sessionDetails, fullPaymentContext, device);
+        await session.createGooglePayPayment({ gateway: "GW", networks: ["VISA"] }).catch(jest.fn());
+        await session.createGooglePayPayment({ gateway: "GW", networks: ["VISA"] }).catch(jest.fn());
+        expect(spy).toBeCalledTimes(1);
+      });
+
+      test("payment context update", async () => {
+        const device = new MockDevice().mockGooglePayClient(true);
+        const spy = jest.spyOn(device, "getGooglePayClient");
+        const session = new Session(sessionDetails, fullPaymentContext, device);
+        await session.createGooglePayPayment({ gateway: "GW", networks: ["VISA"] }).catch(jest.fn());
+        session.updatePaymentContext({});
+        await session.createGooglePayPayment({ gateway: "GW", networks: ["VISA"] }).catch(jest.fn());
+        expect(spy).toBeCalledTimes(2);
+      });
+
+      test("different data", async () => {
+        const device = new MockDevice().mockGooglePayClient(true);
+        const spy = jest.spyOn(device, "getGooglePayClient");
+        const session = new Session(sessionDetails, fullPaymentContext, device);
+        await session.createGooglePayPayment({ gateway: "GW", networks: ["VISA"] }).catch(jest.fn());
+        await session.createGooglePayPayment({ gateway: "GW", networks: ["MASTERCARD"] }).catch(jest.fn());
+        await session.createGooglePayPayment({ gateway: "GW2", networks: ["VISA"] }).catch(jest.fn());
+        expect(spy).toBeCalledTimes(3);
+      });
     });
   });
 

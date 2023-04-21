@@ -51,9 +51,9 @@ export class Browser implements Device {
       timezoneOffsetUtcMinutes: new Date().getTimezoneOffset(),
       locale: window.navigator.language,
       javaEnabled: window.navigator.javaEnabled(),
-      colorDepth: screen.colorDepth,
-      screenHeight: screen.height,
-      screenWidth: screen.width,
+      colorDepth: window.screen.colorDepth,
+      screenHeight: window.screen.height,
+      screenWidth: window.screen.width,
       innerHeight: window.innerHeight,
       innerWidth: window.innerWidth,
     };

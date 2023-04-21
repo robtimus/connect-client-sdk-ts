@@ -1,7 +1,9 @@
 import { ValidatableRequest, ValidationRule } from ".";
 import { api } from "../communicator/model";
 
-export class ValidationRuleBoletoBancarioRequiredness implements ValidationRule<api.BoletoBancarioRequirednessValidator>, api.BoletoBancarioRequirednessValidator {
+export class ValidationRuleBoletoBancarioRequiredness
+  implements ValidationRule<api.BoletoBancarioRequirednessValidator>, api.BoletoBancarioRequirednessValidator
+{
   static readonly ID = "boletoBancarioRequiredness";
 
   readonly id = ValidationRuleBoletoBancarioRequiredness.ID;

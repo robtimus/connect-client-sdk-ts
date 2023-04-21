@@ -85,7 +85,13 @@ function calculateAdditionalAuthenticatedDataLength(encodededProtectedHeader: st
   return ab2str(array);
 }
 
-async function calculateHMAC(macKey: string, encodededProtectedHeader: string, initializationVector: string, cipherText: string, al: string): Promise<string> {
+async function calculateHMAC(
+  macKey: string,
+  encodededProtectedHeader: string,
+  initializationVector: string,
+  cipherText: string,
+  al: string
+): Promise<string> {
   const hmacInput = [encodededProtectedHeader, initializationVector, cipherText, al].join("");
 
   const key = await crypto.subtle.importKey(
@@ -136,7 +142,15 @@ class SubtleCryptoJOSEEncryptor implements JOSEEncryptor {
     const authenticationTag = calculatedHmac.substring(0, calculatedHmac.length / 2);
     const encodedAuthenticationTag = btoa(authenticationTag);
 
-    return Promise.resolve([encodededProtectedHeader, encodedEncryptedContentEncryptionKey, encodededinitializationVector, encodedCipherText, encodedAuthenticationTag].join("."));
+    return Promise.resolve(
+      [
+        encodededProtectedHeader,
+        encodedEncryptedContentEncryptionKey,
+        encodededinitializationVector,
+        encodedCipherText,
+        encodedAuthenticationTag,
+      ].join(".")
+    );
   }
 }
 

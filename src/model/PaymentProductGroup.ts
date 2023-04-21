@@ -1,4 +1,11 @@
-import { AccountOnFile, BasicPaymentProductGroup, BasicPaymentProductGroups, PaymentProductDisplayHints, PaymentProductField, PaymentProductGroup } from "./types";
+import {
+  AccountOnFile,
+  BasicPaymentProductGroup,
+  BasicPaymentProductGroups,
+  PaymentProductDisplayHints,
+  PaymentProductField,
+  PaymentProductGroup,
+} from "./types";
 import { api } from "../communicator/model";
 import { toAccountOnFile } from "./AccountOnFile";
 import { toPaymentProductField } from "./PaymentProductField";

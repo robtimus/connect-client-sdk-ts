@@ -63,7 +63,12 @@ describe("fetch HttpClient", () => {
   afterAll(() => server.close());
 
   test("GET", async () => {
-    const response = await fetchHttpClient.get(`${baseUrl}/echo`).queryParam("name", "value").queryParams("repeated", [1, 2]).header("Authorization", "Bearer token").send();
+    const response = await fetchHttpClient
+      .get(`${baseUrl}/echo`)
+      .queryParam("name", "value")
+      .queryParams("repeated", [1, 2])
+      .header("Authorization", "Bearer token")
+      .send();
     expect(response.statusCode).toBe(200);
     expect(response.contentType).toMatch(/application\/json.*/);
     expect(response.body).toBeTruthy();
@@ -75,7 +80,12 @@ describe("fetch HttpClient", () => {
   });
 
   test("DELETE", async () => {
-    const response = await fetchHttpClient.delete(`${baseUrl}/echo`).queryParam("name", "value").queryParams("repeated", [1, 2]).header("Authorization", "Bearer token").send();
+    const response = await fetchHttpClient
+      .delete(`${baseUrl}/echo`)
+      .queryParam("name", "value")
+      .queryParams("repeated", [1, 2])
+      .header("Authorization", "Bearer token")
+      .send();
     expect(response.statusCode).toBe(200);
     expect(response.contentType).toMatch(/application\/json.*/);
     expect(response.body).toBeTruthy();
@@ -88,7 +98,12 @@ describe("fetch HttpClient", () => {
 
   describe("POST", () => {
     test("without body", async () => {
-      const response = await fetchHttpClient.post(`${baseUrl}/echo`).queryParam("name", "value").queryParams("repeated", [1, 2]).header("Authorization", "Bearer token").send();
+      const response = await fetchHttpClient
+        .post(`${baseUrl}/echo`)
+        .queryParam("name", "value")
+        .queryParams("repeated", [1, 2])
+        .header("Authorization", "Bearer token")
+        .send();
       expect(response.statusCode).toBe(200);
       expect(response.contentType).toMatch(/application\/json.*/);
       expect(response.body).toBeTruthy();
@@ -123,7 +138,12 @@ describe("fetch HttpClient", () => {
 
   describe("PUT", () => {
     test("without body", async () => {
-      const response = await fetchHttpClient.put(`${baseUrl}/echo`).queryParam("name", "value").queryParams("repeated", [1, 2]).header("Authorization", "Bearer token").send();
+      const response = await fetchHttpClient
+        .put(`${baseUrl}/echo`)
+        .queryParam("name", "value")
+        .queryParams("repeated", [1, 2])
+        .header("Authorization", "Bearer token")
+        .send();
       expect(response.statusCode).toBe(200);
       expect(response.contentType).toMatch(/application\/json.*/);
       expect(response.body).toBeTruthy();

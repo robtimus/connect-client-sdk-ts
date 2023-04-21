@@ -194,7 +194,14 @@ export class Session {
       isRecurring: this.paymentContext.isRecurring,
       hide: ["fields"],
     };
-    const cacheKey = constructCacheKey("BasicPaymentProductGroups", params.countryCode, params.currencyCode, params.locale, params.amount, params.isRecurring);
+    const cacheKey = constructCacheKey(
+      "BasicPaymentProductGroups",
+      params.countryCode,
+      params.currencyCode,
+      params.locale,
+      params.amount,
+      params.isRecurring
+    );
     const json = await getValue(this.cache, cacheKey, async () => {
       const json = await this.communicator.getPaymentProductGroups(params);
       updateItems(json.paymentProductGroups, this.sessionDetails.assetUrl);
@@ -215,7 +222,14 @@ export class Session {
       amount: this.paymentContext.amountOfMoney.amount,
       isRecurring: this.paymentContext.isRecurring,
     };
-    const cacheKey = constructCacheKey(`PaymentProductGroup:${paymentProductGroupId}`, params.countryCode, params.currencyCode, params.locale, params.amount, params.isRecurring);
+    const cacheKey = constructCacheKey(
+      `PaymentProductGroup:${paymentProductGroupId}`,
+      params.countryCode,
+      params.currencyCode,
+      params.locale,
+      params.amount,
+      params.isRecurring
+    );
     const json = await getValue(this.cache, cacheKey, async () => {
       const json = await this.communicator.getPaymentProductGroup(paymentProductGroupId, params);
       updateItem(json, this.sessionDetails.assetUrl);
@@ -238,7 +252,14 @@ export class Session {
       isRecurring: this.paymentContext.isRecurring,
       hide: ["fields"],
     };
-    const cacheKey = constructCacheKey("BasicPaymentProducts", params.countryCode, params.currencyCode, params.locale, params.amount, params.isRecurring);
+    const cacheKey = constructCacheKey(
+      "BasicPaymentProducts",
+      params.countryCode,
+      params.currencyCode,
+      params.locale,
+      params.amount,
+      params.isRecurring
+    );
     const json = await getValue(this.cache, cacheKey, async () => {
       const json = await this.communicator.getPaymentProducts(params);
       updateItems(json.paymentProducts, this.sessionDetails.assetUrl);
@@ -366,11 +387,19 @@ export class Session {
       amount: this.paymentContext.amountOfMoney.amount,
       isRecurring: this.paymentContext.isRecurring,
     };
-    const cacheKey = constructCacheKey(`PaymentProductNetworks:${paymentProductId}`, params.countryCode, params.currencyCode, params.amount, params.isRecurring);
+    const cacheKey = constructCacheKey(
+      `PaymentProductNetworks:${paymentProductId}`,
+      params.countryCode,
+      params.currencyCode,
+      params.amount,
+      params.isRecurring
+    );
     return getValue(this.cache, cacheKey, () => this.communicator.getPaymentProductNetworks(paymentProductId, params));
   }
 
-  async createApplePaySession(applePaySpecificInput: MobilePaymentProductSession302SpecificInput): Promise<MobilePaymentProductSession302SpecificOutput> {
+  async createApplePaySession(
+    applePaySpecificInput: MobilePaymentProductSession302SpecificInput
+  ): Promise<MobilePaymentProductSession302SpecificOutput> {
     // Don't cache, always return the latest result
     const json = await this.communicator.createPaymentProductSession(PP_APPLE_PAY, {
       paymentProductSession302SpecificInput: applePaySpecificInput,
@@ -476,7 +505,10 @@ export class Session {
       });
   }
 
-  async createGooglePayButton(googlePaySpecificData: PaymentProduct320SpecificData, options: google.payments.api.ButtonOptions): Promise<HTMLElement> {
+  async createGooglePayButton(
+    googlePaySpecificData: PaymentProduct320SpecificData,
+    options: google.payments.api.ButtonOptions
+  ): Promise<HTMLElement> {
     const client = await this.getGooglePayClient(googlePaySpecificData);
     if (!client) {
       throw new Error("Google Pay client is not available");

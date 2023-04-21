@@ -9,7 +9,13 @@ import { JOSEEncryptor } from "../../../src/crypto";
 import { subtleCryptoEncryptor } from "../../../src/crypto/SubtleCrypto";
 import { HttpClient } from "../../../src/http";
 import { fetchHttpClient } from "../../../src/http/fetch";
-import { ApplePaySpecificInput, GooglePaySpecificInput, PaymentContext, PaymentProduct302SpecificData, PaymentProduct320SpecificData } from "../../../src/model";
+import {
+  ApplePaySpecificInput,
+  GooglePaySpecificInput,
+  PaymentContext,
+  PaymentProduct302SpecificData,
+  PaymentProduct320SpecificData,
+} from "../../../src/model";
 import { GlobalMocks } from "../mock.test";
 
 describe("Browser", () => {

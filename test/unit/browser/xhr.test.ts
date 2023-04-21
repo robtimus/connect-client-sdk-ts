@@ -86,7 +86,12 @@ describe("xhrHttpRequest", () => {
   });
 
   test("GET", async () => {
-    const response = await client.get("/echo").queryParam("name", "value").queryParams("repeated", [1, 2]).header("Authorization", "Bearer token").send();
+    const response = await client
+      .get("/echo")
+      .queryParam("name", "value")
+      .queryParams("repeated", [1, 2])
+      .header("Authorization", "Bearer token")
+      .send();
     expect(response.statusCode).toBe(200);
     expect(response.contentType).toMatch(/application\/json.*/);
     expect(response.body).toBeTruthy();
@@ -100,7 +105,12 @@ describe("xhrHttpRequest", () => {
   });
 
   test("DELETE", async () => {
-    const response = await client.delete("/echo").queryParam("name", "value").queryParams("repeated", [1, 2]).header("Authorization", "Bearer token").send();
+    const response = await client
+      .delete("/echo")
+      .queryParam("name", "value")
+      .queryParams("repeated", [1, 2])
+      .header("Authorization", "Bearer token")
+      .send();
     expect(response.statusCode).toBe(200);
     expect(response.contentType).toMatch(/application\/json.*/);
     expect(response.body).toBeTruthy();
@@ -115,7 +125,12 @@ describe("xhrHttpRequest", () => {
 
   describe("POST", () => {
     test("without body", async () => {
-      const response = await client.post("/echo").queryParam("name", "value").queryParams("repeated", [1, 2]).header("Authorization", "Bearer token").send();
+      const response = await client
+        .post("/echo")
+        .queryParam("name", "value")
+        .queryParams("repeated", [1, 2])
+        .header("Authorization", "Bearer token")
+        .send();
       expect(response.statusCode).toBe(200);
       expect(response.contentType).toMatch(/application\/json.*/);
       expect(response.body).toBeTruthy();
@@ -133,7 +148,12 @@ describe("xhrHttpRequest", () => {
         key: "expirationDate",
         value: "1230",
       };
-      const response = await client.post("/echo", body).queryParam("name", "value").queryParams("repeated", [1, 2]).header("Authorization", "Bearer token").send();
+      const response = await client
+        .post("/echo", body)
+        .queryParam("name", "value")
+        .queryParams("repeated", [1, 2])
+        .header("Authorization", "Bearer token")
+        .send();
       expect(response.statusCode).toBe(200);
       expect(response.contentType).toMatch(/application\/json.*/);
       expect(response.body).toBeTruthy();
@@ -149,7 +169,12 @@ describe("xhrHttpRequest", () => {
 
   describe("PUT", () => {
     test("without body", async () => {
-      const response = await client.put("/echo").queryParam("name", "value").queryParams("repeated", [1, 2]).header("Authorization", "Bearer token").send();
+      const response = await client
+        .put("/echo")
+        .queryParam("name", "value")
+        .queryParams("repeated", [1, 2])
+        .header("Authorization", "Bearer token")
+        .send();
       expect(response.statusCode).toBe(200);
       expect(response.contentType).toMatch(/application\/json.*/);
       expect(response.body).toBeTruthy();
@@ -167,7 +192,12 @@ describe("xhrHttpRequest", () => {
         key: "expirationDate",
         value: "1230",
       };
-      const response = await client.put("/echo", body).queryParam("name", "value").queryParams("repeated", [1, 2]).header("Authorization", "Bearer token").send();
+      const response = await client
+        .put("/echo", body)
+        .queryParam("name", "value")
+        .queryParams("repeated", [1, 2])
+        .header("Authorization", "Bearer token")
+        .send();
       expect(response.statusCode).toBe(200);
       expect(response.contentType).toMatch(/application\/json.*/);
       expect(response.body).toBeTruthy();

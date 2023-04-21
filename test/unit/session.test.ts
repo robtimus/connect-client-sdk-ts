@@ -261,7 +261,11 @@ describe("Session", () => {
     });
   });
 
-  function expectRequest(request: CapturedHttpRequest, params: Record<string, string | number | boolean | string[] | number[] | boolean[] | undefined> = {}, body?: object): void {
+  function expectRequest(
+    request: CapturedHttpRequest,
+    params: Record<string, string | number | boolean | string[] | number[] | boolean[] | undefined> = {},
+    body?: object
+  ): void {
     expect(request.headers["Authorization"]).toBe(`GCS v1Client:${sessionDetails.clientSessionId}`);
     expect(request.headers["X-GCS-ClientMetaInfo"]).toBeTruthy;
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -435,11 +439,14 @@ describe("Session", () => {
       const thirdPartyStatusResponse: api.ThirdPartyStatusResponse = {
         thirdPartyStatus: "WAITING",
       };
-      const device = new MockDevice().mockGet(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/payments/${paymentId}/thirdpartystatus`, {
-        statusCode: 200,
-        contentType: "application/json",
-        body: JSON.parse(JSON.stringify(thirdPartyStatusResponse)),
-      });
+      const device = new MockDevice().mockGet(
+        `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/payments/${paymentId}/thirdpartystatus`,
+        {
+          statusCode: 200,
+          contentType: "application/json",
+          body: JSON.parse(JSON.stringify(thirdPartyStatusResponse)),
+        }
+      );
       const session = new Session(sessionDetails, minimalPaymentContext, device);
       const result1 = await session.getThirdPartyStatus(paymentId);
       const result2 = await session.getThirdPartyStatus(paymentId);
@@ -1116,11 +1123,14 @@ describe("Session", () => {
         deviceFingerprintTransactionId: uuidv4(),
         html: "<span>foo</span>",
       };
-      const device = new MockDevice().mockPost(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/productgroups/cards/deviceFingerprint`, {
-        statusCode: 200,
-        contentType: "application/json",
-        body: JSON.parse(JSON.stringify(deviceFingerprintResponse)),
-      });
+      const device = new MockDevice().mockPost(
+        `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/productgroups/cards/deviceFingerprint`,
+        {
+          statusCode: 200,
+          contentType: "application/json",
+          body: JSON.parse(JSON.stringify(deviceFingerprintResponse)),
+        }
+      );
       const session = new Session(sessionDetails, minimalPaymentContext, device);
       const result1 = await session.getPaymentProductGroupDeviceFingerprint("cards", deviceFingerprintRequest);
       const result2 = await session.getPaymentProductGroupDeviceFingerprint("cards", deviceFingerprintRequest);

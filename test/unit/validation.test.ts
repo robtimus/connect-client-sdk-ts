@@ -701,7 +701,9 @@ describe("validation", () => {
       const rules = Object.keys(validators).map((id) => createValidationRule(id, validators[id]));
       expect(rules.length).toBe(11);
 
-      const ruleBoletoBancarioRequiredness = rules.find((rule) => rule?.id === ValidationRuleBoletoBancarioRequiredness.ID) as ValidationRuleBoletoBancarioRequiredness;
+      const ruleBoletoBancarioRequiredness = rules.find(
+        (rule) => rule?.id === ValidationRuleBoletoBancarioRequiredness.ID
+      ) as ValidationRuleBoletoBancarioRequiredness;
       expect(ruleBoletoBancarioRequiredness.definition).toBe(validators.boletoBancarioRequiredness);
 
       const ruleEmailAddress = rules.find((rule) => rule?.id === ValidationRuleEmailAddress.ID) as ValidationRuleEmailAddress;

@@ -96,7 +96,10 @@ export class Communicator {
       .then((response) => processResponse(response));
   }
 
-  async getPaymentProductGroupDeviceFingerprint(paymentProductGroupId: string, request: api.DeviceFingerprintRequest): Promise<api.DeviceFingerprintResponse> {
+  async getPaymentProductGroupDeviceFingerprint(
+    paymentProductGroupId: string,
+    request: api.DeviceFingerprintRequest
+  ): Promise<api.DeviceFingerprintResponse> {
     const url = createURL(this.config, "v1", `productgroups/${paymentProductGroupId}/deviceFingerprint`);
     return this.device
       .getHttpClient()
@@ -192,7 +195,10 @@ export class Communicator {
       .then((response) => processResponse(response));
   }
 
-  async createPaymentProductSession(paymentProductId: number, request: api.CreatePaymentProductSessionRequest): Promise<api.CreatePaymentProductSessionResponse> {
+  async createPaymentProductSession(
+    paymentProductId: number,
+    request: api.CreatePaymentProductSessionRequest
+  ): Promise<api.CreatePaymentProductSessionResponse> {
     const url = createURL(this.config, "v1", `products/${paymentProductId}/sessions`);
     return this.device
       .getHttpClient()

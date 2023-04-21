@@ -1,6 +1,9 @@
 import { GooglePayClient, GooglePaySpecificInput, PaymentContext, PaymentProduct320SpecificData } from "../model";
 
-function getPaymentsClient(googlePaySpecificData: PaymentProduct320SpecificData, context: PaymentContext): google.payments.api.PaymentsClient | undefined {
+function getPaymentsClient(
+  googlePaySpecificData: PaymentProduct320SpecificData,
+  context: PaymentContext
+): google.payments.api.PaymentsClient | undefined {
   if (googlePaySpecificData.networks.length === 0) {
     console.warn("No Google Pay networks available");
     return undefined;
@@ -28,7 +31,10 @@ function constructCardParameters(data: PaymentProduct320SpecificData): google.pa
   };
 }
 
-function constructTokenizationSpecification(input: GooglePaySpecificInput, data: PaymentProduct320SpecificData): google.payments.api.PaymentMethodTokenizationSpecification {
+function constructTokenizationSpecification(
+  input: GooglePaySpecificInput,
+  data: PaymentProduct320SpecificData
+): google.payments.api.PaymentMethodTokenizationSpecification {
   return {
     type: "PAYMENT_GATEWAY",
     parameters: {
@@ -87,7 +93,11 @@ function constructPrefetchPaymentDataRequest(
   return undefined;
 }
 
-function constructPaymentDataRequest(input: GooglePaySpecificInput, data: PaymentProduct320SpecificData, context: PaymentContext): google.payments.api.PaymentDataRequest {
+function constructPaymentDataRequest(
+  input: GooglePaySpecificInput,
+  data: PaymentProduct320SpecificData,
+  context: PaymentContext
+): google.payments.api.PaymentDataRequest {
   return {
     apiVersion: API_VERSION,
     apiVersionMinor: API_VERSION,

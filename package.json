@@ -66,7 +66,7 @@
     ]
   },
   "prettier": {
-    "printWidth": 180
+    "printWidth": 150
   },
   "husky": {
     "hooks": {

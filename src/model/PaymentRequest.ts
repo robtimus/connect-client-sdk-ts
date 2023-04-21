@@ -77,7 +77,9 @@ export class PaymentRequest implements ValidatableRequest {
 
   setAccountOnFile(accountOnFile?: AccountOnFile): void {
     if (accountOnFile) {
-      accountOnFile.attributes.filter((attribute) => attribute.status !== "MUST_WRITE").forEach((attribute) => delete this.fieldValues[attribute.key]);
+      accountOnFile.attributes
+        .filter((attribute) => attribute.status !== "MUST_WRITE")
+        .forEach((attribute) => delete this.fieldValues[attribute.key]);
     }
     this.accountOnFile = accountOnFile;
   }

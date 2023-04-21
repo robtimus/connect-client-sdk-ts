@@ -51,7 +51,13 @@ class MockHttpRequest implements HttpRequest {
   private readonly params: Record<string, string | number | boolean | string[] | number[] | boolean[] | undefined> = {};
   private readonly headers: Record<string, string | undefined> = {};
 
-  constructor(private readonly method: string, url: string, private readonly matcher: RequestMatcher, private readonly client: MockHttpClient, private readonly body?: object) {
+  constructor(
+    private readonly method: string,
+    url: string,
+    private readonly matcher: RequestMatcher,
+    private readonly client: MockHttpClient,
+    private readonly body?: object
+  ) {
     this.urlBuilder = new URLBuilder(url);
   }
 

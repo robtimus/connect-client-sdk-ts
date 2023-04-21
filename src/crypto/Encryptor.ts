@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
+import { JOSEEncryptor } from ".";
 import { Device, KeyValuePair, PublicKey } from "../model";
 import { PaymentRequest } from "../model/PaymentRequest";
 
@@ -68,7 +69,15 @@ function createEncryptedCustomerInput(clientSessionId: string, paymentRequest: P
 }
 
 export class Encryptor {
-  constructor(private readonly clientSessionId: string, private readonly publicKey: PublicKey, private readonly device: Device) {}
+  private readonly joseEncryptor: JOSEEncryptor;
+
+  constructor(private readonly clientSessionId: string, private readonly publicKey: PublicKey, private readonly device: Device) {
+    const joseEncryptor = this.device.getJOSEEncryptor();
+    if (!joseEncryptor) {
+      throw new Error("encryption not supported");
+    }
+    this.joseEncryptor = joseEncryptor;
+  }
 
   async encrypt(paymentRequest: PaymentRequest): Promise<string> {
     if (!paymentRequest.getPaymentProduct()) {
@@ -78,13 +87,9 @@ export class Encryptor {
     if (!validationResult.valid) {
       throw validationResult.errors;
     }
-    const joseEncryptor = this.device.getJOSEEncryptor();
-    if (!joseEncryptor) {
-      throw new Error("encryption not supported");
-    }
     const encryptedCustomerInput = createEncryptedCustomerInput(this.clientSessionId, paymentRequest, this.device);
     const payload = JSON.stringify(encryptedCustomerInput);
-    return joseEncryptor.encrypt(payload, this.publicKey.keyId, this.publicKey.publicKey);
+    return this.joseEncryptor.encrypt(payload, this.publicKey.keyId, this.publicKey.publicKey);
   }
 }
 

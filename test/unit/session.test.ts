@@ -323,15 +323,17 @@ describe("Session", () => {
         publicKey:
           "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkiJlGL1QjUnGDLpMNBtZPYVtOU121jfFcV4WrZayfw9Ib/1AtPBHP/0ZPocdA23zDh6aB+QiOQEkHZlfnelBNnEzEu4ibda3nDdjSrKveSiQPyB5X+u/IS3CR48B/g4QJ+mcMV9hoFt6Hx3R99A0HWMs4um8elQsgB11MsLmGb1SuLo0S1pgL3EcckXfBDNMUBMQ9EtLC9zQW6Y0kx6GFXHgyjNb4yixXfjo194jfhei80sVQ49Y/SHBt/igATGN1l18IBDtO0eWmWeBckwbNkpkPLAvJfsfa3JpaxbXwg3rTvVXLrIRhvMYqTsQmrBIJDl7F6igPD98Y1FydbKe5QIDAQAB",
       };
-      const device = new MockDevice().mockGet(
-        `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/crypto/publickey`,
-        {
-          statusCode: 200,
-          contentType: "application/json",
-          body: JSON.parse(JSON.stringify(publicKey)),
-        },
-        expectRequest
-      );
+      const device = new MockDevice()
+        .mockGet(
+          `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/crypto/publickey`,
+          {
+            statusCode: 200,
+            contentType: "application/json",
+            body: JSON.parse(JSON.stringify(publicKey)),
+          },
+          expectRequest
+        )
+        .mockJOSEEncryptor(true);
       const session = new Session(sessionDetails, minimalPaymentContext, device);
       expect(async () => await session.getEncryptor()).not.toThrow();
     });
@@ -346,6 +348,31 @@ describe("Session", () => {
         .catch((reason) => reason);
       expect(onSuccess).not.toBeCalled();
       expect(result).toStrictEqual(notImplementedResponse());
+    });
+
+    test("no encryptor", async () => {
+      const publicKey: api.PublicKey = {
+        keyId: uuidv4(),
+        publicKey:
+          "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkiJlGL1QjUnGDLpMNBtZPYVtOU121jfFcV4WrZayfw9Ib/1AtPBHP/0ZPocdA23zDh6aB+QiOQEkHZlfnelBNnEzEu4ibda3nDdjSrKveSiQPyB5X+u/IS3CR48B/g4QJ+mcMV9hoFt6Hx3R99A0HWMs4um8elQsgB11MsLmGb1SuLo0S1pgL3EcckXfBDNMUBMQ9EtLC9zQW6Y0kx6GFXHgyjNb4yixXfjo194jfhei80sVQ49Y/SHBt/igATGN1l18IBDtO0eWmWeBckwbNkpkPLAvJfsfa3JpaxbXwg3rTvVXLrIRhvMYqTsQmrBIJDl7F6igPD98Y1FydbKe5QIDAQAB",
+      };
+      const device = new MockDevice().mockGet(
+        `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/crypto/publickey`,
+        {
+          statusCode: 200,
+          contentType: "application/json",
+          body: JSON.parse(JSON.stringify(publicKey)),
+        },
+        expectRequest
+      );
+      const session = new Session(sessionDetails, minimalPaymentContext, device);
+      const onSuccess = jest.fn();
+      const result = await session
+        .getEncryptor()
+        .then(onSuccess)
+        .catch((reason) => reason);
+      expect(onSuccess).not.toBeCalled();
+      expect(result).toStrictEqual(new Error("encryption not supported"));
     });
   });
 

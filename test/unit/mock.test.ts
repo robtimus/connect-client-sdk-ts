@@ -186,8 +186,14 @@ export class MockDevice implements Device {
     return this;
   }
 
-  mockJOSEEncryptor(joseEncryptor?: JOSEEncryptor): MockDevice {
-    this.joseEncryptor = joseEncryptor;
+  mockJOSEEncryptor(joseEncryptor?: true | JOSEEncryptor): MockDevice {
+    if (joseEncryptor === true) {
+      this.joseEncryptor = {
+        encrypt: jest.fn(),
+      };
+    } else {
+      this.joseEncryptor = joseEncryptor;
+    }
     return this;
   }
 

@@ -217,3 +217,47 @@ export class MockDevice implements Device {
     return this.httpClient.requests;
   }
 }
+
+export class GlobalMocks {
+  private readonly oldValues: Record<string, unknown> = {};
+
+  mock(name: string, value: unknown): GlobalMocks {
+    const oldValue = globalThis[name];
+    Object.defineProperty(globalThis, name, {
+      value,
+      configurable: true,
+    });
+    this.oldValues[name] = oldValue;
+    return this;
+  }
+
+  mockIfNecessary(name: string, value: unknown): GlobalMocks {
+    const oldValue = globalThis[name];
+    if (oldValue === undefined) {
+      this.mock(name, value);
+    }
+    return this;
+  }
+
+  restore(): void {
+    const names = Object.keys(this.oldValues);
+    for (const name of names) {
+      const oldValue = this.oldValues[name];
+      if (oldValue === undefined) {
+        delete globalThis[name];
+      } else {
+        Object.defineProperty(globalThis, name, {
+          value: oldValue,
+        });
+      }
+      delete this.oldValues[name];
+    }
+  }
+}
+
+// Any file not ending with .test.ts has code coverage calculated
+// Any file ending with .test.ts must have at least 1 test
+// This file should not have its code coverage calculated, so add a dummy test instead
+test("dummy", (done) => {
+  done();
+});

@@ -6,6 +6,7 @@ import { newServer } from "mock-xmlhttprequest";
 import { RequestHandler } from "mock-xmlhttprequest/dist/types/MockXhrServer";
 import MockXhrRequest from "mock-xmlhttprequest/dist/types/MockXhrRequest";
 import { xhrHttpClient } from "../../../src/browser/xhr";
+import { GlobalMocks } from "../mock.test";
 
 describe("xhrHttpRequest", () => {
   interface EchoResponse {
@@ -70,19 +71,19 @@ describe("xhrHttpRequest", () => {
     timeout: 1000,
   });
 
+  const globalMocks = new GlobalMocks();
+
   beforeAll(() => {
     server.install();
-
-    if (typeof window === "undefined") {
-      Object.defineProperty(globalThis, "window", {
-        value: {
-          location: "http://localhost",
-        },
-      });
-    }
+    globalMocks.mockIfNecessary("window", {
+      location: new URL("http://localhost"),
+    });
   });
 
-  afterAll(() => server.remove());
+  afterAll(() => {
+    server.remove();
+    globalMocks.restore();
+  });
 
   test("GET", async () => {
     const response = await client.get("/echo").queryParam("name", "value").queryParams("repeated", [1, 2]).header("Authorization", "Bearer token").send();

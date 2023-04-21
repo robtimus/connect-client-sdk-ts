@@ -5,9 +5,9 @@
 import { v4 as uuidv4 } from "uuid";
 import { Encryptor } from "../../../src/crypto/Encryptor";
 import { PaymentRequest } from "../../../src/model/PaymentRequest";
-import { MockDevice } from "../mock";
 import { PublicKey } from "../../../src/model";
 import { toPaymentProduct } from "../../../src/model/PaymentProduct";
+import { MockDevice } from "../mock.test";
 
 describe("Encryptor", () => {
   const clientSessionId = uuidv4();

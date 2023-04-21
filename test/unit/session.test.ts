@@ -4,7 +4,6 @@
 
 import { v4 as uuidv4 } from "uuid";
 import { Session } from "../../src/session";
-import { MockDevice, notImplementedResponse } from "./mock";
 import { api } from "../../src/communicator/model";
 import {
   ApplePayClient,
@@ -17,8 +16,8 @@ import {
 } from "../../src/model";
 import { PP_APPLE_PAY, PP_BANCONTACT, PP_GOOGLE_PAY } from "../../src/model/PaymentProduct";
 import { HttpResponse } from "../../src/http";
-import { CapturedHttpRequest } from "./mock";
 import { sdkIdentifier } from "../../src/metadata";
+import { CapturedHttpRequest, MockDevice, notImplementedResponse } from "./mock.test";
 
 describe("Session", () => {
   const sessionDetails: SessionDetails = {

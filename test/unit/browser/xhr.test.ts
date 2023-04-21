@@ -6,7 +6,7 @@ import { newServer } from "mock-xmlhttprequest";
 import { RequestHandler } from "mock-xmlhttprequest/dist/types/MockXhrServer";
 import MockXhrRequest from "mock-xmlhttprequest/dist/types/MockXhrRequest";
 import { xhrHttpClient } from "../../../src/browser/xhr";
-import { GlobalMocks } from "../mock.test";
+import { Mocks } from "../mock.test";
 
 describe("xhrHttpRequest", () => {
   interface EchoResponse {
@@ -67,11 +67,8 @@ describe("xhrHttpRequest", () => {
     request.respond(200, { "Content-Type": "application/jsonn" }, "Non-JSON");
   });
 
-  const client = xhrHttpClient({
-    timeout: 1000,
-  });
-
-  const globalMocks = new GlobalMocks();
+  const globalMocks = Mocks.global();
+  const clientMocks = Mocks.for(xhrHttpClient);
 
   beforeAll(() => {
     server.install();
@@ -83,10 +80,11 @@ describe("xhrHttpRequest", () => {
   afterAll(() => {
     server.remove();
     globalMocks.restore();
+    clientMocks.restore();
   });
 
   test("GET", async () => {
-    const response = await client
+    const response = await xhrHttpClient
       .get("/echo")
       .queryParam("name", "value")
       .queryParams("repeated", [1, 2])
@@ -105,7 +103,7 @@ describe("xhrHttpRequest", () => {
   });
 
   test("DELETE", async () => {
-    const response = await client
+    const response = await xhrHttpClient
       .delete("/echo")
       .queryParam("name", "value")
       .queryParams("repeated", [1, 2])
@@ -125,7 +123,7 @@ describe("xhrHttpRequest", () => {
 
   describe("POST", () => {
     test("without body", async () => {
-      const response = await client
+      const response = await xhrHttpClient
         .post("/echo")
         .queryParam("name", "value")
         .queryParams("repeated", [1, 2])
@@ -148,7 +146,7 @@ describe("xhrHttpRequest", () => {
         key: "expirationDate",
         value: "1230",
       };
-      const response = await client
+      const response = await xhrHttpClient
         .post("/echo", body)
         .queryParam("name", "value")
         .queryParams("repeated", [1, 2])
@@ -169,7 +167,7 @@ describe("xhrHttpRequest", () => {
 
   describe("PUT", () => {
     test("without body", async () => {
-      const response = await client
+      const response = await xhrHttpClient
         .put("/echo")
         .queryParam("name", "value")
         .queryParams("repeated", [1, 2])
@@ -192,7 +190,7 @@ describe("xhrHttpRequest", () => {
         key: "expirationDate",
         value: "1230",
       };
-      const response = await client
+      const response = await xhrHttpClient
         .put("/echo", body)
         .queryParam("name", "value")
         .queryParams("repeated", [1, 2])
@@ -212,14 +210,14 @@ describe("xhrHttpRequest", () => {
   });
 
   test("non-JSON response", async () => {
-    const response = await client.get("/error").send();
+    const response = await xhrHttpClient.get("/error").send();
     expect(response.statusCode).toBe(500);
     expect(response.contentType).toMatch(/text\/plain.*/);
     expect(response.body).toMatch(new RegExp("Error: /error\\?cacheBust=\\d+"));
   });
 
   test("empty response", async () => {
-    const response = await client.get("/empty").send();
+    const response = await xhrHttpClient.get("/empty").send();
     expect(response.statusCode).toBe(204);
     expect(response.contentType).toBeUndefined();
     expect(response.body).toBeFalsy();
@@ -227,7 +225,7 @@ describe("xhrHttpRequest", () => {
 
   test("XHR error", async () => {
     const onSuccess = jest.fn();
-    const result = await client
+    const result = await xhrHttpClient
       .get("/xhrError")
       .send()
       .then(onSuccess)
@@ -237,8 +235,10 @@ describe("xhrHttpRequest", () => {
   });
 
   test("timeout", async () => {
+    clientMocks.mock("timeout", 1000);
+
     const onSuccess = jest.fn();
-    const result = await client
+    const result = await xhrHttpClient
       .get("/timeout")
       .send()
       .then(onSuccess)
@@ -249,7 +249,7 @@ describe("xhrHttpRequest", () => {
 
   test("response conversion error", async () => {
     const onSuccess = jest.fn();
-    const result = await client
+    const result = await xhrHttpClient
       .get("/incorrectJson")
       .send()
       .then(onSuccess)

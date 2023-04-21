@@ -230,12 +230,14 @@ export class MockDevice implements Device {
   }
 }
 
-export class GlobalMocks {
+export class Mocks {
   private readonly oldValues: Record<string, unknown> = {};
 
-  mock(name: string, value: unknown): GlobalMocks {
-    const oldValue = globalThis[name];
-    Object.defineProperty(globalThis, name, {
+  private constructor(private readonly o: object) {}
+
+  mock(name: string, value: unknown): Mocks {
+    const oldValue = this.o[name];
+    Object.defineProperty(this.o, name, {
       value,
       configurable: true,
     });
@@ -243,8 +245,8 @@ export class GlobalMocks {
     return this;
   }
 
-  mockIfNecessary(name: string, value: unknown): GlobalMocks {
-    const oldValue = globalThis[name];
+  mockIfNecessary(name: string, value: unknown): Mocks {
+    const oldValue = this.o[name];
     if (oldValue === undefined) {
       this.mock(name, value);
     }
@@ -256,14 +258,22 @@ export class GlobalMocks {
     for (const name of names) {
       const oldValue = this.oldValues[name];
       if (oldValue === undefined) {
-        delete globalThis[name];
+        delete this.o[name];
       } else {
-        Object.defineProperty(globalThis, name, {
+        Object.defineProperty(this.o, name, {
           value: oldValue,
         });
       }
       delete this.oldValues[name];
     }
+  }
+
+  static global(): Mocks {
+    return new Mocks(globalThis);
+  }
+
+  static for(o: object): Mocks {
+    return new Mocks(o);
   }
 }
 

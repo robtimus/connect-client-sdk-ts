@@ -8,7 +8,7 @@ import { JWE, JWK } from "node-jose";
 import { JOSEEncryptor } from "../../../src/crypto";
 import { forgeEncryptor } from "../../../src/crypto/forge";
 import { subtleCryptoEncryptor } from "../../../src/crypto/SubtleCrypto";
-import { GlobalMocks } from "../mock.test";
+import { Mocks } from "../mock.test";
 
 function testJOSEEncryptor(joseEncryptor: JOSEEncryptor): void {
   describe("encrypt", () => {
@@ -57,7 +57,7 @@ describe("forge", () => {
 });
 
 describe("crypto.subtle", () => {
-  const globalMocks = new GlobalMocks();
+  const globalMocks = Mocks.global();
 
   beforeAll(() => {
     // Allow crypto to be used without needing to import it in the SubtleCrypto module

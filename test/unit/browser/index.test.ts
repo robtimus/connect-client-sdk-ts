@@ -7,7 +7,6 @@ import { Browser } from "../../../src/browser";
 import { xhrHttpClient } from "../../../src/browser/xhr";
 import { JOSEEncryptor } from "../../../src/crypto";
 import { subtleCryptoEncryptor } from "../../../src/crypto/SubtleCrypto";
-import { HttpClient } from "../../../src/http";
 import { fetchHttpClient } from "../../../src/http/fetch";
 import {
   ApplePaySpecificInput,
@@ -16,10 +15,10 @@ import {
   PaymentProduct302SpecificData,
   PaymentProduct320SpecificData,
 } from "../../../src/model";
-import { GlobalMocks } from "../mock.test";
+import { Mocks } from "../mock.test";
 
 describe("Browser", () => {
-  const globalMocks = new GlobalMocks();
+  const globalMocks = Mocks.global();
 
   afterEach(() => globalMocks.restore());
 
@@ -61,19 +60,6 @@ describe("Browser", () => {
   });
 
   describe("getHttpClient", () => {
-    test("provided", () => {
-      const httpClient: HttpClient = {
-        get: jest.fn(),
-        delete: jest.fn(),
-        post: jest.fn(),
-        put: jest.fn(),
-      };
-      const browser = new Browser({
-        httpClient,
-      });
-      expect(browser.getHttpClient()).toBe(httpClient);
-    });
-
     test("fetch defined", () => {
       globalMocks.mockIfNecessary("fetch", {});
       const browser = new Browser();
@@ -83,7 +69,7 @@ describe("Browser", () => {
     test("fetch not defined", () => {
       globalMocks.mock("fetch", undefined);
       const browser = new Browser();
-      expect(browser.getHttpClient()).toStrictEqual(xhrHttpClient());
+      expect(browser.getHttpClient()).toStrictEqual(xhrHttpClient);
     });
   });
 

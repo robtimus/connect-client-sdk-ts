@@ -1,4 +1,4 @@
-import { GooglePayClient, GooglePaySpecificInput, PaymentContext, PaymentProduct320SpecificData } from "../model";
+import { GooglePayButtonOptions, GooglePayClient, GooglePaySpecificInput, PaymentContext, PaymentProduct320SpecificData } from "../model";
 
 function getPaymentsClient(
   googlePaySpecificData: PaymentProduct320SpecificData,
@@ -129,9 +129,9 @@ class GooglePayClientImpl implements GooglePayClient {
     private readonly context: PaymentContext
   ) {}
 
-  createButton(options: google.payments.api.ButtonOptions): HTMLElement {
-    options = Object.assign({}, options);
-    options.allowedPaymentMethods = options.allowedPaymentMethods || constructAllowedPaymentMethods(this.googlePaySpecificData);
+  createButton(options: GooglePayButtonOptions): HTMLElement {
+    const buttonOptions: google.payments.api.ButtonOptions = Object.assign({}, options);
+    buttonOptions.allowedPaymentMethods = constructAllowedPaymentMethods(this.googlePaySpecificData);
     return this.client.createButton(options);
   }
 

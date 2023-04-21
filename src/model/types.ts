@@ -57,8 +57,10 @@ export interface ApplePayClient {
   ): Promise<ApplePayJS.ApplePayPaymentToken>;
 }
 
+export type GooglePayButtonOptions = Omit<google.payments.api.ButtonOptions, "allowedPaymentMethods">;
+
 export interface GooglePayClient {
-  createButton(options: google.payments.api.ButtonOptions): HTMLElement;
+  createButton(options: GooglePayButtonOptions): HTMLElement;
   prefetchPaymentData(): Promise<void>;
   createPayment(): Promise<google.payments.api.PaymentData>;
 }

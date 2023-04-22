@@ -16,7 +16,7 @@ import {
   PaymentRequest,
   SessionDetails,
 } from "../../src/model";
-import { PP_APPLE_PAY, PP_BANCONTACT, PP_GOOGLE_PAY, toPaymentProduct } from "../../src/model/PaymentProduct";
+import { PP_APPLE_PAY, PP_BANCONTACT, PP_GOOGLE_PAY, toBasicPaymentProducts, toPaymentProduct } from "../../src/model/PaymentProduct";
 import { HttpResponse } from "../../src/http";
 import { sdkIdentifier } from "../../src/metadata";
 import { CapturedHttpRequest, MockDevice, Mocks, notImplementedResponse } from "./mock.test";
@@ -2905,40 +2905,75 @@ describe("Session", () => {
     });
   });
 
-  describe("createApplePayPayment", () => {
+  describe("ApplePay", () => {
+    describe("invalid product", () => {
+      test("wrong id", async () => {
+        const device = new MockDevice().mockApplePayClient(true);
+        const session = new Session(sessionDetails, minimalPaymentContext, device);
+        const product = toBasicPaymentProducts(products).getPaymentProduct(1);
+        const onSuccess = jest.fn();
+        const result = await session
+          .ApplePay(product)
+          .then(onSuccess)
+          .catch((reason) => reason);
+        expect(onSuccess).not.toBeCalled();
+        expect(result).toStrictEqual(new Error("Not a valid Apple Pay product: " + JSON.stringify(product)));
+      });
+
+      test("no Apple Pay specific data", async () => {
+        const device = new MockDevice().mockApplePayClient(true);
+        const session = new Session(sessionDetails, minimalPaymentContext, device);
+        const json = JSON.parse(JSON.stringify(products.paymentProducts[0]));
+        json.id = PP_APPLE_PAY;
+        const product = toPaymentProduct(json);
+        const onSuccess = jest.fn();
+        const result = await session
+          .ApplePay(product)
+          .then(onSuccess)
+          .catch((reason) => reason);
+        expect(onSuccess).not.toBeCalled();
+        expect(result).toStrictEqual(new Error("Not a valid Apple Pay product: " + JSON.stringify(product)));
+      });
+    });
+
     test("Apple Pay not enabled", async () => {
       const device = new MockDevice().mockApplePayClient(true);
       const session = new Session(sessionDetails, minimalPaymentContext, device);
+      const product = toBasicPaymentProducts(products).getPaymentProduct(PP_APPLE_PAY);
       const onSuccess = jest.fn();
       const result = await session
-        .createApplePayPayment({ networks: ["1"] })
+        .ApplePay(product)
         .then(onSuccess)
         .catch((reason) => reason);
-      expect(result).toStrictEqual(new Error("Apple Pay client is not available"));
+      expect(onSuccess).not.toBeCalled();
+      expect(result).toStrictEqual(new Error("Apple Pay is not available"));
     });
 
-    test("Apple Pay enabled", async () => {
-      const createSessionResponse: api.CreatePaymentProductSessionResponse = {
-        paymentProductSession302SpecificOutput: {
-          sessionObject: uuidv4(),
-        },
-      };
-      const onSession = jest.fn();
-      const applePayClient: ApplePayClient = {
-        createPayment: (sessionFactory) => {
-          return sessionFactory({}).then(onSession);
-        },
-      };
-      const device = new MockDevice()
-        .mockPost(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products/302/sessions`, {
-          statusCode: 200,
-          contentType: "application/json",
-          body: JSON.parse(JSON.stringify(createSessionResponse)),
-        })
-        .mockApplePayClient(applePayClient);
-      const session = new Session(sessionDetails, fullPaymentContext, device);
-      await session.createApplePayPayment({ networks: ["1"] });
-      expect(onSession).toHaveBeenCalledWith(createSessionResponse.paymentProductSession302SpecificOutput);
+    describe("Apple Pay enabled", () => {
+      test("createPayment", async () => {
+        const createSessionResponse: api.CreatePaymentProductSessionResponse = {
+          paymentProductSession302SpecificOutput: {
+            sessionObject: uuidv4(),
+          },
+        };
+        const onSession = jest.fn();
+        const applePayClient: ApplePayClient = {
+          createPayment: (sessionFactory) => {
+            return sessionFactory({}).then(onSession);
+          },
+        };
+        const device = new MockDevice()
+          .mockPost(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products/302/sessions`, {
+            statusCode: 200,
+            contentType: "application/json",
+            body: JSON.parse(JSON.stringify(createSessionResponse)),
+          })
+          .mockApplePayClient(applePayClient);
+        const session = new Session(sessionDetails, fullPaymentContext, device);
+        const product = toBasicPaymentProducts(products).getPaymentProduct(PP_APPLE_PAY);
+        await session.ApplePay(product).then((applePay) => applePay.createPayment());
+        expect(onSession).toHaveBeenCalledWith(createSessionResponse.paymentProductSession302SpecificOutput);
+      });
     });
 
     describe("caching", () => {
@@ -2946,8 +2981,9 @@ describe("Session", () => {
         const device = new MockDevice();
         const spy = jest.spyOn(device, "getApplePayClient");
         const session = new Session(sessionDetails, fullPaymentContext, device);
-        await session.createApplePayPayment({ networks: ["1"] }).catch(jest.fn());
-        await session.createApplePayPayment({ networks: ["1"] }).catch(jest.fn());
+        const product = toBasicPaymentProducts(products).getPaymentProduct(PP_APPLE_PAY);
+        await session.ApplePay(product).catch(jest.fn());
+        await session.ApplePay(product).catch(jest.fn());
         expect(spy).toBeCalledTimes(1);
       });
 
@@ -2955,8 +2991,9 @@ describe("Session", () => {
         const device = new MockDevice().mockApplePayClient(true);
         const spy = jest.spyOn(device, "getApplePayClient");
         const session = new Session(sessionDetails, fullPaymentContext, device);
-        await session.createApplePayPayment({ networks: ["1"] }).catch(jest.fn());
-        await session.createApplePayPayment({ networks: ["1"] }).catch(jest.fn());
+        const product = toBasicPaymentProducts(products).getPaymentProduct(PP_APPLE_PAY);
+        await session.ApplePay(product).catch(jest.fn());
+        await session.ApplePay(product).catch(jest.fn());
         expect(spy).toBeCalledTimes(1);
       });
 
@@ -2964,120 +3001,102 @@ describe("Session", () => {
         const device = new MockDevice().mockApplePayClient(true);
         const spy = jest.spyOn(device, "getApplePayClient");
         const session = new Session(sessionDetails, fullPaymentContext, device);
-        await session.createApplePayPayment({ networks: ["1"] }).catch(jest.fn());
+        const product = toBasicPaymentProducts(products).getPaymentProduct(PP_APPLE_PAY);
+        await session.ApplePay(product).catch(jest.fn());
         session.updatePaymentContext({});
-        await session.createApplePayPayment({ networks: ["1"] }).catch(jest.fn());
+        await session.ApplePay(product).catch(jest.fn());
         expect(spy).toBeCalledTimes(2);
       });
+    });
+  });
 
-      test("different data", async () => {
-        const device = new MockDevice().mockApplePayClient(true);
-        const spy = jest.spyOn(device, "getApplePayClient");
+  describe("GooglePay", () => {
+    describe("invalid product", () => {
+      test("wrong id", async () => {
+        const device = new MockDevice().mockGooglePayClient(true);
+        const session = new Session(sessionDetails, minimalPaymentContext, device);
+        const product = toBasicPaymentProducts(products).getPaymentProduct(1);
+        const onSuccess = jest.fn();
+        const result = await session
+          .GooglePay(product)
+          .then(onSuccess)
+          .catch((reason) => reason);
+        expect(onSuccess).not.toBeCalled();
+        expect(result).toStrictEqual(new Error("Not a valid Google Pay product: " + JSON.stringify(product)));
+      });
+
+      test("no Google Pay specific data", async () => {
+        const device = new MockDevice().mockGooglePayClient(true);
+        const session = new Session(sessionDetails, minimalPaymentContext, device);
+        const json = JSON.parse(JSON.stringify(products.paymentProducts[0]));
+        json.id = PP_GOOGLE_PAY;
+        const product = toPaymentProduct(json);
+        const onSuccess = jest.fn();
+        const result = await session
+          .GooglePay(product)
+          .then(onSuccess)
+          .catch((reason) => reason);
+        expect(onSuccess).not.toBeCalled();
+        expect(result).toStrictEqual(new Error("Not a valid Google Pay product: " + JSON.stringify(product)));
+      });
+    });
+
+    test("Google Pay not enabled", async () => {
+      const device = new MockDevice().mockGooglePayClient(true);
+      const session = new Session(sessionDetails, minimalPaymentContext, device);
+      const product = toBasicPaymentProducts(products).getPaymentProduct(PP_GOOGLE_PAY);
+      const onSuccess = jest.fn();
+      const result = await session
+        .GooglePay(product)
+        .then(onSuccess)
+        .catch((reason) => reason);
+      expect(onSuccess).not.toBeCalled();
+      expect(result).toStrictEqual(new Error("Google Pay is not available"));
+    });
+
+    describe("Google Pay enabled", () => {
+      test("createButton", async () => {
+        const googlePayClient: GooglePayClient = {
+          createButton: jest.fn(),
+          prefetchPaymentData: jest.fn(),
+          createPayment: jest.fn(),
+        };
+        const device = new MockDevice().mockGooglePayClient(googlePayClient);
         const session = new Session(sessionDetails, fullPaymentContext, device);
-        await session.createApplePayPayment({ networks: ["1"] }).catch(jest.fn());
-        await session.createApplePayPayment({ networks: ["2"] }).catch(jest.fn());
-        expect(spy).toBeCalledTimes(2);
-      });
-    });
-  });
-
-  describe("createGooglePayButton", () => {
-    test("Google Pay not enabled", async () => {
-      const device = new MockDevice().mockGooglePayClient(true);
-      const session = new Session(sessionDetails, minimalPaymentContext, device);
-      const onSuccess = jest.fn();
-      const result = await session
-        .createGooglePayButton(
-          {
-            gateway: "GW",
-            networks: ["VISA"],
-          },
-          {
+        const product = toBasicPaymentProducts(products).getPaymentProduct(PP_GOOGLE_PAY);
+        await session.GooglePay(product).then((googlePay) =>
+          googlePay.createButton({
             onClick: jest.fn,
-          }
-        )
-        .then(onSuccess)
-        .catch((reason) => reason);
-      expect(result).toStrictEqual(new Error("Google Pay client is not available"));
-    });
-
-    test("Google Pay enabled", async () => {
-      const googlePayClient: GooglePayClient = {
-        createButton: jest.fn(),
-        prefetchPaymentData: jest.fn(),
-        createPayment: jest.fn(),
-      };
-      const device = new MockDevice().mockGooglePayClient(googlePayClient);
-      const session = new Session(sessionDetails, fullPaymentContext, device);
-      await session.createGooglePayButton(
-        {
-          gateway: "GW",
-          networks: ["VISA"],
-        },
-        {
-          onClick: jest.fn,
-        }
-      );
-      expect(googlePayClient.createButton).toHaveBeenCalled();
-    });
-  });
-
-  describe("prefetchGooglePayPaymentData", () => {
-    test("Google Pay not enabled", async () => {
-      const device = new MockDevice().mockGooglePayClient(true);
-      const session = new Session(sessionDetails, minimalPaymentContext, device);
-      const onSuccess = jest.fn();
-      const result = await session
-        .prefetchGooglePayPaymentData({
-          gateway: "GW",
-          networks: ["VISA"],
-        })
-        .then(onSuccess)
-        .catch((reason) => reason);
-      expect(result).toStrictEqual(new Error("Google Pay client is not available"));
-    });
-
-    test("Google Pay enabled", async () => {
-      const googlePayClient: GooglePayClient = {
-        createButton: jest.fn(),
-        prefetchPaymentData: jest.fn(),
-        createPayment: jest.fn(),
-      };
-      const device = new MockDevice().mockGooglePayClient(googlePayClient);
-      const session = new Session(sessionDetails, fullPaymentContext, device);
-      await session.prefetchGooglePayPaymentData({
-        gateway: "GW",
-        networks: ["VISA"],
+          })
+        );
+        expect(googlePayClient.createButton).toHaveBeenCalled();
       });
-      expect(googlePayClient.prefetchPaymentData).toHaveBeenCalled();
-    });
-  });
 
-  describe("createGooglePayPayment", () => {
-    test("Google Pay not enabled", async () => {
-      const device = new MockDevice().mockGooglePayClient(true);
-      const session = new Session(sessionDetails, minimalPaymentContext, device);
-      const onSuccess = jest.fn();
-      const result = await session
-        .createGooglePayPayment({
-          gateway: "GW",
-          networks: ["VISA"],
-        })
-        .then(onSuccess)
-        .catch((reason) => reason);
-      expect(result).toStrictEqual(new Error("Google Pay client is not available"));
-    });
+      test("prefetchPaymentData", async () => {
+        const googlePayClient: GooglePayClient = {
+          createButton: jest.fn(),
+          prefetchPaymentData: jest.fn(),
+          createPayment: jest.fn(),
+        };
+        const device = new MockDevice().mockGooglePayClient(googlePayClient);
+        const session = new Session(sessionDetails, fullPaymentContext, device);
+        const product = toBasicPaymentProducts(products).getPaymentProduct(PP_GOOGLE_PAY);
+        await session.GooglePay(product).then((googlePay) => googlePay.prefetchPaymentData());
+        expect(googlePayClient.prefetchPaymentData).toHaveBeenCalled();
+      });
 
-    test("Google Pay enabled", async () => {
-      const googlePayClient: GooglePayClient = {
-        createButton: jest.fn(),
-        prefetchPaymentData: jest.fn(),
-        createPayment: jest.fn(),
-      };
-      const device = new MockDevice().mockGooglePayClient(googlePayClient);
-      const session = new Session(sessionDetails, fullPaymentContext, device);
-      await session.createGooglePayPayment({ gateway: "GW", networks: ["VISA"] });
-      expect(googlePayClient.createPayment).toHaveBeenCalled();
+      test("createPayment", async () => {
+        const googlePayClient: GooglePayClient = {
+          createButton: jest.fn(),
+          prefetchPaymentData: jest.fn(),
+          createPayment: jest.fn(),
+        };
+        const device = new MockDevice().mockGooglePayClient(googlePayClient);
+        const session = new Session(sessionDetails, fullPaymentContext, device);
+        const product = toBasicPaymentProducts(products).getPaymentProduct(PP_GOOGLE_PAY);
+        await session.GooglePay(product).then((googlePay) => googlePay.createPayment());
+        expect(googlePayClient.createPayment).toHaveBeenCalled();
+      });
     });
 
     describe("caching", () => {
@@ -3085,8 +3104,9 @@ describe("Session", () => {
         const device = new MockDevice();
         const spy = jest.spyOn(device, "getGooglePayClient");
         const session = new Session(sessionDetails, fullPaymentContext, device);
-        await session.createGooglePayPayment({ gateway: "GW", networks: ["VISA"] }).catch(jest.fn());
-        await session.createGooglePayPayment({ gateway: "GW", networks: ["VISA"] }).catch(jest.fn());
+        const product = toBasicPaymentProducts(products).getPaymentProduct(PP_GOOGLE_PAY);
+        await session.GooglePay(product).catch(jest.fn());
+        await session.GooglePay(product).catch(jest.fn());
         expect(spy).toBeCalledTimes(1);
       });
 
@@ -3094,8 +3114,9 @@ describe("Session", () => {
         const device = new MockDevice().mockGooglePayClient(true);
         const spy = jest.spyOn(device, "getGooglePayClient");
         const session = new Session(sessionDetails, fullPaymentContext, device);
-        await session.createGooglePayPayment({ gateway: "GW", networks: ["VISA"] }).catch(jest.fn());
-        await session.createGooglePayPayment({ gateway: "GW", networks: ["VISA"] }).catch(jest.fn());
+        const product = toBasicPaymentProducts(products).getPaymentProduct(PP_GOOGLE_PAY);
+        await session.GooglePay(product).catch(jest.fn());
+        await session.GooglePay(product).catch(jest.fn());
         expect(spy).toBeCalledTimes(1);
       });
 
@@ -3103,20 +3124,11 @@ describe("Session", () => {
         const device = new MockDevice().mockGooglePayClient(true);
         const spy = jest.spyOn(device, "getGooglePayClient");
         const session = new Session(sessionDetails, fullPaymentContext, device);
-        await session.createGooglePayPayment({ gateway: "GW", networks: ["VISA"] }).catch(jest.fn());
+        const product = toBasicPaymentProducts(products).getPaymentProduct(PP_GOOGLE_PAY);
+        await session.GooglePay(product).catch(jest.fn());
         session.updatePaymentContext({});
-        await session.createGooglePayPayment({ gateway: "GW", networks: ["VISA"] }).catch(jest.fn());
+        await session.GooglePay(product).catch(jest.fn());
         expect(spy).toBeCalledTimes(2);
-      });
-
-      test("different data", async () => {
-        const device = new MockDevice().mockGooglePayClient(true);
-        const spy = jest.spyOn(device, "getGooglePayClient");
-        const session = new Session(sessionDetails, fullPaymentContext, device);
-        await session.createGooglePayPayment({ gateway: "GW", networks: ["VISA"] }).catch(jest.fn());
-        await session.createGooglePayPayment({ gateway: "GW", networks: ["MASTERCARD"] }).catch(jest.fn());
-        await session.createGooglePayPayment({ gateway: "GW2", networks: ["VISA"] }).catch(jest.fn());
-        expect(spy).toBeCalledTimes(3);
       });
     });
   });

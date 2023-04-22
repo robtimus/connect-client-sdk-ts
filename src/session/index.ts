@@ -8,6 +8,7 @@ import { HttpResponse } from "../http";
 import {
   ApplePayClient,
   BasicPaymentItems,
+  BasicPaymentProduct,
   BasicPaymentProductGroups,
   BasicPaymentProducts,
   ConvertAmountResult,
@@ -17,6 +18,7 @@ import {
   DeviceFingerprintRequest,
   DeviceFingerprintResult,
   Directory,
+  GooglePayButtonOptions,
   GooglePayClient,
   IINDetailsResult,
   IINDetailsSuccessStatus,
@@ -125,6 +127,16 @@ function productNotFoundError(): HttpResponse {
 }
 
 const browser = new Browser();
+
+export interface ApplePayHelper {
+  createPayment(): Promise<ApplePayJS.ApplePayPaymentToken>;
+}
+
+export interface GooglePayHelper {
+  createButton(options: GooglePayButtonOptions): HTMLElement;
+  prefetchPaymentData(): Promise<void>;
+  createPayment(): Promise<google.payments.api.PaymentData>;
+}
 
 export class Session {
   private readonly communicator: Communicator;
@@ -494,12 +506,17 @@ export class Session {
     return getValue(this.cache, cacheKey, () => this.communicator.getPrivacyPolicy(params));
   }
 
-  async createApplePayPayment(applePaySpecificData: PaymentProduct302SpecificData): Promise<ApplePayJS.ApplePayPaymentToken> {
-    const client = await this.getApplePayClient(applePaySpecificData);
-    if (!client) {
-      throw new Error("Apple Pay client is not available");
+  async ApplePay(applePayProduct: PaymentProduct | BasicPaymentProduct): Promise<ApplePayHelper> {
+    if (applePayProduct.id !== PP_APPLE_PAY || !applePayProduct.paymentProduct302SpecificData) {
+      throw new Error("Not a valid Apple Pay product: " + JSON.stringify(applePayProduct));
     }
-    return client.createPayment((input) => this.createApplePaySession(input));
+    const client = await this.getApplePayClient(applePayProduct.paymentProduct302SpecificData);
+    if (!client) {
+      throw new Error("Apple Pay is not available");
+    }
+    return {
+      createPayment: () => client.createPayment((input) => this.createApplePaySession(input)),
+    };
   }
 
   private async getApplePayClient(applePaySpecificData?: PaymentProduct302SpecificData): Promise<ApplePayClient | undefined> {
@@ -513,7 +530,7 @@ export class Session {
     return getValue(this.cache, cacheKey, () => this.device.getApplePayClient(applePaySpecificInput, applePaySpecificData, this.paymentContext));
   }
 
-  async isApplePayAvailable(applePaySpecificData?: PaymentProduct302SpecificData): Promise<boolean> {
+  private async isApplePayAvailable(applePaySpecificData?: PaymentProduct302SpecificData): Promise<boolean> {
     return this.getApplePayClient(applePaySpecificData)
       .then((client) => !!client)
       .catch((reason) => {
@@ -522,31 +539,19 @@ export class Session {
       });
   }
 
-  async createGooglePayButton(
-    googlePaySpecificData: PaymentProduct320SpecificData,
-    options: google.payments.api.ButtonOptions
-  ): Promise<HTMLElement> {
-    const client = await this.getGooglePayClient(googlePaySpecificData);
-    if (!client) {
-      throw new Error("Google Pay client is not available");
+  async GooglePay(googlePayProduct: PaymentProduct | BasicPaymentProduct): Promise<GooglePayHelper> {
+    if (googlePayProduct.id !== PP_GOOGLE_PAY || !googlePayProduct.paymentProduct320SpecificData) {
+      throw new Error("Not a valid Google Pay product: " + JSON.stringify(googlePayProduct));
     }
-    return client.createButton(options);
-  }
-
-  async prefetchGooglePayPaymentData(googlePaySpecificData: PaymentProduct320SpecificData): Promise<void> {
-    const client = await this.getGooglePayClient(googlePaySpecificData);
+    const client = await this.getGooglePayClient(googlePayProduct.paymentProduct320SpecificData);
     if (!client) {
-      throw new Error("Google Pay client is not available");
+      throw new Error("Google Pay is not available");
     }
-    return client.prefetchPaymentData();
-  }
-
-  async createGooglePayPayment(googlePaySpecificData: PaymentProduct320SpecificData): Promise<google.payments.api.PaymentData> {
-    const client = await this.getGooglePayClient(googlePaySpecificData);
-    if (!client) {
-      throw new Error("Google Pay client is not available");
-    }
-    return client.createPayment();
+    return {
+      createButton: (options) => client.createButton(options),
+      prefetchPaymentData: () => client.prefetchPaymentData(),
+      createPayment: () => client.createPayment(),
+    };
   }
 
   private async getGooglePayClient(googlePaySpecificData?: PaymentProduct320SpecificData): Promise<GooglePayClient | undefined> {
@@ -560,7 +565,7 @@ export class Session {
     return getValue(this.cache, cacheKey, () => this.device.getGooglePayClient(googlePaySpecificInput, googlePaySpecificData, this.paymentContext));
   }
 
-  async isGooglePayAvailable(googlePaySpecificData?: PaymentProduct320SpecificData): Promise<boolean> {
+  private async isGooglePayAvailable(googlePaySpecificData?: PaymentProduct320SpecificData): Promise<boolean> {
     return this.getGooglePayClient(googlePaySpecificData)
       .then((client) => !!client)
       .catch((reason) => {

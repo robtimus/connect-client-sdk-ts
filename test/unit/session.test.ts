@@ -2,6 +2,7 @@
  * @group unit:session
  */
 
+import * as crypto from "crypto";
 import { v4 as uuidv4 } from "uuid";
 import { Session } from "../../src/session";
 import { api } from "../../src/communicator/model";
@@ -17,7 +18,7 @@ import {
 import { PP_APPLE_PAY, PP_BANCONTACT, PP_GOOGLE_PAY } from "../../src/model/PaymentProduct";
 import { HttpResponse } from "../../src/http";
 import { sdkIdentifier } from "../../src/metadata";
-import { CapturedHttpRequest, MockDevice, notImplementedResponse } from "./mock.test";
+import { CapturedHttpRequest, MockDevice, Mocks, notImplementedResponse } from "./mock.test";
 
 describe("Session", () => {
   const sessionDetails: SessionDetails = {
@@ -252,6 +253,8 @@ describe("Session", () => {
     ],
   };
 
+  const globalMocks = Mocks.global();
+
   beforeEach(() => {
     jest.spyOn(console, "debug").mockImplementation(() => {
       /* do nothing */
@@ -260,6 +263,8 @@ describe("Session", () => {
       /* do nothing */
     });
   });
+
+  afterEach(() => globalMocks.restore());
 
   function expectRequest(
     request: CapturedHttpRequest,
@@ -317,30 +322,45 @@ describe("Session", () => {
   });
 
   describe("getEncryptor", () => {
-    test("successful", async () => {
-      const publicKey: api.PublicKey = {
-        keyId: uuidv4(),
-        publicKey:
-          "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkiJlGL1QjUnGDLpMNBtZPYVtOU121jfFcV4WrZayfw9Ib/1AtPBHP/0ZPocdA23zDh6aB+QiOQEkHZlfnelBNnEzEu4ibda3nDdjSrKveSiQPyB5X+u/IS3CR48B/g4QJ+mcMV9hoFt6Hx3R99A0HWMs4um8elQsgB11MsLmGb1SuLo0S1pgL3EcckXfBDNMUBMQ9EtLC9zQW6Y0kx6GFXHgyjNb4yixXfjo194jfhei80sVQ49Y/SHBt/igATGN1l18IBDtO0eWmWeBckwbNkpkPLAvJfsfa3JpaxbXwg3rTvVXLrIRhvMYqTsQmrBIJDl7F6igPD98Y1FydbKe5QIDAQAB",
-      };
-      const device = new MockDevice()
-        .mockGet(
-          `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/crypto/publickey`,
-          {
-            statusCode: 200,
-            contentType: "application/json",
-            body: JSON.parse(JSON.stringify(publicKey)),
-          },
-          expectRequest
-        )
-        .mockJOSEEncryptor(true);
-      const session = new Session(sessionDetails, minimalPaymentContext, device);
-      expect(async () => await session.getEncryptor()).not.toThrow();
+    const publicKey: api.PublicKey = {
+      keyId: uuidv4(),
+      publicKey:
+        "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkiJlGL1QjUnGDLpMNBtZPYVtOU121jfFcV4WrZayfw9Ib/1AtPBHP/0ZPocdA23zDh6aB+QiOQEkHZlfnelBNnEzEu4ibda3nDdjSrKveSiQPyB5X+u/IS3CR48B/g4QJ+mcMV9hoFt6Hx3R99A0HWMs4um8elQsgB11MsLmGb1SuLo0S1pgL3EcckXfBDNMUBMQ9EtLC9zQW6Y0kx6GFXHgyjNb4yixXfjo194jfhei80sVQ49Y/SHBt/igATGN1l18IBDtO0eWmWeBckwbNkpkPLAvJfsfa3JpaxbXwg3rTvVXLrIRhvMYqTsQmrBIJDl7F6igPD98Y1FydbKe5QIDAQAB",
+    };
+
+    describe("successful", () => {
+      const device = new MockDevice().mockGet(
+        `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/crypto/publickey`,
+        {
+          statusCode: 200,
+          contentType: "application/json",
+          body: JSON.parse(JSON.stringify(publicKey)),
+        },
+        expectRequest
+      );
+
+      test("with custom JOSE encryptor", async () => {
+        const session = new Session(sessionDetails, minimalPaymentContext, device);
+        session.setJOSEEncryptor({
+          encrypt: jest.fn(),
+        });
+        expect(async () => await session.getEncryptor()).not.toThrow();
+      });
+
+      test("with SubleCrypto JOSE encryptor", async () => {
+        globalMocks.mockIfNecessary("crypto", crypto);
+
+        const session = new Session(sessionDetails, minimalPaymentContext, device);
+        expect(async () => await session.getEncryptor()).not.toThrow();
+      });
     });
 
     test("HTTP error", async () => {
       // don't mock anything -> will lead to an error response
       const session = new Session(sessionDetails, minimalPaymentContext, new MockDevice());
+      session.setJOSEEncryptor({
+        encrypt: jest.fn(),
+      });
       const onSuccess = jest.fn();
       const result = await session
         .getEncryptor()
@@ -350,12 +370,9 @@ describe("Session", () => {
       expect(result).toStrictEqual(notImplementedResponse());
     });
 
-    test("no encryptor", async () => {
-      const publicKey: api.PublicKey = {
-        keyId: uuidv4(),
-        publicKey:
-          "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkiJlGL1QjUnGDLpMNBtZPYVtOU121jfFcV4WrZayfw9Ib/1AtPBHP/0ZPocdA23zDh6aB+QiOQEkHZlfnelBNnEzEu4ibda3nDdjSrKveSiQPyB5X+u/IS3CR48B/g4QJ+mcMV9hoFt6Hx3R99A0HWMs4um8elQsgB11MsLmGb1SuLo0S1pgL3EcckXfBDNMUBMQ9EtLC9zQW6Y0kx6GFXHgyjNb4yixXfjo194jfhei80sVQ49Y/SHBt/igATGN1l18IBDtO0eWmWeBckwbNkpkPLAvJfsfa3JpaxbXwg3rTvVXLrIRhvMYqTsQmrBIJDl7F6igPD98Y1FydbKe5QIDAQAB",
-      };
+    test("no JOSE encryptor", async () => {
+      globalMocks.mock("crypto", undefined);
+
       const device = new MockDevice().mockGet(
         `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/crypto/publickey`,
         {

@@ -2,11 +2,8 @@
  * @group unit:browser
  */
 
-import * as crypto from "crypto";
 import { Browser } from "../../../src/browser";
 import { xhrHttpClient } from "../../../src/browser/xhr";
-import { JOSEEncryptor } from "../../../src/crypto";
-import { subtleCryptoEncryptor } from "../../../src/crypto/SubtleCrypto";
 import { fetchHttpClient } from "../../../src/http/fetch";
 import {
   ApplePaySpecificInput,
@@ -70,30 +67,6 @@ describe("Browser", () => {
       globalMocks.mock("fetch", undefined);
       const browser = new Browser();
       expect(browser.getHttpClient()).toStrictEqual(xhrHttpClient);
-    });
-  });
-
-  describe("getJOSEEncryptor", () => {
-    test("provided", () => {
-      const joseEncryptor: JOSEEncryptor = {
-        encrypt: jest.fn(),
-      };
-      const browser = new Browser({
-        joseEncryptor,
-      });
-      expect(browser.getJOSEEncryptor()).toBe(joseEncryptor);
-    });
-
-    test("crypto defined", () => {
-      globalMocks.mockIfNecessary("crypto", crypto);
-      const browser = new Browser();
-      expect(browser.getJOSEEncryptor()).toBe(subtleCryptoEncryptor);
-    });
-
-    test("crypto not defined", () => {
-      globalMocks.mock("crypto", undefined);
-      const browser = new Browser();
-      expect(browser.getJOSEEncryptor()).toBeUndefined();
     });
   });
 

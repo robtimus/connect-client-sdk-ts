@@ -1,7 +1,9 @@
 import { v4 as uuidv4 } from "uuid";
 import { Communicator } from "../communicator";
 import { api } from "../communicator/model";
+import { JOSEEncryptor } from "../crypto";
 import { Encryptor } from "../crypto/Encryptor";
+import { isSubtleCryptoAvailable, subtleCryptoEncryptor } from "../crypto/SubtleCrypto";
 import { HttpResponse } from "../http";
 import {
   ApplePayClient,
@@ -124,11 +126,16 @@ function productNotFoundError(): HttpResponse {
 export class Session {
   private readonly communicator: Communicator;
   private readonly cache: Record<string, unknown> = {};
+  private joseEncryptor?: JOSEEncryptor;
   private providedPaymentItem?: PaymentItem;
   private paymentProductAvailability: Record<number, boolean | undefined> = {};
 
   constructor(private readonly sessionDetails: SessionDetails, private paymentContext: PaymentContext, private readonly device: Device) {
     this.communicator = new Communicator(sessionDetails, device);
+
+    if (isSubtleCryptoAvailable()) {
+      this.joseEncryptor = subtleCryptoEncryptor;
+    }
   }
 
   getPaymentContext(): PaymentContext {
@@ -162,8 +169,15 @@ export class Session {
   }
 
   async getEncryptor(): Promise<Encryptor> {
+    if (!this.joseEncryptor) {
+      throw new Error("encryption not supported");
+    }
     const publicKey = await this.getPublicKey();
-    return new Encryptor(this.sessionDetails.clientSessionId, publicKey, this.device);
+    return new Encryptor(this.sessionDetails.clientSessionId, publicKey, this.joseEncryptor, this.device);
+  }
+
+  setJOSEEncryptor(joseEncryptor: JOSEEncryptor): void {
+    this.joseEncryptor = joseEncryptor;
   }
 
   async getPublicKey(): Promise<PublicKey> {

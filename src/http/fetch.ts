@@ -79,4 +79,8 @@ class FetchHttpClient implements HttpClient {
 
 Object.freeze(FetchHttpClient.prototype);
 
+export function isFetchAvailable(): boolean {
+  return typeof fetch !== "undefined";
+}
+
 export const fetchHttpClient: HttpClient = new FetchHttpClient();

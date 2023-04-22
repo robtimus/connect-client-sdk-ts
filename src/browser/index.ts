@@ -1,7 +1,5 @@
-import { JOSEEncryptor } from "../crypto";
-import { subtleCryptoEncryptor } from "../crypto/SubtleCrypto";
 import { HttpClient } from "../http";
-import { fetchHttpClient } from "../http/fetch";
+import { fetchHttpClient, isFetchAvailable } from "../http/fetch";
 import {
   ApplePayClient,
   ApplePaySpecificInput,
@@ -17,27 +15,8 @@ import { newApplePayClient } from "./ApplePay";
 import { newGooglePayClient } from "./GooglePay";
 import { xhrHttpClient } from "./xhr";
 
-export interface BrowserOptions {
-  readonly joseEncryptor?: JOSEEncryptor;
-}
-
 export class Browser implements Device {
-  private readonly httpClient: HttpClient;
-  private readonly joseEncryptor?: JOSEEncryptor;
-
-  constructor(options: BrowserOptions = {}) {
-    if (typeof fetch !== "undefined") {
-      this.httpClient = fetchHttpClient;
-    } else {
-      this.httpClient = xhrHttpClient;
-    }
-
-    if (options.joseEncryptor) {
-      this.joseEncryptor = options.joseEncryptor;
-    } else if (typeof crypto !== "undefined" && typeof crypto.getRandomValues !== "undefined" && typeof crypto.subtle !== "undefined") {
-      this.joseEncryptor = subtleCryptoEncryptor;
-    }
-  }
+  private readonly httpClient: HttpClient = isFetchAvailable() ? fetchHttpClient : xhrHttpClient;
 
   getPlatformIdentifier(): string {
     return window.navigator.userAgent;
@@ -58,10 +37,6 @@ export class Browser implements Device {
 
   getHttpClient(): HttpClient {
     return this.httpClient;
-  }
-
-  getJOSEEncryptor(): JOSEEncryptor | undefined {
-    return this.joseEncryptor;
   }
 
   getApplePayClient(

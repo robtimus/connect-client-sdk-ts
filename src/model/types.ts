@@ -1,4 +1,3 @@
-import { JOSEEncryptor } from "../crypto";
 import { HttpClient } from "../http";
 import { ValidationRule } from "../validation";
 
@@ -8,7 +7,6 @@ export interface Device {
   getPlatformIdentifier(): string;
   getDeviceInformation(): DeviceInformation;
   getHttpClient(): HttpClient;
-  getJOSEEncryptor(): JOSEEncryptor | undefined;
   getApplePayClient(
     applePaySpecificInput: ApplePaySpecificInput,
     applePaySpecificData: PaymentProduct302SpecificData,

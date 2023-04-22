@@ -1,7 +1,6 @@
 import { ApplePayClient, Device, DeviceInformation, GooglePayClient } from "../../src/model";
 import { HttpClient, HttpRequest, HttpResponse } from "../../src/http";
 import { URLBuilder } from "../../src/http/util";
-import { JOSEEncryptor } from "../../src/crypto";
 
 export interface CapturedHttpRequest {
   readonly method: string;
@@ -131,7 +130,6 @@ class MockHttpClient implements HttpClient {
 
 export class MockDevice implements Device {
   private readonly httpClient = new MockHttpClient();
-  private joseEncryptor?: JOSEEncryptor;
   private applePayClient: Promise<ApplePayClient | undefined> = Promise.resolve(undefined);
   private googlePayClient: Promise<GooglePayClient | undefined> = Promise.resolve(undefined);
 
@@ -154,10 +152,6 @@ export class MockDevice implements Device {
 
   getHttpClient(): HttpClient {
     return this.httpClient;
-  }
-
-  getJOSEEncryptor(): JOSEEncryptor | undefined {
-    return this.joseEncryptor;
   }
 
   getApplePayClient(): Promise<ApplePayClient | undefined> {
@@ -183,17 +177,6 @@ export class MockDevice implements Device {
       response,
       requestValidator,
     });
-    return this;
-  }
-
-  mockJOSEEncryptor(joseEncryptor?: true | JOSEEncryptor): MockDevice {
-    if (joseEncryptor === true) {
-      this.joseEncryptor = {
-        encrypt: jest.fn(),
-      };
-    } else {
-      this.joseEncryptor = joseEncryptor;
-    }
     return this;
   }
 

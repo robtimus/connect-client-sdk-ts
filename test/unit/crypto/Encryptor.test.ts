@@ -64,17 +64,15 @@ describe("Encryptor", () => {
     usesRedirectionTo3rdParty: false,
   });
 
-  test("no JOSE encryptor", async () => {
-    try {
-      new Encryptor(clientSessionId, publicKey, new MockDevice());
-      fail("Expected error");
-    } catch (e) {
-      expect(e).toStrictEqual(new Error("encryption not supported"));
-    }
-  });
-
   test("product not set", async () => {
-    const encryptor = new Encryptor(clientSessionId, publicKey, new MockDevice().mockJOSEEncryptor(true));
+    const encryptor = new Encryptor(
+      clientSessionId,
+      publicKey,
+      {
+        encrypt: jest.fn(),
+      },
+      new MockDevice()
+    );
     const request = new PaymentRequest();
     const onSuccess = jest.fn();
     const result = await encryptor
@@ -86,7 +84,14 @@ describe("Encryptor", () => {
   });
 
   test("validation fails", async () => {
-    const encryptor = new Encryptor(clientSessionId, publicKey, new MockDevice().mockJOSEEncryptor(true));
+    const encryptor = new Encryptor(
+      clientSessionId,
+      publicKey,
+      {
+        encrypt: jest.fn(),
+      },
+      new MockDevice()
+    );
     const request = new PaymentRequest();
     request.setPaymentProduct(product);
     const onSuccess = jest.fn();
@@ -111,8 +116,8 @@ describe("Encryptor", () => {
         inputCaptor = { payload, keyId, publicKeyValue };
         return Promise.resolve("encrypted");
       };
-      const device = new MockDevice().mockJOSEEncryptor({ encrypt });
-      const encryptor = new Encryptor(clientSessionId, publicKey, device);
+      const device = new MockDevice();
+      const encryptor = new Encryptor(clientSessionId, publicKey, { encrypt }, device);
       const request = new PaymentRequest();
       request.setPaymentProduct(product);
       request.setValue("expirationDate", "1230");
@@ -149,8 +154,8 @@ describe("Encryptor", () => {
         inputCaptor = { payload, keyId, publicKeyValue };
         return Promise.resolve("encrypted");
       };
-      const device = new MockDevice().mockJOSEEncryptor({ encrypt });
-      const encryptor = new Encryptor(clientSessionId, publicKey, device);
+      const device = new MockDevice();
+      const encryptor = new Encryptor(clientSessionId, publicKey, { encrypt }, device);
       const request = new PaymentRequest();
       request.setPaymentProduct(product);
       request.setValue("expirationDate", "1230");
@@ -187,8 +192,8 @@ describe("Encryptor", () => {
         inputCaptor = { payload, keyId, publicKeyValue };
         return Promise.resolve("encrypted");
       };
-      const device = new MockDevice().mockJOSEEncryptor({ encrypt });
-      const encryptor = new Encryptor(clientSessionId, publicKey, device);
+      const device = new MockDevice();
+      const encryptor = new Encryptor(clientSessionId, publicKey, { encrypt }, device);
       const request = new PaymentRequest();
       request.setPaymentProduct(product);
       request.setAccountOnFile(product.accountsOnFile[0]);

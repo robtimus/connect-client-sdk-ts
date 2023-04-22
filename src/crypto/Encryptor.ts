@@ -69,15 +69,12 @@ function createEncryptedCustomerInput(clientSessionId: string, paymentRequest: P
 }
 
 export class Encryptor {
-  private readonly joseEncryptor: JOSEEncryptor;
-
-  constructor(private readonly clientSessionId: string, private readonly publicKey: PublicKey, private readonly device: Device) {
-    const joseEncryptor = this.device.getJOSEEncryptor();
-    if (!joseEncryptor) {
-      throw new Error("encryption not supported");
-    }
-    this.joseEncryptor = joseEncryptor;
-  }
+  constructor(
+    private readonly clientSessionId: string,
+    private readonly publicKey: PublicKey,
+    private readonly joseEncryptor: JOSEEncryptor,
+    private readonly device: Device
+  ) {}
 
   async encrypt(paymentRequest: PaymentRequest): Promise<string> {
     if (!paymentRequest.getPaymentProduct()) {

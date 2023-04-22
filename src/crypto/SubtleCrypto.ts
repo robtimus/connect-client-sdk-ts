@@ -156,4 +156,8 @@ class SubtleCryptoJOSEEncryptor implements JOSEEncryptor {
 
 Object.freeze(SubtleCryptoJOSEEncryptor.prototype);
 
+export function isSubtleCryptoAvailable(): boolean {
+  return typeof crypto !== "undefined" && typeof crypto.getRandomValues !== "undefined" && typeof crypto.subtle !== "undefined";
+}
+
 export const subtleCryptoEncryptor: JOSEEncryptor = new SubtleCryptoJOSEEncryptor();

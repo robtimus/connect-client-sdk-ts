@@ -23,7 +23,9 @@
     "format": "prettier --write \"**/*.+(json|ts|tsx)\"",
     "format:check": "prettier --check \"**/*.+(json|ts|tsx)\"",
     "build": "npm run format:check && npm run lint && npm run compile",
-    "test": "jest"
+    "test": "jest",
+    "test:unit": "jest --group=unit",
+    "test:integration": "jest --group=integration"
   },
   "devDependencies": {
     "@types/applepayjs": "^14.0.0",
@@ -48,6 +50,7 @@
     "mock-xmlhttprequest": "^8.2.0",
     "node-jose": "^2.2.0",
     "prettier": "^2.8.7",
+    "promiseful-connect-sdk": "^1.2.0",
     "ts-jest": "^29.1.0",
     "typescript": "^5.0.3"
   },

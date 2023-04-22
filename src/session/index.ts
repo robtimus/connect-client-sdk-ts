@@ -38,6 +38,7 @@ import {
 import { toBasicPaymentItems } from "../model/PaymentItem";
 import { PP_APPLE_PAY, PP_BANCONTACT, PP_GOOGLE_PAY, toBasicPaymentProducts, toPaymentProduct } from "../model/PaymentProduct";
 import { toBasicPaymentProductGroups, toPaymentProductGroup } from "../model/PaymentProductGroup";
+import { Browser } from "../browser";
 
 function constructCacheKey(base: string, ...params: unknown[]): string {
   return base + ":" + params.map((value) => `<${value}>`).join(";");
@@ -123,6 +124,8 @@ function productNotFoundError(): HttpResponse {
   };
 }
 
+const browser = new Browser();
+
 export class Session {
   private readonly communicator: Communicator;
   private readonly cache: Record<string, unknown> = {};
@@ -130,7 +133,7 @@ export class Session {
   private providedPaymentItem?: PaymentItem;
   private paymentProductAvailability: Record<number, boolean | undefined> = {};
 
-  constructor(private readonly sessionDetails: SessionDetails, private paymentContext: PaymentContext, private readonly device: Device) {
+  constructor(private readonly sessionDetails: SessionDetails, private paymentContext: PaymentContext, private readonly device: Device = browser) {
     this.communicator = new Communicator(sessionDetails, device);
 
     if (isSubtleCryptoAvailable()) {

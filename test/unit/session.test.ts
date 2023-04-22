@@ -13,9 +13,10 @@ import {
   GooglePayClient,
   MobilePaymentProductSession302SpecificInput,
   PaymentContext,
+  PaymentRequest,
   SessionDetails,
 } from "../../src/model";
-import { PP_APPLE_PAY, PP_BANCONTACT, PP_GOOGLE_PAY } from "../../src/model/PaymentProduct";
+import { PP_APPLE_PAY, PP_BANCONTACT, PP_GOOGLE_PAY, toPaymentProduct } from "../../src/model/PaymentProduct";
 import { HttpResponse } from "../../src/http";
 import { sdkIdentifier } from "../../src/metadata";
 import { CapturedHttpRequest, MockDevice, Mocks, notImplementedResponse } from "./mock.test";
@@ -3153,5 +3154,56 @@ describe("Session", () => {
     expect(result.fields[2].id).toBe("cardNumber");
     expect(result.fields[2].displayHints?.tooltip?.image).toBe(`${sessionDetails.assetUrl}/card.png`);
     expect(result.fields[3].id).toBe("expirationDate");
+  });
+
+  test("default device", async () => {
+    globalMocks.mockIfNecessary("window", {
+      navigator: {
+        language: "en-GB",
+        javaEnabled: () => false,
+      },
+      screen: {
+        colorDepth: 32,
+        screenHeight: 1200,
+        screenWidth: 1920,
+      },
+      innerHeight: 1200,
+      innerWidth: 1920,
+    });
+    const session = new Session(sessionDetails, minimalPaymentContext);
+    // Use encryption with a custom JOSEEncryptor to show that a Browser device is used
+    // Overwrite getPublicKey to prevent making actual HTTP requests
+    Object.defineProperty(session, "getPublicKey", {
+      value: () =>
+        Promise.resolve({
+          keyId: uuidv4(),
+          publicKey:
+            "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkiJlGL1QjUnGDLpMNBtZPYVtOU121jfFcV4WrZayfw9Ib/1AtPBHP/0ZPocdA23zDh6aB+QiOQEkHZlfnelBNnEzEu4ibda3nDdjSrKveSiQPyB5X+u/IS3CR48B/g4QJ+mcMV9hoFt6Hx3R99A0HWMs4um8elQsgB11MsLmGb1SuLo0S1pgL3EcckXfBDNMUBMQ9EtLC9zQW6Y0kx6GFXHgyjNb4yixXfjo194jfhei80sVQ49Y/SHBt/igATGN1l18IBDtO0eWmWeBckwbNkpkPLAvJfsfa3JpaxbXwg3rTvVXLrIRhvMYqTsQmrBIJDl7F6igPD98Y1FydbKe5QIDAQAB",
+        }),
+    });
+    const encrypt = (payload: string) => {
+      return Promise.resolve(payload);
+    };
+    session.setJOSEEncryptor({ encrypt });
+    const encryptor = await session.getEncryptor();
+    const request = new PaymentRequest();
+    request.setPaymentProduct(toPaymentProduct(products.paymentProducts[0]));
+    request.setValue("expirationDate", "1230");
+    request.setValue("cardNumber", "4242424242424242");
+    request.setValue("cvv", "123");
+    const payload = await encryptor.encrypt(request).then(JSON.parse);
+    expect(payload).toHaveProperty("collectedDeviceInformation", {
+      timezoneOffsetUtcMinutes: new Date().getTimezoneOffset(),
+      locale: window.navigator.language,
+      browserData: {
+        javaScriptEnabled: true,
+        javaEnabled: window.navigator.javaEnabled(),
+        colorDepth: window.screen.colorDepth,
+        screenHeight: window.screen.height,
+        screenWidth: window.screen.width,
+        innerHeight: window.innerHeight,
+        innerWidth: window.innerWidth,
+      },
+    });
   });
 });

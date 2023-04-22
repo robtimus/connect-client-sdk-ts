@@ -134,7 +134,11 @@ export type BasicPaymentItem = BasicPaymentProduct | BasicPaymentProductGroup;
 export interface BasicPaymentItems {
   readonly paymentItems: BasicPaymentItem[];
   readonly accountsOnFile: AccountOnFile[];
+  findPaymentItem(id: number): BasicPaymentProduct | undefined;
+  findPaymentItem(id: string): BasicPaymentProductGroup | undefined;
   findPaymentItem(id: number | string): BasicPaymentItem | undefined;
+  getPaymentItem(id: number): BasicPaymentProduct;
+  getPaymentItem(id: string): BasicPaymentProductGroup;
   getPaymentItem(id: number | string): BasicPaymentItem;
   findAccountOnFile(id: number): AccountOnFile | undefined;
   getAccountOnFile(id: number): AccountOnFile;

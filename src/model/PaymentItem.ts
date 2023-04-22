@@ -1,4 +1,12 @@
-import { AccountOnFile, BasicPaymentItem, BasicPaymentItems, BasicPaymentProductGroups, BasicPaymentProducts } from "./types";
+import {
+  AccountOnFile,
+  BasicPaymentItem,
+  BasicPaymentItems,
+  BasicPaymentProduct,
+  BasicPaymentProductGroup,
+  BasicPaymentProductGroups,
+  BasicPaymentProducts,
+} from "./types";
 
 function listPaymentItems(products: BasicPaymentProducts, groups?: BasicPaymentProductGroups): BasicPaymentItem[] {
   if (!groups) {
@@ -37,10 +45,16 @@ class BasicPaymentItemsImpl implements BasicPaymentItems {
     this.accountsOnFile = listAccountsOnFile(this.paymentItems);
   }
 
+  findPaymentItem(id: number): BasicPaymentProduct | undefined;
+  findPaymentItem(id: string): BasicPaymentProductGroup | undefined;
+  findPaymentItem(id: number | string): BasicPaymentItem | undefined;
   findPaymentItem(id: number | string): BasicPaymentItem | undefined {
     return this.paymentItems.find((item) => item.id === id);
   }
 
+  getPaymentItem(id: number): BasicPaymentProduct;
+  getPaymentItem(id: string): BasicPaymentProductGroup;
+  getPaymentItem(id: number | string): BasicPaymentItem;
   getPaymentItem(id: number | string): BasicPaymentItem {
     const item = this.findPaymentItem(id);
     if (item) {

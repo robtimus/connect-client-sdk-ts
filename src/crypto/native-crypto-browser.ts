@@ -43,4 +43,5 @@ export function randomUUID(): string {
 }
 
 export const subtle: SubtleCrypto | undefined = typeof crypto !== "undefined" ? crypto.subtle : undefined;
-export const getRandomValues: ((array: Uint8Array) => Uint8Array) | undefined = typeof crypto !== "undefined" ? crypto.getRandomValues : undefined;
+export const getRandomValues: ((array: Uint8Array) => Uint8Array) | undefined =
+  typeof crypto !== "undefined" ? crypto.getRandomValues.bind(crypto) : undefined;

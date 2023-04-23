@@ -14,7 +14,7 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "browser": {
-    "./lib/util/crypto.js": "./lib/util/crypto-browser.js"
+    "./lib/crypto/native-crypto.js": "./lib/crypto/native-crypto-browser.js"
   },
   "repository": {
     "type": "git",

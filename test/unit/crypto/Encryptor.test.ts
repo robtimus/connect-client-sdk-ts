@@ -6,13 +6,12 @@ import { Encryptor } from "../../../src/crypto/Encryptor";
 import { PaymentRequest } from "../../../src/model/PaymentRequest";
 import { PublicKey } from "../../../src/model";
 import { toPaymentProduct } from "../../../src/model/PaymentProduct";
-import { randomUUID } from "../../../src/util/crypto";
 import { MockDevice } from "../mock.test";
 
 describe("Encryptor", () => {
-  const clientSessionId = randomUUID();
+  const clientSessionId = "client-session-id";
   const publicKey: PublicKey = {
-    keyId: randomUUID(),
+    keyId: "key-id",
     publicKey:
       "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkiJlGL1QjUnGDLpMNBtZPYVtOU121jfFcV4WrZayfw9Ib/1AtPBHP/0ZPocdA23zDh6aB+QiOQEkHZlfnelBNnEzEu4ibda3nDdjSrKveSiQPyB5X+u/IS3CR48B/g4QJ+mcMV9hoFt6Hx3R99A0HWMs4um8elQsgB11MsLmGb1SuLo0S1pgL3EcckXfBDNMUBMQ9EtLC9zQW6Y0kx6GFXHgyjNb4yixXfjo194jfhei80sVQ49Y/SHBt/igATGN1l18IBDtO0eWmWeBckwbNkpkPLAvJfsfa3JpaxbXwg3rTvVXLrIRhvMYqTsQmrBIJDl7F6igPD98Y1FydbKe5QIDAQAB",
   };
@@ -69,6 +68,7 @@ describe("Encryptor", () => {
       clientSessionId,
       publicKey,
       {
+        randomString: jest.fn(),
         encrypt: jest.fn(),
       },
       new MockDevice()
@@ -88,6 +88,7 @@ describe("Encryptor", () => {
       clientSessionId,
       publicKey,
       {
+        randomString: jest.fn(),
         encrypt: jest.fn(),
       },
       new MockDevice()
@@ -105,123 +106,110 @@ describe("Encryptor", () => {
 
   describe("success", () => {
     interface EncryptInput {
-      payload?: string;
-      keyId?: string;
-      publicKeyValue?: string;
+      payload: string;
+      keyId: string;
+      publicKeyValue: string;
     }
 
     test("without account on file", async () => {
-      let inputCaptor: EncryptInput = {};
       const encrypt = (payload: string, keyId: string, publicKeyValue: string) => {
-        inputCaptor = { payload, keyId, publicKeyValue };
-        return Promise.resolve("encrypted");
+        const input: EncryptInput = { payload, keyId, publicKeyValue };
+        return Promise.resolve(JSON.stringify(input));
       };
       const device = new MockDevice();
-      const encryptor = new Encryptor(clientSessionId, publicKey, { encrypt }, device);
-      const request = new PaymentRequest();
-      request.setPaymentProduct(product);
-      request.setValue("expirationDate", "1230");
-      await encryptor.encrypt(request);
-      expect(inputCaptor.keyId).toBe(publicKey.keyId);
-      expect(inputCaptor.publicKeyValue).toBe(publicKey.publicKey);
-
-      const payload = JSON.parse(inputCaptor.payload || "{}");
-      expect(payload).toHaveProperty("clientSessionId", clientSessionId);
-      expect(payload).toHaveProperty("nonce");
-      expect(payload).toHaveProperty("paymentProductId", product.id);
-      expect(payload).not.toHaveProperty("accountOnFileId");
-      expect(payload).toHaveProperty("tokenize", false);
-      expect(payload).toHaveProperty("paymentValues", [{ key: "expirationDate", value: "1230" }]);
-      const deviceInformation = device.getDeviceInformation();
-      expect(payload).toHaveProperty("collectedDeviceInformation", {
-        timezoneOffsetUtcMinutes: deviceInformation.timezoneOffsetUtcMinutes,
-        locale: deviceInformation.locale,
-        browserData: {
-          javaScriptEnabled: true,
-          javaEnabled: deviceInformation.javaEnabled,
-          colorDepth: deviceInformation.colorDepth,
-          screenHeight: deviceInformation.screenHeight,
-          screenWidth: deviceInformation.screenWidth,
-          innerHeight: deviceInformation.innerHeight,
-          innerWidth: deviceInformation.innerWidth,
+      const encryptor = new Encryptor(
+        clientSessionId,
+        publicKey,
+        {
+          randomString: () => "random-nonce",
+          encrypt,
         },
-      });
-    });
-
-    test("without account on file", async () => {
-      let inputCaptor: EncryptInput = {};
-      const encrypt = (payload: string, keyId: string, publicKeyValue: string) => {
-        inputCaptor = { payload, keyId, publicKeyValue };
-        return Promise.resolve("encrypted");
-      };
-      const device = new MockDevice();
-      const encryptor = new Encryptor(clientSessionId, publicKey, { encrypt }, device);
+        device
+      );
       const request = new PaymentRequest();
       request.setPaymentProduct(product);
       request.setValue("expirationDate", "1230");
-      await encryptor.encrypt(request);
-      expect(inputCaptor.keyId).toBe(publicKey.keyId);
-      expect(inputCaptor.publicKeyValue).toBe(publicKey.publicKey);
-
-      const payload = JSON.parse(inputCaptor.payload || "{}");
-      expect(payload).toHaveProperty("clientSessionId", clientSessionId);
-      expect(payload).toHaveProperty("nonce");
-      expect(payload).toHaveProperty("paymentProductId", product.id);
-      expect(payload).not.toHaveProperty("accountOnFileId");
-      expect(payload).toHaveProperty("tokenize", false);
-      expect(payload).toHaveProperty("paymentValues", [{ key: "expirationDate", value: "1230" }]);
+      const input: EncryptInput = await encryptor.encrypt(request).then(JSON.parse);
+      expect(input.keyId).toBe(publicKey.keyId);
+      expect(input.publicKeyValue).toBe(publicKey.publicKey);
+      const payload = JSON.parse(input.payload);
       const deviceInformation = device.getDeviceInformation();
-      expect(payload).toHaveProperty("collectedDeviceInformation", {
-        timezoneOffsetUtcMinutes: deviceInformation.timezoneOffsetUtcMinutes,
-        locale: deviceInformation.locale,
-        browserData: {
-          javaScriptEnabled: true,
-          javaEnabled: deviceInformation.javaEnabled,
-          colorDepth: deviceInformation.colorDepth,
-          screenHeight: deviceInformation.screenHeight,
-          screenWidth: deviceInformation.screenWidth,
-          innerHeight: deviceInformation.innerHeight,
-          innerWidth: deviceInformation.innerWidth,
+      expect(payload).toStrictEqual({
+        clientSessionId,
+        nonce: "random-nonce",
+        paymentProductId: product.id,
+        tokenize: false,
+        paymentValues: [
+          {
+            key: "expirationDate",
+            value: "1230",
+          },
+        ],
+        collectedDeviceInformation: {
+          timezoneOffsetUtcMinutes: deviceInformation.timezoneOffsetUtcMinutes,
+          locale: deviceInformation.locale,
+          browserData: {
+            javaScriptEnabled: true,
+            javaEnabled: deviceInformation.javaEnabled,
+            colorDepth: deviceInformation.colorDepth,
+            screenHeight: deviceInformation.screenHeight,
+            screenWidth: deviceInformation.screenWidth,
+            innerHeight: deviceInformation.innerHeight,
+            innerWidth: deviceInformation.innerWidth,
+          },
         },
       });
     });
 
     test("with account on file", async () => {
-      let inputCaptor: EncryptInput = {};
       const encrypt = (payload: string, keyId: string, publicKeyValue: string) => {
-        inputCaptor = { payload, keyId, publicKeyValue };
-        return Promise.resolve("encrypted");
+        const input: EncryptInput = { payload, keyId, publicKeyValue };
+        return Promise.resolve(JSON.stringify(input));
       };
       const device = new MockDevice();
-      const encryptor = new Encryptor(clientSessionId, publicKey, { encrypt }, device);
+      const encryptor = new Encryptor(
+        clientSessionId,
+        publicKey,
+        {
+          randomString: () => "random-nonce",
+          encrypt,
+        },
+        device
+      );
       const request = new PaymentRequest();
       request.setPaymentProduct(product);
       request.setAccountOnFile(product.accountsOnFile[0]);
       request.setValue("expirationDate", "1230");
       request.setTokenize(true);
-      await encryptor.encrypt(request);
-      expect(inputCaptor.keyId).toBe(publicKey.keyId);
-      expect(inputCaptor.publicKeyValue).toBe(publicKey.publicKey);
-
-      const payload = JSON.parse(inputCaptor.payload || "{}");
-      expect(payload).toHaveProperty("clientSessionId", clientSessionId);
-      expect(payload).toHaveProperty("nonce");
-      expect(payload).toHaveProperty("paymentProductId", product.id);
-      expect(payload).toHaveProperty("accountOnFileId", product.accountsOnFile[0].id);
-      expect(payload).toHaveProperty("tokenize", true);
-      expect(payload).toHaveProperty("paymentValues", [{ key: "expirationDate", value: "1230" }]);
+      const input: EncryptInput = await encryptor.encrypt(request).then(JSON.parse);
+      expect(input.keyId).toBe(publicKey.keyId);
+      expect(input.publicKeyValue).toBe(publicKey.publicKey);
+      const payload = JSON.parse(input.payload);
       const deviceInformation = device.getDeviceInformation();
-      expect(payload).toHaveProperty("collectedDeviceInformation", {
-        timezoneOffsetUtcMinutes: deviceInformation.timezoneOffsetUtcMinutes,
-        locale: deviceInformation.locale,
-        browserData: {
-          javaScriptEnabled: true,
-          javaEnabled: deviceInformation.javaEnabled,
-          colorDepth: deviceInformation.colorDepth,
-          screenHeight: deviceInformation.screenHeight,
-          screenWidth: deviceInformation.screenWidth,
-          innerHeight: deviceInformation.innerHeight,
-          innerWidth: deviceInformation.innerWidth,
+      expect(payload).toStrictEqual({
+        clientSessionId,
+        nonce: "random-nonce",
+        paymentProductId: product.id,
+        accountOnFileId: product.accountsOnFile[0].id,
+        tokenize: true,
+        paymentValues: [
+          {
+            key: "expirationDate",
+            value: "1230",
+          },
+        ],
+        collectedDeviceInformation: {
+          timezoneOffsetUtcMinutes: deviceInformation.timezoneOffsetUtcMinutes,
+          locale: deviceInformation.locale,
+          browserData: {
+            javaScriptEnabled: true,
+            javaEnabled: deviceInformation.javaEnabled,
+            colorDepth: deviceInformation.colorDepth,
+            screenHeight: deviceInformation.screenHeight,
+            screenWidth: deviceInformation.screenWidth,
+            innerHeight: deviceInformation.innerHeight,
+            innerWidth: deviceInformation.innerWidth,
+          },
         },
       });
     });

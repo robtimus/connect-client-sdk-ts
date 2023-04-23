@@ -1,7 +1,6 @@
-import { JOSEEncryptor } from ".";
+import { CryptoEngine } from ".";
 import { Device, KeyValuePair, PublicKey } from "../model";
 import { PaymentRequest } from "../model/PaymentRequest";
-import { randomUUID } from "../util/crypto";
 
 interface BrowserData {
   javaScriptEnabled: true;
@@ -46,12 +45,17 @@ function collectDeviceInformation(device: Device): DeviceInformation {
   };
 }
 
-function createEncryptedCustomerInput(clientSessionId: string, paymentRequest: PaymentRequest, device: Device): EncryptedCustomerInput {
+function createEncryptedCustomerInput(
+  clientSessionId: string,
+  nonce: string,
+  paymentRequest: PaymentRequest,
+  device: Device
+): EncryptedCustomerInput {
   const values = paymentRequest.getUnmaskedValues();
 
   const encryptedCustomerInput: EncryptedCustomerInput = {
     clientSessionId,
-    nonce: randomUUID(),
+    nonce,
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     paymentProductId: paymentRequest.getPaymentProduct()!.id,
     tokenize: paymentRequest.getTokenize(),
@@ -72,7 +76,7 @@ export class Encryptor {
   constructor(
     private readonly clientSessionId: string,
     private readonly publicKey: PublicKey,
-    private readonly joseEncryptor: JOSEEncryptor,
+    private readonly engine: CryptoEngine,
     private readonly device: Device
   ) {}
 
@@ -84,9 +88,10 @@ export class Encryptor {
     if (!validationResult.valid) {
       throw validationResult.errors;
     }
-    const encryptedCustomerInput = createEncryptedCustomerInput(this.clientSessionId, paymentRequest, this.device);
+    const nonce = this.engine.randomString();
+    const encryptedCustomerInput = createEncryptedCustomerInput(this.clientSessionId, nonce, paymentRequest, this.device);
     const payload = JSON.stringify(encryptedCustomerInput);
-    return this.joseEncryptor.encrypt(payload, this.publicKey.keyId, this.publicKey.publicKey);
+    return this.engine.encrypt(payload, this.publicKey.keyId, this.publicKey.publicKey);
   }
 }
 

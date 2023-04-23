@@ -1,6 +1,3 @@
-export const subtle = crypto.subtle;
-export const getRandomValues = crypto.getRandomValues;
-
 // byteToHex copied from https://github.com/uuidjs/uuid/blob/v9.0.0/src/stringify.js
 
 const byteToHex: string[] = [];
@@ -44,3 +41,6 @@ export function randomUUID(): string {
   }
   throw new Error("Neither crypto.randomUUID nor crypto.getRandomValues is available");
 }
+
+export const subtle: SubtleCrypto | undefined = typeof crypto !== "undefined" ? crypto.subtle : undefined;
+export const getRandomValues: ((array: Uint8Array) => Uint8Array) | undefined = typeof crypto !== "undefined" ? crypto.getRandomValues : undefined;

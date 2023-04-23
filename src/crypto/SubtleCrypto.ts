@@ -1,5 +1,5 @@
-import { JOSEEncryptor } from ".";
-import * as crypto from "../util/crypto";
+import { CryptoEngine } from ".";
+import * as crypto from "./native-crypto";
 
 const CEK_KEY_LENGTH = 512;
 const IV_LENGTH = 128;
@@ -108,13 +108,17 @@ async function calculateHMAC(
   return crypto.subtle.sign("HMAC", key, str2ab(hmacInput)).then(ab2str);
 }
 
-class SubtleCryptoJOSEEncryptor implements JOSEEncryptor {
+class SubtleCryptoEngine implements CryptoEngine {
+  randomString(): string {
+    return crypto.randomUUID();
+  }
+
   async encrypt(payload: string, keyId: string, publicKey: string): Promise<string> {
     const protectedHeader = createProtectedHeader(keyId);
     const encodededProtectedHeader = btoa(protectedHeader);
 
     // Create ContentEncryptionKey, is a random byte[]
-    const CEK = ab2str(crypto.getRandomValues(new Int8Array(CEK_KEY_LENGTH / 8)));
+    const CEK = ab2str(crypto.getRandomValues(new Uint8Array(CEK_KEY_LENGTH / 8)));
     const rsaPublicKey = await decodePemPublicKey(publicKey);
 
     // Encrypt the contentEncryptionKey with the GC gateway publickey and encode it with Base64 encoding
@@ -126,7 +130,7 @@ class SubtleCryptoJOSEEncryptor implements JOSEEncryptor {
     const encKey = CEK.substring(CEK_KEY_LENGTH / 2 / 8);
 
     // Create Initialization Vector
-    const initializationVector = ab2str(crypto.getRandomValues(new Int8Array(IV_LENGTH / 8)));
+    const initializationVector = ab2str(crypto.getRandomValues(new Uint8Array(IV_LENGTH / 8)));
     const encodededinitializationVector = btoa(initializationVector);
 
     // Encrypt content with ContentEncryptionKey and Initialization Vector
@@ -155,10 +159,10 @@ class SubtleCryptoJOSEEncryptor implements JOSEEncryptor {
   }
 }
 
-Object.freeze(SubtleCryptoJOSEEncryptor.prototype);
+Object.freeze(SubtleCryptoEngine.prototype);
 
 export function isSubtleCryptoAvailable(): boolean {
-  return typeof crypto !== "undefined" && typeof crypto.getRandomValues !== "undefined" && typeof crypto.subtle !== "undefined";
+  return typeof crypto.getRandomValues !== "undefined" && typeof crypto.subtle !== "undefined";
 }
 
-export const subtleCryptoEncryptor: JOSEEncryptor = new SubtleCryptoJOSEEncryptor();
+export const subtleCryptoEngine: CryptoEngine = new SubtleCryptoEngine();

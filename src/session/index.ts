@@ -1,8 +1,8 @@
 import { Communicator } from "../communicator";
 import { api } from "../communicator/model";
-import { JOSEEncryptor } from "../crypto";
+import { CryptoEngine } from "../crypto";
 import { Encryptor } from "../crypto/Encryptor";
-import { isSubtleCryptoAvailable, subtleCryptoEncryptor } from "../crypto/SubtleCrypto";
+import { isSubtleCryptoAvailable, subtleCryptoEngine } from "../crypto/SubtleCrypto";
 import { HttpResponse } from "../http";
 import {
   ApplePayClient,
@@ -40,7 +40,6 @@ import { toBasicPaymentItems } from "../model/PaymentItem";
 import { PP_APPLE_PAY, PP_BANCONTACT, PP_GOOGLE_PAY, toBasicPaymentProducts, toPaymentProduct } from "../model/PaymentProduct";
 import { toBasicPaymentProductGroups, toPaymentProductGroup } from "../model/PaymentProductGroup";
 import { Browser } from "../browser";
-import { randomUUID } from "../util/crypto";
 
 function constructCacheKey(base: string, ...params: unknown[]): string {
   return base + ":" + params.map((value) => `<${value}>`).join(";");
@@ -111,7 +110,7 @@ function productNotFoundError(): HttpResponse {
     statusCode: 404,
     contentType: "application/json",
     body: {
-      errorId: randomUUID(),
+      errorId: "n/a",
       errors: [
         {
           category: "CONNECT_PLATFORM_ERROR",
@@ -141,7 +140,7 @@ export interface GooglePayHelper {
 export class Session {
   private readonly communicator: Communicator;
   private readonly cache: Record<string, unknown> = {};
-  private joseEncryptor?: JOSEEncryptor;
+  private cryptoEngine?: CryptoEngine;
   private providedPaymentItem?: PaymentItem;
   private paymentProductAvailability: Record<number, boolean | undefined> = {};
 
@@ -149,7 +148,7 @@ export class Session {
     this.communicator = new Communicator(sessionDetails, device);
 
     if (isSubtleCryptoAvailable()) {
-      this.joseEncryptor = subtleCryptoEncryptor;
+      this.cryptoEngine = subtleCryptoEngine;
     }
   }
 
@@ -184,15 +183,15 @@ export class Session {
   }
 
   async getEncryptor(): Promise<Encryptor> {
-    if (!this.joseEncryptor) {
+    if (!this.cryptoEngine) {
       throw new Error("encryption not supported");
     }
     const publicKey = await this.getPublicKey();
-    return new Encryptor(this.sessionDetails.clientSessionId, publicKey, this.joseEncryptor, this.device);
+    return new Encryptor(this.sessionDetails.clientSessionId, publicKey, this.cryptoEngine, this.device);
   }
 
-  setJOSEEncryptor(joseEncryptor: JOSEEncryptor): void {
-    this.joseEncryptor = joseEncryptor;
+  setCryptoEngine(cryptoEngine: CryptoEngine): void {
+    this.cryptoEngine = cryptoEngine;
   }
 
   async getPublicKey(): Promise<PublicKey> {

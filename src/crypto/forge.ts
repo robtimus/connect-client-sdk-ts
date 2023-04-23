@@ -1,5 +1,5 @@
 import * as forge from "node-forge";
-import { JOSEEncryptor } from ".";
+import { CryptoEngine } from ".";
 
 const CEK_KEY_LENGTH = 512;
 const IV_LENGTH = 128;
@@ -64,7 +64,11 @@ function calculateHMAC(macKey: string, encodededProtectedHeader: string, initial
   return hmac.digest().bytes();
 }
 
-class ForgeJOSEEncryptor implements JOSEEncryptor {
+class ForgeCryptoEngine implements CryptoEngine {
+  randomString(): string {
+    return forge.util.bytesToHex(forge.random.getBytesSync(16));
+  }
+
   encrypt(payload: string, keyId: string, publicKey: string): Promise<string> {
     const protectedHeader = createProtectedHeader(keyId);
     const encodededProtectedHeader = btoa(protectedHeader);
@@ -111,6 +115,6 @@ class ForgeJOSEEncryptor implements JOSEEncryptor {
   }
 }
 
-Object.freeze(ForgeJOSEEncryptor.prototype);
+Object.freeze(ForgeCryptoEngine.prototype);
 
-export const forgeEncryptor: JOSEEncryptor = new ForgeJOSEEncryptor();
+export const forgeCryptoEngine: CryptoEngine = new ForgeCryptoEngine();

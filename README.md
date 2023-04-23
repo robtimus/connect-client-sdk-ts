@@ -9,6 +9,7 @@ An SDK for the [Ingenico Connect](https://epayments.developer-ingenico.com/) Cli
 
 * No explicit requirement on browser specifics. This makes it usable for React Native apps.
 * No deprecated legacy code.
+* Native cryptography if available, through [web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API). [node-forge](https://www.npmjs.com/package/node-forge) can still be used as fallback.
 * TODO...
 
 ## Initialization
@@ -21,7 +22,7 @@ TODO
 
 ## Requirements
 
-Node.js 14 or higher is required.
+Node.js 16 or higher is required.
 
 ## Installation
 
@@ -38,17 +39,15 @@ From the root of the project install all dependencies, then compile the code:
 
 ## Testing
 
-TODO: verify
-
 There are two types of tests:
 
 1. Unit tests. These will work out-of-the-box.\
    Run these tests as follows:
 
     ```
-    npm run test:unit
+    npm run test
     ```
-2. Integration tests. Before you can run these, you first need to copy file `__tests__/config.json.dist` to `__tests__/config.json` and replace all values as needed.\
+2. Integration tests. Before you can run these, you first need to copy file `test/config.json.dist` to `test/config.json` and replace all values as needed.\
    Run these tests as follows:
 
     ```
@@ -57,4 +56,4 @@ There are two types of tests:
 
 You can also run both types of tests together as follows:
 
-    npm run test
+    npm run test:all

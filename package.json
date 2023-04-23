@@ -26,9 +26,9 @@
     "format": "prettier --write \"**/*.+(json|ts|tsx)\"",
     "format:check": "prettier --check \"**/*.+(json|ts|tsx)\"",
     "build": "npm run format:check && npm run lint && npm run compile",
-    "test": "jest",
-    "test:unit": "jest --group=unit",
-    "test:integration": "jest --group=integration"
+    "test": "jest --group=unit",
+    "test:integration": "jest --group=integration",
+    "test:all": "jest"
   },
   "dependencies": {
     "node-forge": "^1.3.1"

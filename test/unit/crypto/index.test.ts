@@ -2,18 +2,16 @@
  * @group unit:validation
  */
 
-import * as crypto from "crypto";
-import { v4 as uuidv4 } from "uuid";
 import { JWE, JWK } from "node-jose";
 import { JOSEEncryptor } from "../../../src/crypto";
 import { forgeEncryptor } from "../../../src/crypto/forge";
 import { subtleCryptoEncryptor } from "../../../src/crypto/SubtleCrypto";
-import { Mocks } from "../mock.test";
+import { randomUUID } from "../../../src/util/crypto";
 
 function testJOSEEncryptor(joseEncryptor: JOSEEncryptor): void {
   describe("encrypt", () => {
     const payload = {
-      clientSessionId: uuidv4(),
+      clientSessionId: randomUUID(),
       paymentValues: [
         {
           key: "cardNumber",
@@ -57,16 +55,5 @@ describe("forge", () => {
 });
 
 describe("crypto.subtle", () => {
-  const globalMocks = Mocks.global();
-
-  beforeAll(() => {
-    // Allow crypto to be used without needing to import it in the SubtleCrypto module
-    globalMocks.mockIfNecessary("crypto", crypto);
-  });
-
-  afterAll(() => {
-    globalMocks.restore();
-  });
-
   testJOSEEncryptor(subtleCryptoEncryptor);
 });

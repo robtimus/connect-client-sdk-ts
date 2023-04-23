@@ -2,8 +2,6 @@
  * @group unit:session
  */
 
-import * as crypto from "crypto";
-import { v4 as uuidv4 } from "uuid";
 import { Session } from "../../src/session";
 import { api } from "../../src/communicator/model";
 import {
@@ -19,14 +17,15 @@ import {
 import { PP_APPLE_PAY, PP_BANCONTACT, PP_GOOGLE_PAY, toBasicPaymentProducts, toPaymentProduct } from "../../src/model/PaymentProduct";
 import { HttpResponse } from "../../src/http";
 import { sdkIdentifier } from "../../src/metadata";
+import { randomUUID } from "../../src/util/crypto";
 import { CapturedHttpRequest, MockDevice, Mocks, notImplementedResponse } from "./mock.test";
 
 describe("Session", () => {
   const sessionDetails: SessionDetails = {
-    clientSessionId: uuidv4(),
+    clientSessionId: randomUUID(),
     assetUrl: "http://localhost/assets",
     clientApiUrl: "http://localhost/client",
-    customerId: uuidv4(),
+    customerId: randomUUID(),
   };
   const minimalPaymentContext: PaymentContext = {
     amountOfMoney: {
@@ -324,7 +323,7 @@ describe("Session", () => {
 
   describe("getEncryptor", () => {
     const publicKey: api.PublicKey = {
-      keyId: uuidv4(),
+      keyId: randomUUID(),
       publicKey:
         "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkiJlGL1QjUnGDLpMNBtZPYVtOU121jfFcV4WrZayfw9Ib/1AtPBHP/0ZPocdA23zDh6aB+QiOQEkHZlfnelBNnEzEu4ibda3nDdjSrKveSiQPyB5X+u/IS3CR48B/g4QJ+mcMV9hoFt6Hx3R99A0HWMs4um8elQsgB11MsLmGb1SuLo0S1pgL3EcckXfBDNMUBMQ9EtLC9zQW6Y0kx6GFXHgyjNb4yixXfjo194jfhei80sVQ49Y/SHBt/igATGN1l18IBDtO0eWmWeBckwbNkpkPLAvJfsfa3JpaxbXwg3rTvVXLrIRhvMYqTsQmrBIJDl7F6igPD98Y1FydbKe5QIDAQAB",
     };
@@ -349,8 +348,6 @@ describe("Session", () => {
       });
 
       test("with SubleCrypto JOSE encryptor", async () => {
-        globalMocks.mockIfNecessary("crypto", crypto);
-
         const session = new Session(sessionDetails, minimalPaymentContext, device);
         expect(async () => await session.getEncryptor()).not.toThrow();
       });
@@ -372,8 +369,6 @@ describe("Session", () => {
     });
 
     test("no JOSE encryptor", async () => {
-      globalMocks.mock("crypto", undefined);
-
       const device = new MockDevice().mockGet(
         `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/crypto/publickey`,
         {
@@ -384,6 +379,11 @@ describe("Session", () => {
         expectRequest
       );
       const session = new Session(sessionDetails, minimalPaymentContext, device);
+      // In Node environments, crypto.subtle is always available, therefore the default JOSEEncryptor will always be set
+      // Set it to undefined this way instead, to mock the case where crypto.subtle is not available
+      Object.defineProperty(session, "joseEncryptor", {
+        value: undefined,
+      });
       const onSuccess = jest.fn();
       const result = await session
         .getEncryptor()
@@ -397,7 +397,7 @@ describe("Session", () => {
   describe("getPublicKey", () => {
     test("successful", async () => {
       const publicKey: api.PublicKey = {
-        keyId: uuidv4(),
+        keyId: randomUUID(),
         publicKey:
           "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkiJlGL1QjUnGDLpMNBtZPYVtOU121jfFcV4WrZayfw9Ib/1AtPBHP/0ZPocdA23zDh6aB+QiOQEkHZlfnelBNnEzEu4ibda3nDdjSrKveSiQPyB5X+u/IS3CR48B/g4QJ+mcMV9hoFt6Hx3R99A0HWMs4um8elQsgB11MsLmGb1SuLo0S1pgL3EcckXfBDNMUBMQ9EtLC9zQW6Y0kx6GFXHgyjNb4yixXfjo194jfhei80sVQ49Y/SHBt/igATGN1l18IBDtO0eWmWeBckwbNkpkPLAvJfsfa3JpaxbXwg3rTvVXLrIRhvMYqTsQmrBIJDl7F6igPD98Y1FydbKe5QIDAQAB",
       };
@@ -429,7 +429,7 @@ describe("Session", () => {
 
     test("caching", async () => {
       const publicKey: api.PublicKey = {
-        keyId: uuidv4(),
+        keyId: randomUUID(),
         publicKey:
           "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkiJlGL1QjUnGDLpMNBtZPYVtOU121jfFcV4WrZayfw9Ib/1AtPBHP/0ZPocdA23zDh6aB+QiOQEkHZlfnelBNnEzEu4ibda3nDdjSrKveSiQPyB5X+u/IS3CR48B/g4QJ+mcMV9hoFt6Hx3R99A0HWMs4um8elQsgB11MsLmGb1SuLo0S1pgL3EcckXfBDNMUBMQ9EtLC9zQW6Y0kx6GFXHgyjNb4yixXfjo194jfhei80sVQ49Y/SHBt/igATGN1l18IBDtO0eWmWeBckwbNkpkPLAvJfsfa3JpaxbXwg3rTvVXLrIRhvMYqTsQmrBIJDl7F6igPD98Y1FydbKe5QIDAQAB",
       };
@@ -448,7 +448,7 @@ describe("Session", () => {
 
   describe("getThirdPartyStatus", () => {
     test("successful", async () => {
-      const paymentId = uuidv4();
+      const paymentId = randomUUID();
       const thirdPartyStatusResponse: api.ThirdPartyStatusResponse = {
         thirdPartyStatus: "WAITING",
       };
@@ -467,7 +467,7 @@ describe("Session", () => {
     });
 
     test("HTTP error", async () => {
-      const paymentId = uuidv4();
+      const paymentId = randomUUID();
       // don't mock anything -> will lead to an error response
       const session = new Session(sessionDetails, minimalPaymentContext, new MockDevice());
       const onSuccess = jest.fn();
@@ -480,7 +480,7 @@ describe("Session", () => {
     });
 
     test("caching not enabled", async () => {
-      const paymentId = uuidv4();
+      const paymentId = randomUUID();
       const thirdPartyStatusResponse: api.ThirdPartyStatusResponse = {
         thirdPartyStatus: "WAITING",
       };
@@ -1134,7 +1134,7 @@ describe("Session", () => {
 
     test("successful", async () => {
       const deviceFingerprintResponse: api.DeviceFingerprintResponse = {
-        deviceFingerprintTransactionId: uuidv4(),
+        deviceFingerprintTransactionId: randomUUID(),
         html: "<span>foo</span>",
       };
       const device = new MockDevice().mockPost(
@@ -1165,7 +1165,7 @@ describe("Session", () => {
 
     test("caching not enabled", async () => {
       const deviceFingerprintResponse: api.DeviceFingerprintResponse = {
-        deviceFingerprintTransactionId: uuidv4(),
+        deviceFingerprintTransactionId: randomUUID(),
         html: "<span>foo</span>",
       };
       const device = new MockDevice().mockPost(
@@ -2209,7 +2209,7 @@ describe("Session", () => {
 
     test("successful", async () => {
       const deviceFingerprintResponse: api.DeviceFingerprintResponse = {
-        deviceFingerprintTransactionId: uuidv4(),
+        deviceFingerprintTransactionId: randomUUID(),
         html: "<span>foo</span>",
       };
       const device = new MockDevice().mockPost(
@@ -2240,7 +2240,7 @@ describe("Session", () => {
 
     test("caching not enabled", async () => {
       const deviceFingerprintResponse: api.DeviceFingerprintResponse = {
-        deviceFingerprintTransactionId: uuidv4(),
+        deviceFingerprintTransactionId: randomUUID(),
         html: "<span>foo</span>",
       };
       const device = new MockDevice().mockPost(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products/1/deviceFingerprint`, {
@@ -2382,7 +2382,7 @@ describe("Session", () => {
     test("successful", async () => {
       const createSessionResponse: api.CreatePaymentProductSessionResponse = {
         paymentProductSession302SpecificOutput: {
-          sessionObject: uuidv4(),
+          sessionObject: randomUUID(),
         },
       };
       const device = new MockDevice().mockPost(
@@ -2449,7 +2449,7 @@ describe("Session", () => {
     test("caching not enabled", async () => {
       const createSessionResponse: api.CreatePaymentProductSessionResponse = {
         paymentProductSession302SpecificOutput: {
-          sessionObject: uuidv4(),
+          sessionObject: randomUUID(),
         },
       };
       const device = new MockDevice().mockPost(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products/302/sessions`, {
@@ -2642,7 +2642,7 @@ describe("Session", () => {
 
     test("not known", async () => {
       const errorResponse: api.ErrorResponse = {
-        errorId: uuidv4(),
+        errorId: randomUUID(),
         errors: [],
       };
       const device = new MockDevice().mockPost(
@@ -2953,7 +2953,7 @@ describe("Session", () => {
       test("createPayment", async () => {
         const createSessionResponse: api.CreatePaymentProductSessionResponse = {
           paymentProductSession302SpecificOutput: {
-            sessionObject: uuidv4(),
+            sessionObject: randomUUID(),
           },
         };
         const onSession = jest.fn();
@@ -3188,7 +3188,7 @@ describe("Session", () => {
     Object.defineProperty(session, "getPublicKey", {
       value: () =>
         Promise.resolve({
-          keyId: uuidv4(),
+          keyId: randomUUID(),
           publicKey:
             "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkiJlGL1QjUnGDLpMNBtZPYVtOU121jfFcV4WrZayfw9Ib/1AtPBHP/0ZPocdA23zDh6aB+QiOQEkHZlfnelBNnEzEu4ibda3nDdjSrKveSiQPyB5X+u/IS3CR48B/g4QJ+mcMV9hoFt6Hx3R99A0HWMs4um8elQsgB11MsLmGb1SuLo0S1pgL3EcckXfBDNMUBMQ9EtLC9zQW6Y0kx6GFXHgyjNb4yixXfjo194jfhei80sVQ49Y/SHBt/igATGN1l18IBDtO0eWmWeBckwbNkpkPLAvJfsfa3JpaxbXwg3rTvVXLrIRhvMYqTsQmrBIJDl7F6igPD98Y1FydbKe5QIDAQAB",
         }),

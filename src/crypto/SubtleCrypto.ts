@@ -1,4 +1,5 @@
 import { JOSEEncryptor } from ".";
+import * as crypto from "../util/crypto";
 
 const CEK_KEY_LENGTH = 512;
 const IV_LENGTH = 128;

@@ -1,7 +1,7 @@
-import { v4 as uuidv4 } from "uuid";
 import { JOSEEncryptor } from ".";
 import { Device, KeyValuePair, PublicKey } from "../model";
 import { PaymentRequest } from "../model/PaymentRequest";
+import { randomUUID } from "../util/crypto";
 
 interface BrowserData {
   javaScriptEnabled: true;
@@ -51,7 +51,7 @@ function createEncryptedCustomerInput(clientSessionId: string, paymentRequest: P
 
   const encryptedCustomerInput: EncryptedCustomerInput = {
     clientSessionId,
-    nonce: uuidv4(),
+    nonce: randomUUID(),
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     paymentProductId: paymentRequest.getPaymentProduct()!.id,
     tokenize: paymentRequest.getTokenize(),

@@ -52,10 +52,10 @@ describe("session", () => {
   }
 
   async function createSession(): Promise<Session> {
-    const sessionDetails: SessionDetails = await sessionResponse.then((response) => {
+    const sessionDetails: SessionDetails = (await sessionResponse.then((response) => {
       response.clientApiUrl = replaceHost(response.clientApiUrl || "");
       return response;
-    }) as SessionDetails;
+    })) as SessionDetails;
     return new Session(sessionDetails, paymentContext, device);
   }
 

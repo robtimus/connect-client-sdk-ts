@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
 import { Communicator } from "../communicator";
 import { api } from "../communicator/model";
 import { JOSEEncryptor } from "../crypto";
@@ -41,6 +40,7 @@ import { toBasicPaymentItems } from "../model/PaymentItem";
 import { PP_APPLE_PAY, PP_BANCONTACT, PP_GOOGLE_PAY, toBasicPaymentProducts, toPaymentProduct } from "../model/PaymentProduct";
 import { toBasicPaymentProductGroups, toPaymentProductGroup } from "../model/PaymentProductGroup";
 import { Browser } from "../browser";
+import { randomUUID } from "../util/crypto";
 
 function constructCacheKey(base: string, ...params: unknown[]): string {
   return base + ":" + params.map((value) => `<${value}>`).join(";");
@@ -111,7 +111,7 @@ function productNotFoundError(): HttpResponse {
     statusCode: 404,
     contentType: "application/json",
     body: {
-      errorId: uuidv4(),
+      errorId: randomUUID(),
       errors: [
         {
           category: "CONNECT_PLATFORM_ERROR",

@@ -3,6 +3,7 @@
  */
 
 import { Server } from "http";
+import { AddressInfo } from "net";
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import { fetchHttpClient } from "../../../src/http/fetch";
@@ -57,10 +58,15 @@ describe("fetch HttpClient", () => {
 
   beforeAll(() => {
     server = app.listen();
-    baseUrl = `http://localhost:${server.address().port}`;
+    const address = server.address() as AddressInfo;
+    baseUrl = `http://localhost:${address.port}`;
   });
 
-  afterAll(() => server.close());
+  afterAll((done) => {
+    server.close(() => {
+      done();
+    });
+  });
 
   test("GET", async () => {
     const response = await fetchHttpClient

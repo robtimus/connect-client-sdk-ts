@@ -1,5 +1,5 @@
 /**
- * @group unit:validation
+ * @group unit:crypto
  */
 
 import { JWE, JWK } from "node-jose";

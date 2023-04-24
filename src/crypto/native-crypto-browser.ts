@@ -42,6 +42,15 @@ export function randomUUID(): string {
   throw new Error("Neither crypto.randomUUID nor crypto.getRandomValues is available");
 }
 
+export function getRandomValues(array: Uint8Array): Uint8Array {
+  if (typeof crypto !== "undefined" && typeof crypto.getRandomValues !== "undefined") {
+    return crypto.getRandomValues(array);
+  }
+  throw new Error("crypto.getRandomValues is not available");
+}
+
 export const subtle: SubtleCrypto | undefined = typeof crypto !== "undefined" ? crypto.subtle : undefined;
-export const getRandomValues: ((array: Uint8Array) => Uint8Array) | undefined =
-  typeof crypto !== "undefined" ? crypto.getRandomValues.bind(crypto) : undefined;
+
+export function isAvailable(): boolean {
+  return typeof crypto !== "undefined" && typeof crypto.getRandomValues !== "undefined" && typeof crypto.subtle !== "undefined";
+}

@@ -162,7 +162,7 @@ class SubtleCryptoEngine implements CryptoEngine {
 Object.freeze(SubtleCryptoEngine.prototype);
 
 export function isSubtleCryptoAvailable(): boolean {
-  return typeof crypto.getRandomValues !== "undefined" && typeof crypto.subtle !== "undefined";
+  return crypto.isAvailable();
 }
 
 export const subtleCryptoEngine: CryptoEngine = new SubtleCryptoEngine();

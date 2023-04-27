@@ -1,85 +1,4 @@
-import { HttpClient } from "../http";
-import { ValidatableRequest, ValidationError, ValidationResult, ValidationRule } from "../validation";
-
-// General
-
-/**
- * An interface describing the current device. This could be a browser or a native device.
- */
-export interface Device {
-  /**
-   * @returns A string representing the platform and/or device.
-   */
-  getPlatformIdentifier(): string;
-  /**
-   * @returns The necessary information about the device.
-   */
-  getDeviceInformation(): DeviceInformation;
-  /**
-   * @returns A device specific HTTP client.
-   */
-  getHttpClient(): HttpClient;
-  /**
-   * @param applePaySpecificInput Input needed to work with Apple Pay.
-   * @param applePaySpecificData Apple Pay specific data, as retrieved by the Ingenico Connect Client API.
-   * @param context The current payment context.
-   * @returns A promise that contains an Apple Pay client for the given parameters, if available.
-   */
-  getApplePayClient(
-    applePaySpecificInput: ApplePaySpecificInput,
-    applePaySpecificData: PaymentProduct302SpecificData,
-    context: PaymentContext
-  ): Promise<ApplePayClient | undefined>;
-  /**
-   * @param googlePaySpecificInput Input needed to work with Google Pay.
-   * @param googlePaySpecificData Google Pay specific data, as retrieved by the Ingenico Connect Client API.
-   * @param context The current payment context.
-   * @returns A promise that contains an Google Pay client for the given parameters, if available.
-   */
-  getGooglePayClient(
-    googlePaySpecificInput: GooglePaySpecificInput,
-    googlePaySpecificData: PaymentProduct320SpecificData,
-    context: PaymentContext
-  ): Promise<GooglePayClient | undefined>;
-}
-
-/**
- * Object containing information on the device.
- */
-export interface DeviceInformation {
-  /**
-   * The device's timezone offset from UTC, in minutes.
-   */
-  readonly timezoneOffsetUtcMinutes: number;
-  /**
-   * The device's current locale, e.g. "en" or "en-GB".
-   */
-  readonly locale: string;
-  /**
-   * Whether or not Java is enabled on the device.
-   */
-  readonly javaEnabled: boolean;
-  /**
-   * The color depth in bits.
-   */
-  readonly colorDepth: number;
-  /**
-   * The height of the screen, in pixels.
-   */
-  readonly screenHeight: number;
-  /**
-   * The width of the screen, in pixels.
-   */
-  readonly screenWidth: number;
-  /**
-   * The inner height of the application or website, in pixels.
-   */
-  readonly innerHeight: number;
-  /**
-   * The inner width of the application or website, in pixels.
-   */
-  readonly innerWidth: number;
-}
+// Context
 
 /**
  * The context for the current payment.
@@ -115,64 +34,6 @@ export interface PaymentContext {
    */
   readonly paymentProductSpecificInputs?: PaymentProductSpecificInputs;
 }
-
-/**
- * Details about the current client session.
- * Can be provided as the response of an Ingenico Connect Server API create session call.
- */
-export interface SessionDetails {
-  readonly clientSessionId: string;
-  readonly assetUrl: string;
-  readonly clientApiUrl: string;
-  readonly customerId: string;
-}
-
-// Payment product specific clients
-
-/**
- * An Apple Pay specific client.
- */
-export interface ApplePayClient {
-  /**
-   * Initiates an Apple Pay payment.\
-   * Implementations should construct the input to the session factory,
-   * and parse the created Apple Pay merchant session to JSON to provide it to the completeMerchantValidation call.
-   * @param sessionFactory A function that can create an Apple Pay merchant session.
-   * @return A promise that contains the payment result.
-   */
-  createPayment(
-    sessionFactory: (input: MobilePaymentProductSession302SpecificInput) => Promise<MobilePaymentProductSession302SpecificOutput>
-  ): Promise<ApplePayJS.ApplePayPaymentToken>;
-}
-
-/**
- * Available options for creating Google Pay buttons.
- */
-export type GooglePayButtonOptions = Omit<google.payments.api.ButtonOptions, "allowedPaymentMethods">;
-
-/**
- * A Google Pay specific client.
- */
-export interface GooglePayClient {
-  /**
-   * Generates a Google Pay payment button styled with the latest Google Pay branding for insertion into a webpage.
-   * @param options Options for the Google Pay payment button. The allowed payment methods should be automatically set by the client.
-   * @returns The generated payment button.
-   */
-  createButton(options: GooglePayButtonOptions): HTMLElement;
-  /**
-   * Prefetches configuration to improve {@link createPayment} execution time on later user interaction.
-   * @returns A promise that contains no value.
-   */
-  prefetchPaymentData(): Promise<void>;
-  /**
-   * Initiates a Google Pay payment.
-   * @return A promise that contains the payment result.
-   */
-  createPayment(): Promise<google.payments.api.PaymentData>;
-}
-
-// Payment product specific inputs
 
 export interface PaymentProductSpecificInputs {
   readonly bancontact?: BancontactSpecificInput;
@@ -222,7 +83,33 @@ export interface GooglePaySpecificInput {
   readonly acquirerCountry?: string;
 }
 
+// Session specifiic
+
+/**
+ * Details about the current client session.
+ * Can be provided as the response of an Ingenico Connect Server API create session call.
+ */
+export interface SessionDetails {
+  readonly clientSessionId: string;
+  readonly assetUrl: string;
+  readonly clientApiUrl: string;
+  readonly customerId: string;
+}
+
 // Crypto
+
+/**
+ * Responsible for encrypting {@link PaymentRequest} objects.
+ */
+export interface Encryptor {
+  /**
+   * Encrypts a payment request.
+   * @param paymentRequest The payment request to encrypt.
+   * @returns A promise that contains the encrypted payment request.
+   * @throws If the payment request has no payment product set, or if the payment request is not valid.
+   */
+  encrypt(paymentRequest: PaymentRequest): Promise<string>;
+}
 
 export interface PublicKey {
   readonly keyId: string;
@@ -607,20 +494,20 @@ export interface PaymentProductFieldDataRestrictions {
   /**
    * The validation rules that apply for the field.
    */
-  readonly validationRules: ValidationRule<unknown>[];
+  readonly validationRules: ValidationRule[];
   /**
    * Finds a validation rule based on its type.
    * @param type The type of the validation rule to look for.
    * @returns The matching validation rule, or undefined if there is no such validation rule.
    */
-  findValidationRule(type: string): ValidationRule<unknown> | undefined;
+  findValidationRule(type: string): ValidationRule | undefined;
   /**
    * Finds a validation rule based on its type.
    * @param type The type of the validation rule to look for.
    * @returns The matching validation rule.
    * @throws If there is no such validation rule.
    */
-  getValidationRule(type: string): ValidationRule<unknown>;
+  getValidationRule(type: string): ValidationRule;
 }
 
 export interface PaymentProductFieldDisplayElement {
@@ -678,6 +565,109 @@ export interface ValueMappingElement {
   readonly displayElements: PaymentProductFieldDisplayElement[];
   readonly displayName?: string;
   readonly value: string;
+}
+
+// Products / Product Groups - validation
+
+/**
+ * Indicates a single validation rule violation for a single field.
+ */
+export interface ValidationError {
+  /**
+   * The field for which the validation error occurred.
+   */
+  readonly fieldId: string;
+  /**
+   * The ID of the validation rule that was violated.
+   */
+  readonly ruleId: string;
+}
+
+/**
+ * The result of validating a {@link PaymentRequest}.
+ */
+export type ValidationResult = { valid: true } | { valid: false; errors: ValidationError[] };
+
+/**
+ * A validation rule, responsible for validating only a specific aspect of a single field for a {@link PaymentRequest}.
+ */
+export interface ValidationRule {
+  /**
+   * The validation rule ID. This can be used for the ruleId field of {@link ValidationError}s.
+   */
+  readonly id: string;
+  /**
+   * Validates a single field for a payment request. It can retrieve the field's value, but also if necessary other values, from the payment request.
+   * @param request The request to validate a single field of.
+   * @param fieldId The ID of the field to validate.
+   * @returns True if the field's value in the payment request is valid, or false otherwise.
+   */
+  validate(request: PaymentRequest, fieldId: string): boolean;
+}
+
+/**
+ * A validation rule that can validate a single value.
+ */
+export interface SingleValueValidationRule extends ValidationRule {
+  /**
+   * Validates a single value.
+   * @param value The value to validate.
+   * @returns True if the value is valid, or false otherwise.
+   */
+  validateValue(value: string): boolean;
+}
+
+export interface ValidationRuleBoletoBancarioRequiredness extends ValidationRule {
+  readonly id: "boletoBancarioRequiredness";
+  readonly fiscalNumberLength: number;
+}
+
+export interface ValidationRuleEmailAddress extends SingleValueValidationRule {
+  readonly id: "emailAddress";
+}
+
+export interface ValidationRuleExpirationDate extends SingleValueValidationRule {
+  readonly id: "expirationDate";
+}
+
+export interface ValidationRuleFixedList extends SingleValueValidationRule {
+  readonly id: "fixedList";
+  readonly allowedValues: string[];
+}
+
+export interface ValidationRuleIban extends SingleValueValidationRule {
+  readonly id: "iban";
+}
+
+export interface ValidationRuleLength extends SingleValueValidationRule {
+  readonly id: "length";
+  readonly minLength: number;
+  readonly maxLength: number;
+}
+
+export interface ValidationRuleLuhn extends SingleValueValidationRule {
+  readonly id: "luhn";
+}
+
+export interface ValidationRuleRange extends SingleValueValidationRule {
+  readonly id: "range";
+  readonly minValue: number;
+  readonly maxValue: number;
+  validateValue(value: string | number): boolean;
+}
+
+export interface ValidationRuleRegularExpression extends SingleValueValidationRule {
+  readonly id: "regularExpression";
+  readonly regularExpression: string;
+}
+
+export interface ValidationRuleResidentIdNumber extends SingleValueValidationRule {
+  readonly id: "residentIdNumber";
+}
+
+export interface ValidationRuleTermsAndConditions extends SingleValueValidationRule {
+  readonly id: "termsAndConditions";
+  validateValue(value: string | boolean): boolean;
 }
 
 // Products / Product Groups - customer details
@@ -813,7 +803,7 @@ export interface ErrorResponse {
 /**
  * A container for all the values the user provided.
  */
-export class PaymentRequest implements ValidatableRequest {
+export class PaymentRequest {
   private readonly fieldValues: Record<string, string | undefined> = {};
   private paymentProduct?: PaymentProduct;
   private accountOnFile?: AccountOnFile;

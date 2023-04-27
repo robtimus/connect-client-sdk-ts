@@ -1,6 +1,6 @@
-import { HttpResponse } from "../http";
-import { sdkIdentifier } from "../metadata";
-import { Device } from "../model";
+import { Device } from "../ext";
+import { HttpResponse } from "../ext/http";
+import { sdkIdentifier } from "../util/metadata";
 import { api } from "./model";
 
 interface Metadata {

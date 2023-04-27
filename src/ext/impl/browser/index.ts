@@ -58,7 +58,7 @@ Object.freeze(Browser.prototype);
 /**
  * A device representing the current web browser.
  * It uses the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API">Fetch API</a> for HTTP requests if available,
- * or XMLHttpRequest otherwise.
+ * or <a href="https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest">XMLHttpRequest</a> otherwise.
  * It supports Apple Pay if the browser supports it, and Google Pay if the necessary JavaScript files are loaded.
  */
 export const browser: Device = new Browser();

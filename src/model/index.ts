@@ -579,6 +579,7 @@ export interface ValidationError {
   readonly fieldId: string;
   /**
    * The ID of the validation rule that was violated.
+   * The value will be "required" for required fields that are not present.
    */
   readonly ruleId: string;
 }

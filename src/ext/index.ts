@@ -1,3 +1,8 @@
+/**
+ * Contains interfaces that allow developers to extend the SDK.
+ * @module
+ */
+
 import {
   ApplePaySpecificInput,
   GooglePaySpecificInput,

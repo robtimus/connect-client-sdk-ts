@@ -2,9 +2,8 @@
  * @group unit:crypto
  */
 
-import { Encryptor } from "../../../src/crypto/Encryptor";
-import { PaymentRequest } from "../../../src/model/PaymentRequest";
-import { PublicKey } from "../../../src/model";
+import { newEncryptor } from "../../../src/crypto/Encryptor";
+import { PaymentRequest, PublicKey } from "../../../src/model";
 import { toPaymentProduct } from "../../../src/model/PaymentProduct";
 import { MockDevice } from "../mock.test";
 
@@ -64,7 +63,7 @@ describe("Encryptor", () => {
   });
 
   test("product not set", async () => {
-    const encryptor = new Encryptor(
+    const encryptor = newEncryptor(
       clientSessionId,
       publicKey,
       {
@@ -84,7 +83,7 @@ describe("Encryptor", () => {
   });
 
   test("validation fails", async () => {
-    const encryptor = new Encryptor(
+    const encryptor = newEncryptor(
       clientSessionId,
       publicKey,
       {
@@ -117,7 +116,7 @@ describe("Encryptor", () => {
         return Promise.resolve(JSON.stringify(input));
       };
       const device = new MockDevice();
-      const encryptor = new Encryptor(
+      const encryptor = newEncryptor(
         clientSessionId,
         publicKey,
         {
@@ -167,7 +166,7 @@ describe("Encryptor", () => {
         return Promise.resolve(JSON.stringify(input));
       };
       const device = new MockDevice();
-      const encryptor = new Encryptor(
+      const encryptor = newEncryptor(
         clientSessionId,
         publicKey,
         {

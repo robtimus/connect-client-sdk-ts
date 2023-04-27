@@ -117,4 +117,7 @@ class ForgeCryptoEngine implements CryptoEngine {
 
 Object.freeze(ForgeCryptoEngine.prototype);
 
+/**
+ * A crypto engine backed by <a href="https://www.npmjs.com/package/node-forge">node-forge</a>.
+ */
 export const forgeCryptoEngine: CryptoEngine = new ForgeCryptoEngine();

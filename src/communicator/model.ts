@@ -1,12 +1,6 @@
-// Configuration
-
-export interface CommunicatorConfiguration {
-  clientSessionId: string;
-  customerId: string;
-  clientApiUrl: string;
-  assetUrl: string;
-}
-
+/**
+ * Definition of types used by the Ingenico Connect Client API.
+ */
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace api {
   // Crypto

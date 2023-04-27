@@ -21,7 +21,7 @@ class ApplePayClientImpl implements ApplePayClient {
       currencyCode: this.context.amountOfMoney.currencyCode,
       countryCode: this.applePaySpecificInput.acquirerCountry || this.context.countryCode,
       total: {
-        label: this.applePaySpecificInput.merchantName,
+        label: this.applePaySpecificInput.lineItem || this.applePaySpecificInput.merchantName,
         amount: (this.context.amountOfMoney.amount / 100).toString(),
       },
       supportedNetworks: this.applePaySpecificData.networks,

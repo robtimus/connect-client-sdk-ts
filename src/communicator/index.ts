@@ -1,13 +1,20 @@
 import { HttpResponse } from "../http";
 import { sdkIdentifier } from "../metadata";
 import { Device } from "../model";
-import { CommunicatorConfiguration, api } from "./model";
+import { api } from "./model";
 
 interface Metadata {
   readonly screenSize: string;
   readonly platformIdentifier: string;
   readonly sdkIdentifier: string;
   readonly sdkCreator: string;
+}
+
+export interface CommunicatorConfiguration {
+  clientSessionId: string;
+  customerId: string;
+  clientApiUrl: string;
+  assetUrl: string;
 }
 
 function createURL(config: CommunicatorConfiguration, apiVersion: string, path: string): string {

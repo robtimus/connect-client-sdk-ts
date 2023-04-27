@@ -2,9 +2,9 @@
  * @group unit:model
  */
 
+import { PaymentRequest } from "../../../src/model";
 import { toAccountOnFile } from "../../../src/model/AccountOnFile";
 import { toPaymentProduct } from "../../../src/model/PaymentProduct";
-import { PaymentRequest } from "../../../src/model/PaymentRequest";
 import { ValidationRuleExpirationDate } from "../../../src/validation/ValidationRuleExpirationDate";
 import { ValidationRuleLuhn } from "../../../src/validation/ValidationRuleLuhn";
 

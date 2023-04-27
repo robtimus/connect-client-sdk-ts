@@ -4,9 +4,8 @@
 
 import * as dateFormat from "dateformat";
 import * as duration from "duration-fns";
-import { PaymentProduct } from "../../src/model";
+import { PaymentProduct, PaymentRequest } from "../../src/model";
 import { toPaymentProduct } from "../../src/model/PaymentProduct";
-import { PaymentRequest } from "../../src/model/PaymentRequest";
 import { ValidationRuleBoletoBancarioRequiredness } from "../../src/validation/ValidationRuleBoletoBancarioRequiredness";
 import { ValidationRuleEmailAddress } from "../../src/validation/ValidationRuleEmailAddress";
 import { ValidationRuleExpirationDate } from "../../src/validation/ValidationRuleExpirationDate";

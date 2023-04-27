@@ -5,7 +5,7 @@ import {
   PaymentProductDisplayHints,
   PaymentProductField,
   PaymentProductGroup,
-} from "./types";
+} from ".";
 import { api } from "../communicator/model";
 import { toAccountOnFile } from "./AccountOnFile";
 import { toPaymentProductField } from "./PaymentProductField";

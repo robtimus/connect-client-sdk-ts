@@ -2,8 +2,7 @@
  * @group unit:browser
  */
 
-import { Browser } from "../../../src/browser";
-import { xhrHttpClient } from "../../../src/browser/xhr";
+import { browser } from "../../../src/browser";
 import { fetchHttpClient } from "../../../src/http/fetch";
 import {
   ApplePaySpecificInput,
@@ -25,7 +24,6 @@ describe("Browser", () => {
         userAgent: "TestAgent",
       },
     });
-    const browser = new Browser();
     expect(browser.getPlatformIdentifier()).toBe(window.navigator.userAgent);
   });
 
@@ -43,7 +41,6 @@ describe("Browser", () => {
       innerHeight: 1200,
       innerWidth: 1920,
     });
-    const browser = new Browser();
     expect(browser.getDeviceInformation()).toStrictEqual({
       timezoneOffsetUtcMinutes: new Date().getTimezoneOffset(),
       locale: window.navigator.language,
@@ -56,18 +53,9 @@ describe("Browser", () => {
     });
   });
 
-  describe("getHttpClient", () => {
-    test("fetch defined", () => {
-      globalMocks.mockIfNecessary("fetch", {});
-      const browser = new Browser();
-      expect(browser.getHttpClient()).toBe(fetchHttpClient);
-    });
-
-    test("fetch not defined", () => {
-      globalMocks.mock("fetch", undefined);
-      const browser = new Browser();
-      expect(browser.getHttpClient()).toStrictEqual(xhrHttpClient);
-    });
+  test("getHttpClient", () => {
+    globalMocks.mockIfNecessary("fetch", {});
+    expect(browser.getHttpClient()).toBe(fetchHttpClient);
   });
 
   describe("getApplePayClient", () => {
@@ -94,7 +82,6 @@ describe("Browser", () => {
         globalMocks.mock("ApplePaySession", {
           canMakePayments: () => true,
         });
-        const browser = new Browser();
         const applePayClient = await browser.getApplePayClient(applePaySpecificInput, applePaySpecificData, paymentContext);
         expect(applePayClient).not.toBeUndefined();
       });
@@ -103,7 +90,6 @@ describe("Browser", () => {
         globalMocks.mock("ApplePaySession", {
           canMakePayments: () => false,
         });
-        const browser = new Browser();
         const applePayClient = await browser.getApplePayClient(applePaySpecificInput, applePaySpecificData, paymentContext);
         expect(applePayClient).toBeUndefined();
       });
@@ -111,7 +97,6 @@ describe("Browser", () => {
 
     test("ApplePaySession not defined", async () => {
       globalMocks.mock("ApplePaySession", undefined);
-      const browser = new Browser();
       const applePayClient = await browser.getApplePayClient(applePaySpecificInput, applePaySpecificData, paymentContext);
       expect(applePayClient).toBeUndefined();
     });
@@ -147,8 +132,7 @@ describe("Browser", () => {
     describe("Google Pay loaded", () => {
       test("ready to pay", async () => {
         class PaymentsClientMock {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          isReadyToPay(request: google.payments.api.IsReadyToPayRequest): Promise<google.payments.api.IsReadyToPayResponse> {
+          isReadyToPay(): Promise<google.payments.api.IsReadyToPayResponse> {
             return Promise.resolve({
               result: true,
             });
@@ -162,15 +146,13 @@ describe("Browser", () => {
             },
           },
         });
-        const browser = new Browser();
         const googlePayClient = await browser.getGooglePayClient(googlePaySpecificInput, googlePaySpecificData, paymentContext);
         expect(googlePayClient).not.toBeUndefined();
       });
 
       test("not ready to pay", async () => {
         class PaymentsClientMock {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          isReadyToPay(request: google.payments.api.IsReadyToPayRequest): Promise<google.payments.api.IsReadyToPayResponse> {
+          isReadyToPay(): Promise<google.payments.api.IsReadyToPayResponse> {
             return Promise.resolve({
               result: false,
             });
@@ -184,7 +166,6 @@ describe("Browser", () => {
             },
           },
         });
-        const browser = new Browser();
         const googlePayClient = await browser.getGooglePayClient(googlePaySpecificInput, googlePaySpecificData, paymentContext);
         expect(googlePayClient).toBeUndefined();
       });
@@ -192,7 +173,6 @@ describe("Browser", () => {
 
     test("Google Pay not loaded", async () => {
       globalMocks.mock("google", undefined);
-      const browser = new Browser();
       const googlePayClient = await browser.getGooglePayClient(googlePaySpecificInput, googlePaySpecificData, paymentContext);
       expect(googlePayClient).toBeUndefined();
     });

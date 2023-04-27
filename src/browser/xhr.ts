@@ -121,4 +121,7 @@ class XhrHttpClient implements HttpClient {
 
 Object.freeze(XhrHttpClient.prototype);
 
-export const xhrHttpClient = new XhrHttpClient();
+/**
+ * An HTTP client backed by XMLHttpRequest.
+ */
+export const xhrHttpClient: HttpClient = new XhrHttpClient();

@@ -6,7 +6,7 @@ import {
   BasicPaymentProductGroup,
   BasicPaymentProductGroups,
   BasicPaymentProducts,
-} from "./types";
+} from ".";
 
 function listPaymentItems(products: BasicPaymentProducts, groups?: BasicPaymentProductGroups): BasicPaymentItem[] {
   if (!groups) {

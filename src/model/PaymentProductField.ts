@@ -1,4 +1,4 @@
-import { MaskedString, PaymentProductField, PaymentProductFieldDataRestrictions, PaymentProductFieldDisplayHints } from "./types";
+import { MaskedString, PaymentProductField, PaymentProductFieldDataRestrictions, PaymentProductFieldDisplayHints } from ".";
 import { api } from "../communicator/model";
 import { applyMask, removeMask } from "../util/masking";
 import { toPaymentProductFieldDataRestrictions } from "./PaymentProductFieldDataRestrictions";
@@ -17,16 +17,16 @@ class PaymentProductFieldImpl implements PaymentProductField {
   readonly displayHints?: PaymentProductFieldDisplayHints;
   readonly id: string;
   readonly type: string;
-  readonly inputType: string;
   readonly usedForLookup?: boolean;
+  readonly inputType: string;
 
   constructor(json: api.PaymentProductField) {
     this.dataRestrictions = toPaymentProductFieldDataRestrictions(json.dataRestrictions);
     this.displayHints = json.displayHints ? toPaymentProductFieldDisplayHints(json.displayHints) : undefined;
     this.id = json.id;
     this.type = json.type;
-    this.inputType = json.displayHints && json.displayHints.obfuscate ? "password" : inputTypes[json.type] || json.type;
     this.usedForLookup = json.usedForLookup;
+    this.inputType = json.displayHints && json.displayHints.obfuscate ? "password" : inputTypes[json.type] || json.type;
   }
 
   applyMask(newValue: string, oldValue?: string): MaskedString {

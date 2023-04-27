@@ -1,6 +1,5 @@
-import { CryptoEngine } from ".";
-import { Device, KeyValuePair, PublicKey } from "../model";
-import { PaymentRequest } from "../model/PaymentRequest";
+import { CryptoEngine, Encryptor } from ".";
+import { Device, KeyValuePair, PaymentRequest, PublicKey } from "../model";
 
 interface BrowserData {
   javaScriptEnabled: true;
@@ -72,7 +71,7 @@ function createEncryptedCustomerInput(
   return encryptedCustomerInput;
 }
 
-export class Encryptor {
+class EncryptorImpl implements Encryptor {
   constructor(
     private readonly clientSessionId: string,
     private readonly publicKey: PublicKey,
@@ -80,6 +79,12 @@ export class Encryptor {
     private readonly device: Device
   ) {}
 
+  /**
+   * Encrypts a payment request.
+   * @param paymentRequest The payment request to encrypt.
+   * @returns A promise that contains the encrypted payment request.
+   * @throws If the payment request has no payment product set, or if the payment request is not valid.
+   */
   async encrypt(paymentRequest: PaymentRequest): Promise<string> {
     if (!paymentRequest.getPaymentProduct()) {
       throw new Error("no PaymentProduct set");
@@ -95,4 +100,8 @@ export class Encryptor {
   }
 }
 
-Object.freeze(Encryptor.prototype);
+Object.freeze(EncryptorImpl.prototype);
+
+export function newEncryptor(clientSessionId: string, publicKey: PublicKey, engine: CryptoEngine, device: Device): Encryptor {
+  return new EncryptorImpl(clientSessionId, publicKey, engine, device);
+}

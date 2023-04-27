@@ -1,0 +1,29 @@
+{
+  "name": "Ingenico Connect client SDK",
+  "readme": "README.md",
+  "entryPointStrategy": "expand",
+  "entryPoints": ["src"],
+  "exclude": [
+    "**/node_modules/**",
+    "src/browser/ApplePay.ts",
+    "src/browser/GooglePay.ts",
+    "src/crypto/Encryptor.ts",
+    "src/crypto/native-crypto*.ts",
+    "src/communicator/index.ts",
+    "src/metadata/**",
+    "src/model/AccountOnFile.ts",
+    "src/model/AccountOnFileDisplayHints.ts",
+    "src/model/LabelTemplateElement.ts",
+    "src/model/PaymentItem.ts",
+    "src/model/PaymentProduct.ts",
+    "src/model/PaymentProductField.ts",
+    "src/model/PaymentProductFieldDataRestrictions.ts",
+    "src/model/PaymentProductFieldDisplayHints.ts",
+    "src/model/PaymentProductGroup.ts",
+    "src/util/masking.ts",
+    "src/validation/factory.ts"
+  ],
+  "excludePrivate": true,
+  "disableSources": true,
+  "hideGenerator": true
+}

@@ -15,7 +15,7 @@ import { newApplePayClient } from "./ApplePay";
 import { newGooglePayClient } from "./GooglePay";
 import { xhrHttpClient } from "./xhr";
 
-export class Browser implements Device {
+class Browser implements Device {
   private readonly httpClient: HttpClient = isFetchAvailable() ? fetchHttpClient : xhrHttpClient;
 
   getPlatformIdentifier(): string {
@@ -57,3 +57,11 @@ export class Browser implements Device {
 }
 
 Object.freeze(Browser.prototype);
+
+/**
+ * A device representing the current web browser.
+ * It uses the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API">Fetch API</a> for HTTP requests if available,
+ * or XMLHttpRequest otherwise.
+ * It supports Apple Pay if the browser supports it, and Google Pay if the necessary JavaScript files are loaded.
+ */
+export const browser: Device = new Browser();

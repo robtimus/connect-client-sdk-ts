@@ -66,7 +66,7 @@ function constructPrefetchPaymentDataRequest(
   data: PaymentProduct320SpecificData,
   context: PaymentContext
 ): google.payments.api.PaymentDataRequest | undefined {
-  if (input.gatewayMerchantId && input.merchantName) {
+  if (input.gatewayMerchantId) {
     // The cast is necessary because the TypeScript definition incorrectly makes totalPrice required
     const transactionInfo = {
       totalPriceStatus: "NOT_CURRENTLY_KNOWN",
@@ -141,7 +141,7 @@ class GooglePayClientImpl implements GooglePayClient {
       this.client.prefetchPaymentData(request);
     }
     console.warn(
-      `Prefetch Google payment data not triggered due to missing information. gatewayMerchantId: ${this.googlePaySpecificInput.gatewayMerchantId}, merchantName: ${this.googlePaySpecificInput.merchantName}`
+      `Prefetch Google payment data not triggered due to missing information. gatewayMerchantId: ${this.googlePaySpecificInput.gatewayMerchantId}`
     );
   }
 

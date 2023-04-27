@@ -1,4 +1,4 @@
-import { PaymentProductFieldDataRestrictions } from "./types";
+import { PaymentProductFieldDataRestrictions } from ".";
 import { api } from "../communicator/model";
 import { createValidationRule } from "../validation/factory";
 import { ValidationRule } from "../validation";

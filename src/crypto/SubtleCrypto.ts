@@ -161,8 +161,18 @@ class SubtleCryptoEngine implements CryptoEngine {
 
 Object.freeze(SubtleCryptoEngine.prototype);
 
+/**
+ * Returns whether or not <a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto">SubtleCrypto</a> and related functionality is available.
+ * This can be used to determine whether or not {@link subtleCryptoEngine} can be used.
+ * @returns True if {@link subtleCryptoEngine} can be used, or false otherwise.
+ */
 export function isSubtleCryptoAvailable(): boolean {
   return crypto.isAvailable();
 }
 
+/**
+ * A crypto engine backed by <a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto">SubtleCrypto</a>.
+ * This will work in modern browsers and supported Node.js versions. Attempting to use it in older browsers or Node.js versions will fail.
+ * If needed, use {@link isSubtleCryptoAvailable} to determine whether or not this crypto engine can be used.
+ */
 export const subtleCryptoEngine: CryptoEngine = new SubtleCryptoEngine();

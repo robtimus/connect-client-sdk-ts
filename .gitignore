@@ -2,6 +2,7 @@ node_modules
 /coverage
 /docs
 /lib
+/src/util/metadata.ts
 logfile.txt
 .vscode
 .idea

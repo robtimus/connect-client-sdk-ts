@@ -21,12 +21,13 @@
     "url": "git+https://github.com/robtimus/connect-client-sdk-ts.git"
   },
   "scripts": {
+    "generate": "node ./scripts/generate-metadata.ts",
     "compile": "tsc",
     "lint": "eslint ./src --ext .ts",
     "format": "prettier --write \"**/*.+(json|ts|tsx)\"",
     "format:check": "prettier --check \"**/*.+(json|ts|tsx)\"",
-    "build": "npm run format:check && npm run lint && npm run compile",
-    "typedoc": "typedoc",
+    "build": "npm run generate && npm run format:check && npm run lint && npm run compile",
+    "typedoc": "npm run generate && typedoc",
     "test": "jest --group=unit",
     "test:integration": "jest --group=integration",
     "test:all": "jest"

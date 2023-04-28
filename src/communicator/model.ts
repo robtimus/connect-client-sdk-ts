@@ -358,7 +358,7 @@ export namespace api {
     paymentProductId: number;
   }
 
-  export type GetIINDetailsSuccessStatus = "SUPPORTED" | "UNSUPPORTED";
+  export type GetIINDetailsSuccessStatus = "SUPPORTED" | "NOT_ALLOWED";
   export type GetIINDetailsSuccessResult = { status?: GetIINDetailsSuccessStatus } & GetIINDetailsResponse;
 
   export type GetIINDetailsErrorStatus = "UNKNOWN";

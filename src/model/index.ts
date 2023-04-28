@@ -763,7 +763,7 @@ export interface AmountOfMoney {
   readonly currencyCode: string;
 }
 
-export type IINDetailsSuccessStatus = "SUPPORTED" | "UNSUPPORTED";
+export type IINDetailsSuccessStatus = "SUPPORTED" | "NOT_ALLOWED";
 /**
  * The result of an IIN details call for an existing card number.
  */
@@ -783,10 +783,18 @@ export interface IINDetailsErrorResult extends ErrorResponse {
   readonly status: IINDetailErrorStatus;
 }
 
+export type IINDetailInvalidInputStatus = "NOT_ENOUGH_DIGITS";
 /**
- * The result of an IIN details call. The common status field can be used to determine the type of result - success or error.
+ * The input of an IIN details call is invalid.
  */
-export type IINDetailsResult = IINDetailsSuccessResult | IINDetailsErrorResult;
+export interface IINDetailsInvalidInputResult {
+  readonly status: IINDetailInvalidInputStatus;
+}
+
+/**
+ * The result of an IIN details call. The common status field can be used to determine the type of result - success, invalid input or error.
+ */
+export type IINDetailsResult = IINDetailsSuccessResult | IINDetailsInvalidInputResult | IINDetailsErrorResult;
 
 export interface IINDetail {
   readonly isAllowedInContext: boolean;

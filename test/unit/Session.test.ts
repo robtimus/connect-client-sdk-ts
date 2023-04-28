@@ -2532,13 +2532,10 @@ describe("Session", () => {
   describe("getIINDetails", () => {
     test("not enough digits", async () => {
       const session = new Session(sessionDetails, minimalPaymentContext, new MockDevice());
-      const onSuccess = jest.fn();
-      const result = await session
-        .getIINDetails("12345")
-        .then(onSuccess)
-        .catch((reason) => reason);
-      expect(onSuccess).not.toBeCalled();
-      expect(result).toStrictEqual(new Error("not enough digits"));
+      const result = await session.getIINDetails("12345");
+      expect(result).toStrictEqual({
+        status: "NOT_ENOUGH_DIGITS",
+      });
     });
 
     describe("allowed in context", () => {
@@ -2631,7 +2628,7 @@ describe("Session", () => {
       );
       const session = new Session(sessionDetails, minimalPaymentContext, device);
       const result = await session.getIINDetails("123456");
-      expect(result).toStrictEqual(Object.assign({ status: "UNSUPPORTED" }, iinDetailsResponse));
+      expect(result).toStrictEqual(Object.assign({ status: "NOT_ALLOWED" }, iinDetailsResponse));
     });
 
     test("not known", async () => {
@@ -2701,7 +2698,7 @@ describe("Session", () => {
           });
         const session = new Session(sessionDetails, minimalPaymentContext, device);
         const result = await session.getIINDetails("123456");
-        expect(result).toStrictEqual(Object.assign({ status: "UNSUPPORTED" }, iinDetailsResponse));
+        expect(result).toStrictEqual(Object.assign({ status: "NOT_ALLOWED" }, iinDetailsResponse));
       });
 
       test("product HTTP error", async () => {
@@ -2712,7 +2709,7 @@ describe("Session", () => {
         });
         const session = new Session(sessionDetails, minimalPaymentContext, device);
         const result = await session.getIINDetails("123456");
-        expect(result).toStrictEqual(Object.assign({ status: "UNSUPPORTED" }, iinDetailsResponse));
+        expect(result).toStrictEqual(Object.assign({ status: "NOT_ALLOWED" }, iinDetailsResponse));
       });
     });
 

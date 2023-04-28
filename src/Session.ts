@@ -584,10 +584,11 @@ export class Session {
 
   /**
    * Retrieves IIN details for a (partial) credit card number.
-   * There can be three possible outcomes:
+   * There can be four possible outcomes:
+   * * status === "NOT_ENOUGH_DIGITS": the card number contains fewer than 6 digits.
    * * status === "SUPPORTED": the card number is recognized and supported for the current payment context.\
    *   The result will contain the payment product ID and if available the cobrands.
-   * * status === "UNSUPPORTED": the card number is recognized but not supported for the current payment context.\
+   * * status === "NOT_ALLOWED": the card number is recognized but not supported for the current payment context.\
    *   The result will contain the payment product ID and if available the cobrands.
    * * status === "UKNOWN": the card number is not recognized.\
    *   The result will not contain a payment product ID or any cobrands, but instead the error response returned by the Ingenico Connect Client API.
@@ -598,7 +599,9 @@ export class Session {
   async getIINDetails(partialCreditCardNumber: string): Promise<IINDetailsResult> {
     partialCreditCardNumber = partialCreditCardNumber.replace(/\s/g, "");
     if (partialCreditCardNumber.length < 6) {
-      throw new Error("not enough digits");
+      return {
+        status: "NOT_ENOUGH_DIGITS",
+      };
     }
     const paymentContext: api.PaymentContext = {
       amountOfMoney: this.paymentContext.amountOfMoney,
@@ -637,7 +640,7 @@ export class Session {
         await this.getPaymentProduct(json.paymentProductId);
         status = "SUPPORTED";
       } catch (e) {
-        status = "UNSUPPORTED";
+        status = "NOT_ALLOWED";
       }
     }
     return Object.assign(json, { status });

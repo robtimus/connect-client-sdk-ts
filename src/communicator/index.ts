@@ -245,7 +245,7 @@ export class Communicator {
           if (json.isAllowedInContext === true) {
             status = "SUPPORTED";
           } else if (json.isAllowedInContext === false) {
-            status = "UNSUPPORTED";
+            status = "NOT_ALLOWED";
           }
           return Object.assign({ status }, json);
         }

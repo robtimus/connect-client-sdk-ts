@@ -40,7 +40,7 @@ describe("Session", () => {
     countryCode: "NL",
     isInstallments: false,
     isRecurring: true,
-    locale: "en-GB",
+    locale: "en_GB",
     paymentProductSpecificInputs: {
       applePay: {
         merchantName: "TEST",
@@ -293,7 +293,7 @@ describe("Session", () => {
         currencyCode: "EUR",
       },
       isRecurring: true,
-      locale: "en-GB",
+      locale: "en_GB",
       production: true,
       paymentProductSpecificInputs: {
         applePay: {
@@ -309,7 +309,7 @@ describe("Session", () => {
       },
       countryCode: "NL",
       isRecurring: true,
-      locale: "en-GB",
+      locale: "en_GB",
       production: true,
       paymentProductSpecificInputs: {
         applePay: {

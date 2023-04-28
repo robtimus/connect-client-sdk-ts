@@ -2681,7 +2681,7 @@ describe("Session", () => {
           });
         const session = new Session(sessionDetails, minimalPaymentContext, device);
         const result = await session.getIINDetails("123456");
-        expect(result).toStrictEqual(Object.assign({ status: "SUPPORTED" }, iinDetailsResponse));
+        expect(result).toStrictEqual(Object.assign({ status: "SUPPORTED", isAllowedInContext: true }, iinDetailsResponse));
       });
 
       test("product not found", async () => {
@@ -2698,7 +2698,7 @@ describe("Session", () => {
           });
         const session = new Session(sessionDetails, minimalPaymentContext, device);
         const result = await session.getIINDetails("123456");
-        expect(result).toStrictEqual(Object.assign({ status: "NOT_ALLOWED" }, iinDetailsResponse));
+        expect(result).toStrictEqual(Object.assign({ status: "NOT_ALLOWED", isAllowedInContext: false }, iinDetailsResponse));
       });
 
       test("product HTTP error", async () => {
@@ -2709,7 +2709,7 @@ describe("Session", () => {
         });
         const session = new Session(sessionDetails, minimalPaymentContext, device);
         const result = await session.getIINDetails("123456");
-        expect(result).toStrictEqual(Object.assign({ status: "NOT_ALLOWED" }, iinDetailsResponse));
+        expect(result).toStrictEqual(Object.assign({ status: "NOT_ALLOWED", isAllowedInContext: false }, iinDetailsResponse));
       });
     });
 

@@ -632,18 +632,25 @@ export class Session {
       return json;
     }
     let status: IINDetailsSuccessStatus;
-    if (json.status) {
-      status = json.status;
+    let isAllowedInContext: boolean;
+    if (json.isAllowedInContext === true) {
+      isAllowedInContext = json.isAllowedInContext;
+      status = "SUPPORTED";
+    } else if (json.isAllowedInContext === false) {
+      isAllowedInContext = json.isAllowedInContext;
+      status = "NOT_ALLOWED";
     } else {
       // This should not happen because a payment context is always provided. Query the product anyway.
       try {
         await this.getPaymentProduct(json.paymentProductId);
         status = "SUPPORTED";
+        isAllowedInContext = true;
       } catch (e) {
         status = "NOT_ALLOWED";
+        isAllowedInContext = false;
       }
     }
-    return Object.assign(json, { status });
+    return Object.assign(json, { status, isAllowedInContext });
   }
 
   /**

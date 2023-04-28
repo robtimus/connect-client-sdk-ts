@@ -240,13 +240,8 @@ export class Communicator {
       .send()
       .then((response) => {
         if (response.statusCode / 100 === 2) {
-          let status: api.GetIINDetailsSuccessStatus | undefined;
+          const status: api.GetIINDetailsSuccessStatus = "KNOWN";
           const json = response.body as api.GetIINDetailsResponse;
-          if (json.isAllowedInContext === true) {
-            status = "SUPPORTED";
-          } else if (json.isAllowedInContext === false) {
-            status = "NOT_ALLOWED";
-          }
           return Object.assign({ status }, json);
         }
         if (response.statusCode === 404) {

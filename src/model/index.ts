@@ -771,7 +771,7 @@ export interface IINDetailsSuccessResult {
   readonly status: IINDetailsSuccessStatus;
   readonly coBrands?: IINDetail[];
   readonly countryCode: string;
-  readonly isAllowedInContext?: boolean;
+  readonly isAllowedInContext: boolean;
   readonly paymentProductId: number;
 }
 

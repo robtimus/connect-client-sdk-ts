@@ -56,7 +56,6 @@ describe("Session", () => {
         merchantName: "TEST",
       },
     },
-    production: true,
   };
 
   const products: api.PaymentProducts = {
@@ -294,7 +293,6 @@ describe("Session", () => {
       },
       isRecurring: true,
       locale: "en_GB",
-      production: true,
       paymentProductSpecificInputs: {
         applePay: {
           merchantName: "TEST",
@@ -310,7 +308,6 @@ describe("Session", () => {
       countryCode: "NL",
       isRecurring: true,
       locale: "en_GB",
-      production: true,
       paymentProductSpecificInputs: {
         applePay: {
           merchantName: "TEST",

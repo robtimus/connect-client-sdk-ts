@@ -25,11 +25,6 @@ export interface PaymentContext {
    */
   readonly isRecurring?: boolean;
   /**
-   * Whether or not the application is running in a production environment.
-   * If not explicitly set to true, some functionality may run in test-mode.
-   */
-  readonly production?: boolean;
-  /**
    * Inputs specific for certain payment products.
    */
   readonly paymentProductSpecificInputs?: PaymentProductSpecificInputs;
@@ -81,6 +76,10 @@ export interface GooglePaySpecificInput {
    * Your two-letter ISO 3166 country code. Used for Google Pay payment requests, and defaults to the {@link PaymentContext}'s country code.
    */
   readonly acquirerCountry?: string;
+  /**
+   * The Google Pay environment to target. Defaults to "TEST".
+   */
+  readonly environment?: "PRODUCTION" | "TEST";
 }
 
 // Session specifiic

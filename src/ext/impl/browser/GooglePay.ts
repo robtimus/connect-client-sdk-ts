@@ -2,8 +2,8 @@ import { GooglePayButtonOptions, GooglePayClient } from "../..";
 import { GooglePaySpecificInput, PaymentContext, PaymentProduct320SpecificData } from "../../../model";
 
 function getPaymentsClient(
-  googlePaySpecificData: PaymentProduct320SpecificData,
-  context: PaymentContext
+  googlePaySpecificInput: GooglePaySpecificInput,
+  googlePaySpecificData: PaymentProduct320SpecificData
 ): google.payments.api.PaymentsClient | undefined {
   if (googlePaySpecificData.networks.length === 0) {
     console.warn("No Google Pay networks available");
@@ -13,8 +13,7 @@ function getPaymentsClient(
     console.warn("The Google Pay API script was not loaded. See https://developers.google.com/pay/api/web/guides/tutorial#js-load");
     return undefined;
   }
-  const environment: google.payments.api.Environment = context.production ? "PRODUCTION" : "TEST";
-  return new google.payments.api.PaymentsClient({ environment });
+  return new google.payments.api.PaymentsClient({ environment: googlePaySpecificInput.environment });
 }
 
 const API_VERSION = 2;
@@ -158,7 +157,7 @@ export async function newGooglePayClient(
   googlePaySpecificData: PaymentProduct320SpecificData,
   context: PaymentContext
 ): Promise<GooglePayClient | undefined> {
-  const client = getPaymentsClient(googlePaySpecificData, context);
+  const client = getPaymentsClient(googlePaySpecificInput, googlePaySpecificData);
   if (!client) {
     return undefined;
   }

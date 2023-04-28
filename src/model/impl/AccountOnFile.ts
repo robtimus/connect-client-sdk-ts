@@ -28,16 +28,37 @@ class AccountOnFileImpl implements AccountOnFile {
     throw new Error(`could not find AccountOnFileAttribute with key ${key}`);
   }
 
-  findMaskedValue(attributeKey: string): MaskedString | undefined {
-    const attribute = this.findAttribute(attributeKey);
+  findMaskedAttributeValue(key: string): MaskedString | undefined {
+    const attribute = this.findAttribute(key);
     if (!attribute) {
       return undefined;
     }
-    const wildcardMask = this.displayHints.findLabelTemplate(attributeKey)?.wildcardMask;
+    const wildcardMask = this.displayHints.findLabelTemplate(key)?.wildcardMask;
     if (wildcardMask === undefined) {
       return undefined;
     }
     return applyMask(wildcardMask, attribute.value);
+  }
+
+  findAttributeDisplayValue(key: string): string | undefined {
+    const attribute = this.findAttribute(key);
+    if (!attribute) {
+      return undefined;
+    }
+    return this.getDisplayValue(attribute);
+  }
+
+  getAttributeDisplayValue(key: string): string {
+    const attribute = this.getAttribute(key);
+    return this.getDisplayValue(attribute);
+  }
+
+  private getDisplayValue(attribute: AccountOnFileAttribute): string {
+    const wildcardMask = this.displayHints.findLabelTemplate(attribute.key)?.wildcardMask;
+    if (wildcardMask === undefined) {
+      return attribute.value;
+    }
+    return applyMask(wildcardMask, attribute.value).formattedValue;
   }
 }
 

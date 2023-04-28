@@ -65,23 +65,56 @@ describe("toAccountOnFile", () => {
     });
   });
 
-  describe("findMaskedValue", () => {
+  describe("findMaskedAttributeValue", () => {
     test("non-matching attribute", () => {
-      const result = accountOnFile.findMaskedValue("foo");
+      const result = accountOnFile.findMaskedAttributeValue("foo");
       expect(result).toBeUndefined();
     });
 
     test("without wildcard mask", () => {
-      const result = accountOnFile.findMaskedValue("cardNumber");
+      const result = accountOnFile.findMaskedAttributeValue("cardNumber");
       expect(result).toBeUndefined();
     });
 
     test("with wildcard mask", () => {
-      const result = accountOnFile.findMaskedValue("expirationDate");
+      const result = accountOnFile.findMaskedAttributeValue("expirationDate");
       expect(result).toStrictEqual({
         formattedValue: "12-**",
         cursorIndex: 1,
       });
+    });
+  });
+
+  describe("findAttributeDisplayValue", () => {
+    test("non-matching attribute", () => {
+      const result = accountOnFile.findAttributeDisplayValue("foo");
+      expect(result).toBeUndefined();
+    });
+
+    test("without wildcard mask", () => {
+      const result = accountOnFile.findAttributeDisplayValue("cardNumber");
+      expect(result).toBe("****");
+    });
+
+    test("with wildcard mask", () => {
+      const result = accountOnFile.findAttributeDisplayValue("expirationDate");
+      expect(result).toBe("12-**");
+    });
+  });
+
+  describe("getAttributeDisplayValue", () => {
+    test("non-matching attribute", () => {
+      expect(() => accountOnFile.getAttributeDisplayValue("foo")).toThrow(new Error("could not find AccountOnFileAttribute with key foo"));
+    });
+
+    test("without wildcard mask", () => {
+      const result = accountOnFile.getAttributeDisplayValue("cardNumber");
+      expect(result).toBe("****");
+    });
+
+    test("with wildcard mask", () => {
+      const result = accountOnFile.getAttributeDisplayValue("expirationDate");
+      expect(result).toBe("12-**");
     });
   });
 });

@@ -144,10 +144,27 @@ export interface AccountOnFile {
   getAttribute(key: string): AccountOnFileAttribute;
   /**
    * Finds an attribute value with masking applied.
-   * @param attributeKey The key of the attribute value to look for.
+   * @param key The key of the attribute value to look for.
    * @returns The masked value for the attribute, or undefined if there is no such attribute, or the attribute has no label template with a mask.
    */
-  findMaskedValue(attributeKey: string): MaskedString | undefined;
+  findMaskedAttributeValue(key: string): MaskedString | undefined;
+  /**
+   * Finds an attribute value usable for displaying.
+   * If the attribute exists and has a label template with a mask, this method is similar to {@link findMaskedAttributeValue}.
+   * If the attribute exists but has no label template with a mask, this method will simply return the attribute's value.
+   * @param key The key of the attribute value to look for.
+   * @returns The display value for the attribute, or undefined if there is no such attribute.
+   */
+  findAttributeDisplayValue(key: string): string | undefined;
+  /**
+   * Finds an attribute value usable for displaying.
+   * If the attribute has a label template with a mask, this method is similar to {@link findMaskedAttributeValue}.
+   * If the attribute has no label template with a mask, this method will simply return the attribute's value.
+   * @param key The key of the attribute value to look for.
+   * @returns The display value for the attribute.
+   * @throws If there is no such attribute.
+   */
+  getAttributeDisplayValue(key: string): string;
 }
 
 export interface AccountOnFileAttribute extends KeyValuePair {

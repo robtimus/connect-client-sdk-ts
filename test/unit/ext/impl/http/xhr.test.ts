@@ -6,7 +6,7 @@ import { newServer } from "mock-xmlhttprequest";
 import { RequestHandler } from "mock-xmlhttprequest/dist/types/MockXhrServer";
 import MockXhrRequest from "mock-xmlhttprequest/dist/types/MockXhrRequest";
 import { xhrHttpClient } from "../../../../../src/ext/impl/http/xhr";
-import { Mocks } from "../../../mock";
+import { Mocks } from "../../../test-util";
 
 describe("xhrHttpRequest", () => {
   interface EchoResponse {

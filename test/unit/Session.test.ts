@@ -13,10 +13,10 @@ import {
   SessionDetails,
 } from "../../src/model";
 import { PP_APPLE_PAY, PP_BANCONTACT, PP_GOOGLE_PAY, toBasicPaymentProducts, toPaymentProduct } from "../../src/model/impl/PaymentProduct";
-import { CapturedHttpRequest, MockDevice, Mocks, notImplementedResponse } from "./mock";
 import { ApplePayClient, GooglePayClient } from "../../src/ext";
 import { sdkIdentifier } from "../../src/util/metadata";
 import { HttpResponse } from "../../src/ext/http";
+import { CapturedHttpRequest, MockDevice, Mocks, notImplementedResponse } from "./test-util";
 
 describe("Session", () => {
   const sessionDetails: SessionDetails = {

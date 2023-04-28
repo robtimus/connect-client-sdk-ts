@@ -6,7 +6,7 @@ import * as crypto from "crypto";
 import { expect } from "@jest/globals";
 import { MatcherFunction } from "expect";
 import { getRandomValues, isAvailable, randomUUID } from "../../../../../src/ext/impl/crypto/native-crypto-browser";
-import { Mocks } from "../../../mock";
+import { Mocks, minNode } from "../../../test-util";
 
 const toBeUUID: MatcherFunction<[]> = function (actual: unknown) {
   const expected = crypto.randomUUID().replace(/[a-z0-9]/gi, "x");
@@ -78,7 +78,8 @@ describe("native crypto", () => {
       expect(randomUUID()).toBeUUID();
     });
 
-    test("crypto.randomUUID defined", () => {
+    // crypto.webcrypto.randomUUID was added in Node.js 16.7
+    minNode(16, 7).test("crypto.randomUUID defined", () => {
       globalMocks.mock("crypto", crypto.webcrypto);
 
       expect(randomUUID()).toBeUUID();

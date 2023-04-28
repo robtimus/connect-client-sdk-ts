@@ -4,6 +4,7 @@
 
 import { browser } from "../../../../../src/ext/impl/browser";
 import { fetchHttpClient } from "../../../../../src/ext/impl/http/fetch";
+import { xhrHttpClient } from "../../../../../src/ext/impl/http/xhr";
 import {
   ApplePaySpecificInput,
   GooglePaySpecificInput,
@@ -11,7 +12,7 @@ import {
   PaymentProduct302SpecificData,
   PaymentProduct320SpecificData,
 } from "../../../../../src/model";
-import { Mocks } from "../../../mock";
+import { Mocks, isMinNode } from "../../../test-util";
 
 describe("Browser", () => {
   const globalMocks = Mocks.global();
@@ -54,8 +55,9 @@ describe("Browser", () => {
   });
 
   test("getHttpClient", () => {
-    globalMocks.mockIfNecessary("fetch", {});
-    expect(browser.getHttpClient()).toBe(fetchHttpClient);
+    // Fetch is natively available only from Node.js 18 on
+    const expected = isMinNode(18) ? fetchHttpClient : xhrHttpClient;
+    expect(browser.getHttpClient()).toBe(expected);
   });
 
   describe("getApplePayClient", () => {

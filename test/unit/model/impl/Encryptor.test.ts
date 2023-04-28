@@ -5,7 +5,7 @@
 import { PaymentRequest, PublicKey } from "../../../../src/model";
 import { newEncryptor } from "../../../../src/model/impl/Encryptor";
 import { toPaymentProduct } from "../../../../src/model/impl/PaymentProduct";
-import { MockDevice } from "../../mock";
+import { MockDevice } from "../../test-util";
 
 describe("Encryptor", () => {
   const clientSessionId = "client-session-id";

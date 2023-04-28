@@ -1,3 +1,4 @@
+import { SemVer } from "semver";
 import { ApplePayClient, Device, DeviceInformation, GooglePayClient } from "../../src/ext";
 import { HttpClient, HttpRequest, HttpResponse } from "../../src/ext/http";
 import { URLBuilder } from "../../src/ext/http/util";
@@ -258,4 +259,30 @@ export class Mocks {
   static for(o: object): Mocks {
     return new Mocks(o);
   }
+}
+
+export function isMinNode(major: number, minor = 0): boolean {
+  const currentVersion = new SemVer(process.versions.node);
+  return currentVersion.major > major || (currentVersion.major === major && currentVersion.minor >= minor);
+}
+
+export interface MinNodeJest {
+  describe: jest.Describe;
+  test: jest.It;
+}
+
+export function minNode(major: number, minor = 0): MinNodeJest {
+  const condition = isMinNode(major, minor);
+  return {
+    describe: describeWhen(condition),
+    test: testWhen(condition),
+  };
+}
+
+export function describeWhen(condition: boolean): jest.Describe {
+  return condition ? describe : describe.skip;
+}
+
+export function testWhen(condition: boolean): jest.It {
+  return condition ? test : test.skip;
 }

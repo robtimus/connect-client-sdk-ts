@@ -9,9 +9,11 @@ An SDK for the [Ingenico Connect](https://epayments.developer-ingenico.com/) Cli
 
 * No hard requirement on browser specifics. Although this is the default, with only a little work it's possible to use the SDK in React Native apps.
 * No custom code for functionality most modern browsers support like Base64 encoding/decoding.
+* Proper promises.
 * HTTP calls use the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) if available, with [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) available as fallback.
-* Native cryptography if available, through the [web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API). [node-forge](https://www.npmjs.com/package/node-forge) can still be used as fallback.
+* Native cryptography if available, through the [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API). [node-forge](https://www.npmjs.com/package/node-forge) can still be used as fallback.
 * No deprecated legacy code.
+* More support for creating Apple Pay and Google Pay payments.
 
 ## Initialization
 
@@ -24,6 +26,37 @@ Install this SDK using your preferred Node.js package manager like `npm`, `yarn`
 TODO
 
 ## Requirements
+
+### Browsers
+
+The following are the minimum supported browsers:
+
+| Browser             | Default  | Web API Cryptography |
+|---------------------|----------|----------------------|
+| Chrome              | 69+      | 37+                  |
+| Edge                | 79+      | 12+                  |
+| Safari              | 12+      | 7+                   |
+| Firefox             | 62+      | 34+                  |
+| Opera               | 56+      | 24+                  |
+| Chrome for Android  | 112+     | 112+                 |
+| Safari on iOS       | 12+      | 7+                   |
+| Opera Mobile        | 73+      | 73+                  |
+| Android Browser     | 112+     | 4.4+                 |
+| Firefox for Android | 110+     | 110+                 |
+
+Internet Explorer and older versions of these browser can become supported by using a polyfill like [core-js](https://www.npmjs.com/package/core-js).
+
+If the Web Crypto API is not available, it's possible to use node-forge instead as follows:
+
+```
+import { forgeCryptoEngine } from "@robtimus/connect-client-sdk/lib/ext/impl/crypto/forge";
+
+// create session as usual
+
+session.setCryptoEngine(forgeCryptoEngine);
+```
+
+### Node.js
 
 Node.js 16 or higher is required.
 

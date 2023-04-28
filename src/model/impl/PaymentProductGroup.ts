@@ -45,20 +45,13 @@ export function toBasicPaymentProductGroup(json: api.PaymentProductGroup): Basic
   return new BasicPaymentProductGroupImpl(json);
 }
 
-// Cannot seem to get flatMap to work; flatMap manually
-function listAccountsOnFile(paymentProductGroups: BasicPaymentProductGroup[]): AccountOnFile[] {
-  const result: AccountOnFile[] = [];
-  paymentProductGroups.forEach((group) => result.push(...group.accountsOnFile));
-  return result;
-}
-
 class BasicPaymentProductGroupsImpl implements BasicPaymentProductGroups {
   readonly paymentProductGroups: BasicPaymentProductGroup[];
   readonly accountsOnFile: AccountOnFile[];
 
   constructor(json: api.PaymentProductGroups) {
     this.paymentProductGroups = json.paymentProductGroups.map(toBasicPaymentProductGroup);
-    this.accountsOnFile = listAccountsOnFile(this.paymentProductGroups);
+    this.accountsOnFile = this.paymentProductGroups.flatMap((group) => group.accountsOnFile);
   }
 
   findPaymentProductGroup(id: string): BasicPaymentProductGroup | undefined {

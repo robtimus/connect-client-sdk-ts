@@ -87,20 +87,13 @@ export function toBasicPaymentProduct(json: api.PaymentProduct): BasicPaymentPro
   return new BasicPaymentProductImpl(json);
 }
 
-// Cannot seem to get flatMap to work; flatMap manually
-function listAccountsOnFile(paymentProducts: BasicPaymentProduct[]): AccountOnFile[] {
-  const result: AccountOnFile[] = [];
-  paymentProducts.forEach((product) => result.push(...product.accountsOnFile));
-  return result;
-}
-
 class BasicPaymentProductsImpl implements BasicPaymentProducts {
   readonly paymentProducts: BasicPaymentProduct[];
   readonly accountsOnFile: AccountOnFile[];
 
   constructor(json: api.PaymentProducts) {
     this.paymentProducts = json.paymentProducts.map(toBasicPaymentProduct);
-    this.accountsOnFile = listAccountsOnFile(this.paymentProducts);
+    this.accountsOnFile = this.paymentProducts.flatMap((product) => product.accountsOnFile);
   }
 
   findPaymentProduct(id: number): BasicPaymentProduct | undefined {

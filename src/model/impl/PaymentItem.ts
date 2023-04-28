@@ -29,20 +29,13 @@ function listPaymentItems(products: BasicPaymentProducts, groups?: BasicPaymentP
   return result;
 }
 
-// Cannot seem to get flatMap to work; flatMap manually
-function listAccountsOnFile(paymentItems: BasicPaymentItem[]): AccountOnFile[] {
-  const result: AccountOnFile[] = [];
-  paymentItems.forEach((item) => result.push(...item.accountsOnFile));
-  return result;
-}
-
 class BasicPaymentItemsImpl implements BasicPaymentItems {
   readonly paymentItems: BasicPaymentItem[];
   readonly accountsOnFile: AccountOnFile[];
 
   constructor(products: BasicPaymentProducts, groups?: BasicPaymentProductGroups) {
     this.paymentItems = listPaymentItems(products, groups);
-    this.accountsOnFile = listAccountsOnFile(this.paymentItems);
+    this.accountsOnFile = this.paymentItems.flatMap((item) => item.accountsOnFile);
   }
 
   findPaymentItem(id: number): BasicPaymentProduct | undefined;

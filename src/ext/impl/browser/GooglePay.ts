@@ -100,7 +100,7 @@ function constructPaymentDataRequest(
 ): google.payments.api.PaymentDataRequest {
   return {
     apiVersion: API_VERSION,
-    apiVersionMinor: API_VERSION,
+    apiVersionMinor: API_VERSION_MINOR,
     allowedPaymentMethods: [
       {
         type: "CARD",

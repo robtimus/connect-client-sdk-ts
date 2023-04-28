@@ -379,7 +379,7 @@ describe("Session", () => {
         expectRequest
       );
       const session = new Session(sessionDetails, minimalPaymentContext, device);
-      // In Node environments, crypto.subtle is always available, therefore the default crypto engine will always be set
+      // In Node.js environments (16+), crypto.subtle is always available, therefore the default crypto engine will always be set
       // Set it to undefined this way instead, to mock the case where crypto.subtle is not available
       Object.defineProperty(session, "cryptoEngine", {
         value: undefined,

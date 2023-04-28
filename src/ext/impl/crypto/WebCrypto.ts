@@ -108,7 +108,7 @@ async function calculateHMAC(
   return crypto.subtle.sign("HMAC", key, str2ab(hmacInput)).then(ab2str);
 }
 
-class SubtleCryptoEngine implements CryptoEngine {
+class WebCryptoCryptoEngine implements CryptoEngine {
   randomString(): string {
     return crypto.randomUUID();
   }
@@ -159,20 +159,20 @@ class SubtleCryptoEngine implements CryptoEngine {
   }
 }
 
-Object.freeze(SubtleCryptoEngine.prototype);
+Object.freeze(WebCryptoCryptoEngine.prototype);
 
 /**
- * Returns whether or not <a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto">SubtleCrypto</a> and related functionality is available.
- * This can be used to determine whether or not {@link subtleCryptoEngine} can be used.
- * @returns True if {@link subtleCryptoEngine} can be used, or false otherwise.
+ * Returns whether or not the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API">Web Crypto API</a> is available.
+ * This can be used to determine whether or not {@link webCryptoCryptoEngine} can be used.
+ * @returns True if {@link webCryptoCryptoEngine} can be used, or false otherwise.
  */
-export function isSubtleCryptoAvailable(): boolean {
+export function isWebCryptoAvailable(): boolean {
   return crypto.isAvailable();
 }
 
 /**
- * A crypto engine backed by <a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto">SubtleCrypto</a>.
+ * A crypto engine backed by the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API">Web Crypto API</a>.
  * This will work in modern browsers and supported Node.js versions. Attempting to use it in older browsers or Node.js versions will fail.
- * If needed, use {@link isSubtleCryptoAvailable} to determine whether or not this crypto engine can be used.
+ * If needed, use {@link isWebCryptoAvailable} to determine whether or not this crypto engine can be used.
  */
-export const subtleCryptoEngine: CryptoEngine = new SubtleCryptoEngine();
+export const webCryptoCryptoEngine: CryptoEngine = new WebCryptoCryptoEngine();

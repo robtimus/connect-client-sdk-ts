@@ -4,7 +4,7 @@ import { ApplePayClient, Device, GooglePayButtonOptions, GooglePayClient } from 
 import { CryptoEngine } from "./ext/crypto";
 import { HttpResponse } from "./ext/http";
 import { browser } from "./ext/impl/browser";
-import { isSubtleCryptoAvailable, subtleCryptoEngine } from "./ext/impl/crypto/SubtleCrypto";
+import { isWebCryptoAvailable, webCryptoCryptoEngine } from "./ext/impl/crypto/WebCrypto";
 import {
   BasicPaymentItems,
   BasicPaymentProduct,
@@ -166,7 +166,7 @@ export class Session {
   private paymentProductAvailability: Record<number, boolean | undefined> = {};
 
   /**
-   * Creates a new session. This will use {@link subtleCryptoEngine} if available.
+   * Creates a new session. This will use {@link webCryptoCryptoEngine} if available.
    * Otherwise, no crypto engine will be set, unless one is explicitly provided using {@link setCryptoEngine}.
    * @param sessionDetails The session details, as returned by an Ingenico Connect Server API create session call.
    * @param paymentContext The context for the current payment.
@@ -175,8 +175,8 @@ export class Session {
   constructor(private readonly sessionDetails: SessionDetails, private paymentContext: PaymentContext, private readonly device: Device = browser) {
     this.communicator = new Communicator(sessionDetails, device);
 
-    if (isSubtleCryptoAvailable()) {
-      this.cryptoEngine = subtleCryptoEngine;
+    if (isWebCryptoAvailable()) {
+      this.cryptoEngine = webCryptoCryptoEngine;
     }
   }
 
@@ -228,7 +228,7 @@ export class Session {
   /**
    * Returns an object that can be used to encrypt {@link PaymentRequest} objects.
    * @returns A promise containing an {@link Encryptor}.
-   * @throws If {@link subtleCryptoEngine} is not available and no other crypto engine has been set using {@link setCryptoEngine}.
+   * @throws If {@link webCryptoCryptoEngine} is not available and no other crypto engine has been set using {@link setCryptoEngine}.
    */
   async getEncryptor(): Promise<Encryptor> {
     if (!this.cryptoEngine) {
@@ -239,7 +239,7 @@ export class Session {
   }
 
   /**
-   * Sets the crypto engine to use. This method should be used to provide a crypto engine in case {@link subtleCryptoEngine} is not available.
+   * Sets the crypto engine to use. This method should be used to provide a crypto engine in case {@link webCryptoCryptoEngine} is not available.
    * @param cryptoEngine The crypto engine to set.
    */
   setCryptoEngine(cryptoEngine: CryptoEngine): void {

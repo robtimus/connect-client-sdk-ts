@@ -5,7 +5,7 @@
 import { JWE, JWK } from "node-jose";
 import { CryptoEngine } from "../../../../../src/ext/crypto";
 import { forgeCryptoEngine } from "../../../../../src/ext/impl/crypto/forge";
-import { subtleCryptoEngine } from "../../../../../src/ext/impl/crypto/SubtleCrypto";
+import { webCryptoCryptoEngine } from "../../../../../src/ext/impl/crypto/WebCrypto";
 
 function testCryptoEngine(cryptoEngine: CryptoEngine): void {
   describe("encrypt", () => {
@@ -53,6 +53,6 @@ describe("forge", () => {
   testCryptoEngine(forgeCryptoEngine);
 });
 
-describe("crypto.subtle", () => {
-  testCryptoEngine(subtleCryptoEngine);
+describe("Web Crypto API", () => {
+  testCryptoEngine(webCryptoCryptoEngine);
 });

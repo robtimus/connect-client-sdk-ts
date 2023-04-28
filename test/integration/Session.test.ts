@@ -3,7 +3,8 @@
  */
 
 import * as connectSdk from "promiseful-connect-sdk";
-import { PaymentContext, Session, SessionDetails, fetchHttpClient } from "../../src";
+import { PaymentContext, Session, SessionDetails } from "../../src";
+import { fetchHttpClient } from "../../src/ext/impl/http/fetch";
 import { Device } from "../../src/ext";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires

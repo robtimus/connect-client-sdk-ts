@@ -14,7 +14,7 @@ function createProtectedHeader(keyId: string): string {
 
 function decodePemPublicKey(publickeyB64Encoded: string): forge.pki.rsa.PublicKey {
   // step 1: base64decode
-  const publickeyB64Decoded = atob(publickeyB64Encoded);
+  const publickeyB64Decoded = forge.util.decode64(publickeyB64Encoded);
   // create a bytebuffer with these bytes
   const buffer2 = forge.util.createBuffer(publickeyB64Decoded, "raw");
   // convert DER to ASN1 object
@@ -71,7 +71,7 @@ class ForgeCryptoEngine implements CryptoEngine {
 
   encrypt(payload: string, keyId: string, publicKey: string): Promise<string> {
     const protectedHeader = createProtectedHeader(keyId);
-    const encodededProtectedHeader = btoa(protectedHeader);
+    const encodededProtectedHeader = forge.util.encode64(protectedHeader);
 
     // Create ContentEncryptionKey, is a random byte[]
     const CEK = forge.random.getBytesSync(CEK_KEY_LENGTH / 8);
@@ -79,7 +79,7 @@ class ForgeCryptoEngine implements CryptoEngine {
 
     // Encrypt the contentEncryptionKey with the GC gateway publickey and encode it with Base64 encoding
     const encryptedContentEncryptionKey = encryptContentEncryptionKey(CEK, rsaPublicKey);
-    const encodedEncryptedContentEncryptionKey = btoa(encryptedContentEncryptionKey);
+    const encodedEncryptedContentEncryptionKey = forge.util.encode64(encryptedContentEncryptionKey);
 
     // Split the contentEncryptionKey in ENC_KEY and MAC_KEY for using hmac
     const macKey = CEK.substring(0, CEK_KEY_LENGTH / 2 / 8);
@@ -87,11 +87,11 @@ class ForgeCryptoEngine implements CryptoEngine {
 
     // Create Initialization Vector
     const initializationVector = forge.random.getBytesSync(IV_LENGTH / 8);
-    const encodededinitializationVector = btoa(initializationVector);
+    const encodededinitializationVector = forge.util.encode64(initializationVector);
 
     // Encrypt content with ContentEncryptionKey and Initialization Vector
     const cipherText = encryptPayload(payload, encKey, initializationVector);
-    const encodedCipherText = btoa(cipherText);
+    const encodedCipherText = forge.util.encode64(cipherText);
 
     // Create Additional Authenticated Data  and Additional Authenticated Data Length
     const al = calculateAdditionalAuthenticatedDataLength(encodededProtectedHeader);
@@ -101,7 +101,7 @@ class ForgeCryptoEngine implements CryptoEngine {
 
     // Truncate HMAC Value to Create Authentication Tag
     const authenticationTag = calculatedHmac.substring(0, calculatedHmac.length / 2);
-    const encodedAuthenticationTag = btoa(authenticationTag);
+    const encodedAuthenticationTag = forge.util.encode64(authenticationTag);
 
     return Promise.resolve(
       [

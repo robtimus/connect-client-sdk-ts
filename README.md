@@ -5,16 +5,19 @@
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=robtimus%3Aconnect-client-sdk&metric=coverage)](https://sonarcloud.io/summary/overall?id=robtimus%3Aconnect-client-sdk)
 [![Known Vulnerabilities](https://snyk.io/test/github/robtimus/connect-client-sdk-ts/badge.svg)](https://snyk.io/test/github/robtimus/connect-client-sdk-ts)
 
-An SDK for the [Ingenico Connect](https://epayments.developer-ingenico.com/) Client API. It's based on the [official SDK](https://github.com/Ingenico-ePayments/connect-sdk-client-js), but provides some improvements:
+An SDK for the [Ingenico Connect](https://epayments.developer-ingenico.com/) Client API. It's based on the [official SDK](https://github.com/Ingenico-ePayments/connect-sdk-client-js), but is mostly written from scratch, and provides some improvements:
 
-* No explicit requirement on browser specifics. This makes it usable for React Native apps.
+* No hard requirement on browser specifics. Although this is the default, with only a little work it's possible to use the SDK in React Native apps.
+* No custom code for functionality most modern browsers support like Base64 encoding/decoding.
+* HTTP calls use the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) if available, with [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) available as fallback.
+* Native cryptography if available, through the [web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API). [node-forge](https://www.npmjs.com/package/node-forge) can still be used as fallback.
 * No deprecated legacy code.
-* Native cryptography if available, through [web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API). [node-forge](https://www.npmjs.com/package/node-forge) can still be used as fallback.
-* TODO...
 
 ## Initialization
 
-TODO
+Install this SDK using your preferred Node.js package manager like `npm`, `yarn` or `pnpm`. For instance:
+
+    npm i @robtimus/connect-client-sdk
 
 ## Usage
 
@@ -23,12 +26,6 @@ TODO
 ## Requirements
 
 Node.js 16 or higher is required.
-
-## Installation
-
-From the folder where your `package.json` is located, run the following command to install the SDK:
-
-    npm i @robtimus/connect-client-sdk
 
 ## Building the repository
 

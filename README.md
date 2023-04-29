@@ -46,14 +46,15 @@ The following are the minimum supported browsers:
 
 Internet Explorer and older versions of these browser can become supported by using a polyfill like [core-js](https://www.npmjs.com/package/core-js).
 
-If the Web Crypto API is not available, it's possible to use [node-forge](https://www.npmjs.com/package/node-forge) instead as follows:
+If the Web Crypto API is not available, it's possible to use [node-forge](https://www.npmjs.com/package/node-forge) instead. For instance:
 
 ```
 import { forgeCryptoEngine } from "@robtimus/connect-client-sdk/lib/ext/impl/crypto/forge";
+import { isWebCryptoAvailable, webCryptoCryptoEngine } from "@robtimus/connect-client-sdk/lib/ext/impl/crypto/WebCrypto";
 
 // create session as usual
 
-session.setCryptoEngine(forgeCryptoEngine);
+session.setCryptoEngine(isWebCryptoAvailable() ? webCryptoCryptoEngine : forgeCryptoEngine);
 ```
 
 ### Node.js

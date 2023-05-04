@@ -1,5 +1,5 @@
 import { PaymentRequest, ValidationRuleLength } from "../..";
-import { api } from "../../../communicator/model";
+import * as api from "../../../communicator/model";
 
 class ValidationRuleLengthImpl implements ValidationRuleLength {
   static readonly ID = "length";

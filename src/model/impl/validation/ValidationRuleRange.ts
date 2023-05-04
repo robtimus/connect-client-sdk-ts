@@ -1,5 +1,5 @@
 import { PaymentRequest, ValidationRuleRange } from "../..";
-import { api } from "../../../communicator/model";
+import * as api from "../../../communicator/model";
 
 class ValidationRuleRangeImpl implements ValidationRuleRange {
   static readonly ID = "range";

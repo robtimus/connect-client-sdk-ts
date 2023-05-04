@@ -2,7 +2,7 @@
  * @group unit:model
  */
 
-import { api } from "../../../../src/communicator/model";
+import * as api from "../../../../src/communicator/model";
 import { toAccountOnFile } from "../../../../src/model/impl/AccountOnFile";
 
 const json: api.AccountOnFile = {

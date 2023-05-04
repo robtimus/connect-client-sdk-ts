@@ -1,5 +1,5 @@
 import { PaymentRequest, ValidationRuleTermsAndConditions } from "../..";
-import { api } from "../../../communicator/model";
+import * as api from "../../../communicator/model";
 
 class ValidationRuleTermsAndConditionsImpl implements ValidationRuleTermsAndConditions {
   static readonly ID = "termsAndConditions";

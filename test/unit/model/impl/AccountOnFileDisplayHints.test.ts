@@ -2,7 +2,7 @@
  * @group unit:model
  */
 
-import { api } from "../../../../src/communicator/model";
+import * as api from "../../../../src/communicator/model";
 import { toAccountOnFileDisplayHints } from "../../../../src/model/impl/AccountOnFileDisplayHints";
 
 const json: api.AccountOnFileDisplayHints = {

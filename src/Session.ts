@@ -1,5 +1,5 @@
 import { Communicator } from "./communicator";
-import { api } from "./communicator/model";
+import * as api from "./communicator/model";
 import { ApplePayClient, Device, GooglePayButtonOptions, GooglePayClient } from "./ext";
 import { CryptoEngine } from "./ext/crypto";
 import { HttpResponse } from "./ext/http";

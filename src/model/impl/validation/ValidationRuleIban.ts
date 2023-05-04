@@ -1,5 +1,5 @@
 import { PaymentRequest, ValidationRuleIban } from "../..";
-import { api } from "../../../communicator/model";
+import * as api from "../../../communicator/model";
 
 const IBAN_REGEXP = /^[A-Z]{2}[0-9]{2}[A-Z0-9]{4}[0-9]{7}([A-Z0-9]?){0,16}$/;
 

@@ -1,5 +1,5 @@
 import { PaymentRequest, ValidationRuleExpirationDate } from "../..";
-import { api } from "../../../communicator/model";
+import * as api from "../../../communicator/model";
 
 // value is mmYY or mmYYYY
 const DATE_FORMAT_REGEXP = /^(\d{4}|\d{6})$/;

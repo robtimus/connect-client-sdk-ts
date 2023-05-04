@@ -1,5 +1,5 @@
 import { PaymentProductFieldDataRestrictions, ValidationRule } from "..";
-import { api } from "../../communicator/model";
+import * as api from "../../communicator/model";
 import { createValidationRule } from "./validation";
 
 function createValidationRules(json: api.PaymentProductFieldValidators): ValidationRule[] {

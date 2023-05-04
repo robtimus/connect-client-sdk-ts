@@ -1,5 +1,5 @@
 import { MaskedString, PaymentProductField, PaymentProductFieldDataRestrictions, PaymentProductFieldDisplayHints } from "..";
-import { api } from "../../communicator/model";
+import * as api from "../../communicator/model";
 import { applyMask, removeMask } from "../../util/masking";
 import { toPaymentProductFieldDataRestrictions } from "./PaymentProductFieldDataRestrictions";
 import { toPaymentProductFieldDisplayHints } from "./PaymentProductFieldDisplayHints";

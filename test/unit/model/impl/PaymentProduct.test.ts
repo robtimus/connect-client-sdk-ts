@@ -2,7 +2,7 @@
  * @group unit:model
  */
 
-import { api } from "../../../../src/communicator/model";
+import * as api from "../../../../src/communicator/model";
 import { toBasicPaymentProduct, toBasicPaymentProducts, toPaymentProduct } from "../../../../src/model/impl/PaymentProduct";
 
 const minimalJson: api.PaymentProduct = {

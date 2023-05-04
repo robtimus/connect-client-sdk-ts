@@ -2,7 +2,7 @@
  * @group unit:model
  */
 
-import { api } from "../../../../src/communicator/model";
+import * as api from "../../../../src/communicator/model";
 import { toPaymentProductFieldDataRestrictions } from "../../../../src/model/impl/PaymentProductFieldDataRestrictions";
 
 describe("toPaymentProductFieldDataRestrictions", () => {

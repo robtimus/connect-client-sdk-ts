@@ -1,5 +1,5 @@
 import { PaymentRequest, ValidationRuleRegularExpression } from "../..";
-import { api } from "../../../communicator/model";
+import * as api from "../../../communicator/model";
 
 class ValidationRuleRegularExpressionImpl implements ValidationRuleRegularExpression {
   static readonly ID = "regularExpression";

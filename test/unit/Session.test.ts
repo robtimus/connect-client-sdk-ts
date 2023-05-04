@@ -3,7 +3,7 @@
  */
 
 import { Session } from "../../src/Session";
-import { api } from "../../src/communicator/model";
+import * as api from "../../src/communicator/model";
 import {
   CustomerDetailsRequest,
   DeviceFingerprintRequest,

@@ -1,7 +1,7 @@
 import { Device } from "../ext";
 import { HttpResponse } from "../ext/http";
 import { sdkIdentifier } from "../util/metadata";
-import { api } from "./model";
+import * as api from "./model";
 
 interface Metadata {
   readonly screenSize: string;

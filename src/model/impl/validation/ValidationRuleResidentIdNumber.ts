@@ -1,5 +1,5 @@
 import { PaymentRequest, ValidationRuleResidentIdNumber } from "../..";
-import { api } from "../../../communicator/model";
+import * as api from "../../../communicator/model";
 
 const WEIGHTS: number[] = [];
 

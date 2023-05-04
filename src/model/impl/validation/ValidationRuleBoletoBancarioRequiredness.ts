@@ -1,5 +1,5 @@
 import { PaymentRequest, ValidationRuleBoletoBancarioRequiredness } from "../..";
-import { api } from "../../../communicator/model";
+import * as api from "../../../communicator/model";
 
 class ValidationRuleBoletoBancarioRequirednessImpl implements ValidationRuleBoletoBancarioRequiredness {
   static readonly ID = "boletoBancarioRequiredness";

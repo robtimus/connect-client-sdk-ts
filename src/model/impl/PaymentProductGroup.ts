@@ -6,7 +6,7 @@ import {
   PaymentProductField,
   PaymentProductGroup,
 } from "..";
-import { api } from "../../communicator/model";
+import * as api from "../../communicator/model";
 import { toAccountOnFile } from "./AccountOnFile";
 import { toPaymentProductField } from "./PaymentProductField";
 

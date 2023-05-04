@@ -1,5 +1,5 @@
 import { PaymentRequest, ValidationRuleFixedList } from "../..";
-import { api } from "../../../communicator/model";
+import * as api from "../../../communicator/model";
 
 class ValidationRuleFixedListImpl implements ValidationRuleFixedList {
   static readonly ID = "fixedList";

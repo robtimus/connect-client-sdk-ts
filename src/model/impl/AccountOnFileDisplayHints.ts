@@ -1,5 +1,5 @@
 import { AccountOnFileDisplayHints, LabelTemplateElement } from "..";
-import { api } from "../../communicator/model";
+import * as api from "../../communicator/model";
 import { toLabelTemplateElement } from "./LabelTemplateElement";
 
 class AccountOnFileDisplayHintsImpl implements AccountOnFileDisplayHints {

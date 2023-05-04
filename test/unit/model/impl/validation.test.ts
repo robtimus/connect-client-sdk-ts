@@ -32,7 +32,7 @@ import { toValidationRuleRegularExpression } from "../../../../src/model/impl/va
 import { toValidationRuleResidentIdNumber } from "../../../../src/model/impl/validation/ValidationRuleResidentIdNumber";
 import { toValidationRuleTermsAndConditions } from "../../../../src/model/impl/validation/ValidationRuleTermsAndConditions";
 import { createValidationRule } from "../../../../src/model/impl/validation";
-import { api } from "../../../../src/communicator/model";
+import * as api from "../../../../src/communicator/model";
 
 const fieldId = "testField";
 const fiscalNumberFieldId = "fiscalNumber";

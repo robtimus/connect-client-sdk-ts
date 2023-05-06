@@ -6,6 +6,7 @@ import {
   PaymentContext,
   PaymentProduct302SpecificData,
 } from "../../../model";
+import { formatAmount } from "../../../util/amounts";
 
 class ApplePayClientImpl implements ApplePayClient {
   constructor(
@@ -22,7 +23,7 @@ class ApplePayClientImpl implements ApplePayClient {
       countryCode: this.applePaySpecificInput.acquirerCountry || this.context.countryCode,
       total: {
         label: this.applePaySpecificInput.lineItem || this.applePaySpecificInput.merchantName,
-        amount: (this.context.amountOfMoney.amount / 100).toString(),
+        amount: formatAmount(this.context.amountOfMoney.amount),
       },
       supportedNetworks: this.applePaySpecificData.networks,
       merchantCapabilities: ["supports3DS"],

@@ -1,5 +1,6 @@
 import { GooglePayButtonOptions, GooglePayClient } from "../..";
 import { GooglePaySpecificInput, PaymentContext, PaymentProduct320SpecificData } from "../../../model";
+import { formatAmount } from "../../../util/amounts";
 
 function getPaymentsClient(
   googlePaySpecificInput: GooglePaySpecificInput,
@@ -18,11 +19,6 @@ function getPaymentsClient(
 
 const API_VERSION = 2;
 const API_VERSION_MINOR = 0;
-
-function formatAmount(amount: number): string {
-  const output = "00" + amount;
-  return output.slice(0, output.length - 2) + "." + output.slice(output.length - 2);
-}
 
 function constructCardParameters(data: PaymentProduct320SpecificData): google.payments.api.CardParameters {
   return {

@@ -39,8 +39,6 @@ class ApplePayClientImpl implements ApplePayClient {
 
     return new Promise((resolve, reject) => {
       const applePaySession = new ApplePaySession(version, paymentRequest);
-      applePaySession.begin();
-
       applePaySession.onvalidatemerchant = (event) => {
         const input: MobilePaymentProductSession302SpecificInput = {
           displayName: this.applePaySpecificInput.merchantName,
@@ -65,6 +63,7 @@ class ApplePayClientImpl implements ApplePayClient {
           reject("Error authorizing payment");
         }
       };
+      applePaySession.begin();
     });
   }
 }

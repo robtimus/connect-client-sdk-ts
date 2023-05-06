@@ -45,16 +45,14 @@ class ApplePaySessionMock {
   onpaymentauthorized?: (event: ApplePayJS.ApplePayPaymentAuthorizedEvent) => void;
 
   begin(): void {
-    setTimeout(() => {
-      const onvalidatemerchant = this.onvalidatemerchant;
-      if (!onvalidatemerchant) {
-        throw new Error("onvalidatemerchant not set");
-      }
-      const event: ApplePayJS.ApplePayValidateMerchantEvent = {
-        validationURL: "http://localhost/validate",
-      } as ApplePayJS.ApplePayValidateMerchantEvent;
-      onvalidatemerchant(event);
-    }, 50);
+    const onvalidatemerchant = this.onvalidatemerchant;
+    if (!onvalidatemerchant) {
+      throw new Error("onvalidatemerchant not set");
+    }
+    const event: ApplePayJS.ApplePayValidateMerchantEvent = {
+      validationURL: "http://localhost/validate",
+    } as ApplePayJS.ApplePayValidateMerchantEvent;
+    onvalidatemerchant(event);
   }
 
   completeMerchantValidation(merchantSession: unknown): void {

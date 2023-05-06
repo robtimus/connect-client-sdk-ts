@@ -62,31 +62,29 @@ function constructPrefetchPaymentDataRequest(
   data: PaymentProduct320SpecificData,
   context: PaymentContext
 ): google.payments.api.PaymentDataRequest | undefined {
-  if (input.gatewayMerchantId) {
-    // The cast is necessary because the TypeScript definition incorrectly makes totalPrice required
-    const transactionInfo = {
-      totalPriceStatus: "NOT_CURRENTLY_KNOWN",
-      currencyCode: context.amountOfMoney.currencyCode,
-    } as google.payments.api.TransactionInfo;
+  // The cast is necessary because the TypeScript definition incorrectly makes totalPrice required
+  const transactionInfo = {
+    currencyCode: context.amountOfMoney.currencyCode,
+    countryCode: input.acquirerCountry || context.countryCode,
+    totalPriceStatus: "NOT_CURRENTLY_KNOWN",
+  } as google.payments.api.TransactionInfo;
 
-    return {
-      apiVersion: API_VERSION,
-      apiVersionMinor: API_VERSION_MINOR,
-      allowedPaymentMethods: [
-        {
-          type: "CARD",
-          parameters: constructCardParameters(data),
-          tokenizationSpecification: constructTokenizationSpecification(input, data),
-        },
-      ],
-      transactionInfo,
-      merchantInfo: {
-        merchantId: input.merchantId,
-        merchantName: input.merchantName,
+  return {
+    apiVersion: API_VERSION,
+    apiVersionMinor: API_VERSION_MINOR,
+    allowedPaymentMethods: [
+      {
+        type: "CARD",
+        parameters: constructCardParameters(data),
+        tokenizationSpecification: constructTokenizationSpecification(input, data),
       },
-    };
-  }
-  return undefined;
+    ],
+    transactionInfo,
+    merchantInfo: {
+      merchantId: input.merchantId,
+      merchantName: input.merchantName,
+    },
+  };
 }
 
 function constructPaymentDataRequest(
@@ -105,10 +103,10 @@ function constructPaymentDataRequest(
       },
     ],
     transactionInfo: {
-      totalPriceStatus: "FINAL",
-      totalPrice: formatAmount(context.amountOfMoney.amount),
-      countryCode: input.acquirerCountry || context.countryCode,
       currencyCode: context.amountOfMoney.currencyCode,
+      countryCode: input.acquirerCountry || context.countryCode,
+      totalPrice: formatAmount(context.amountOfMoney.amount),
+      totalPriceStatus: "FINAL",
     },
     merchantInfo: {
       merchantId: input.merchantId,
@@ -128,7 +126,7 @@ class GooglePayClientImpl implements GooglePayClient {
   createButton(options: GooglePayButtonOptions): HTMLElement {
     const buttonOptions: google.payments.api.ButtonOptions = Object.assign({}, options);
     buttonOptions.allowedPaymentMethods = constructAllowedPaymentMethods(this.googlePaySpecificData);
-    return this.client.createButton(options);
+    return this.client.createButton(buttonOptions);
   }
 
   async prefetchPaymentData(): Promise<void> {

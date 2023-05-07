@@ -1,5 +1,5 @@
 /**
- * Definition of types used by the Ingenico Connect Client API.
+ * Definition of types used by the Worldline Connect Client API.
  * @module
  */
 

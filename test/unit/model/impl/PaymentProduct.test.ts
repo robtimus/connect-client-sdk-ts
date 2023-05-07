@@ -71,7 +71,7 @@ const fullJson: api.PaymentProduct = {
     networks: ["VISA"],
   },
   paymentProduct320SpecificData: {
-    gateway: "ingenico",
+    gateway: "worldline",
     networks: ["1"],
   },
   paymentProduct863SpecificData: {

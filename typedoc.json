@@ -1,5 +1,5 @@
 {
-  "name": "Ingenico Connect client SDK",
+  "name": "Worldline Connect client SDK",
   "readme": "README.md",
   "entryPointStrategy": "expand",
   "entryPoints": ["src"],

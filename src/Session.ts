@@ -156,7 +156,7 @@ export interface GooglePayHelper {
 }
 
 /**
- * The main entry point for communicating with the Ingenico Connect Client API.
+ * The main entry point for communicating with the Worldline Connect Client API.
  */
 export class Session {
   private readonly communicator: Communicator;
@@ -168,7 +168,7 @@ export class Session {
   /**
    * Creates a new session. This will use {@link webCryptoCryptoEngine} if available.
    * Otherwise, no crypto engine will be set, unless one is explicitly provided using {@link setCryptoEngine}.
-   * @param sessionDetails The session details, as returned by an Ingenico Connect Server API create session call.
+   * @param sessionDetails The session details, as returned by an Worldline Connect Server API create session call.
    * @param paymentContext The context for the current payment.
    * @param device An object representing the current device. If not given, it is assumed that the current device is a browser.
    */
@@ -269,7 +269,7 @@ export class Session {
    * Retrieves the payment items available for the current payment context.\
    * Note that for Apple Pay and Google Pay to possibly be part of the result, these need to be enabled in the device.
    * Furthermore, the current payment context *must* contain the necessary payment product specific inputs.
-   * Otherwise, both products will be filtered out if they are returned by the Ingenico Connect Client API.
+   * Otherwise, both products will be filtered out if they are returned by the Worldline Connect Client API.
    * @param useGroups True to include payment product groups, or false to only include payment products.
    * @returns A promise containing the available payment items.
    */
@@ -359,7 +359,7 @@ export class Session {
    * Retrieves the payment productss available for the current payment context.\
    * Note that for Apple Pay and Google Pay to possibly be part of the result, these need to be enabled in the device.
    * Furthermore, the current payment context *must* contain the necessary payment product specific inputs.
-   * Otherwise, both products will be filtered out if they are returned by the Ingenico Connect Client API.
+   * Otherwise, both products will be filtered out if they are returned by the Worldline Connect Client API.
    * @returns A promise containing the available payment products.
    */
   async getBasicPaymentProducts(): Promise<BasicPaymentProducts> {
@@ -591,7 +591,7 @@ export class Session {
    * * status === "NOT_ALLOWED": the card number is recognized but not supported for the current payment context.\
    *   The result will contain the payment product ID and if available the cobrands.
    * * status === "UKNOWN": the card number is not recognized.\
-   *   The result will not contain a payment product ID or any cobrands, but instead the error response returned by the Ingenico Connect Client API.
+   *   The result will not contain a payment product ID or any cobrands, but instead the error response returned by the Worldline Connect Client API.
    * @param partialCreditCardNumber The (partial) credit card number. Only its first 6 or 8 characters will be used.
    * @returns A promise containing the IIN details result.
    * @throws If the given partial credit card number does not have at least 6 digits.

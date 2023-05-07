@@ -32,7 +32,7 @@ export interface Device {
   getHttpClient(): HttpClient;
   /**
    * @param applePaySpecificInput Input needed to work with Apple Pay.
-   * @param applePaySpecificData Apple Pay specific data, as retrieved by the Ingenico Connect Client API.
+   * @param applePaySpecificData Apple Pay specific data, as retrieved by the Worldline Connect Client API.
    * @param context The current payment context.
    * @returns A promise that contains an Apple Pay client for the given parameters, if available.
    */
@@ -43,7 +43,7 @@ export interface Device {
   ): Promise<ApplePayClient | undefined>;
   /**
    * @param googlePaySpecificInput Input needed to work with Google Pay.
-   * @param googlePaySpecificData Google Pay specific data, as retrieved by the Ingenico Connect Client API.
+   * @param googlePaySpecificData Google Pay specific data, as retrieved by the Worldline Connect Client API.
    * @param context The current payment context.
    * @returns A promise that contains an Google Pay client for the given parameters, if available.
    */

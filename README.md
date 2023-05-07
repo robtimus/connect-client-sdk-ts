@@ -1,11 +1,11 @@
-# Ingenico Connect client SDK
+# Worldline Connect client SDK
 [![npm](https://img.shields.io/npm/v/@robtimus/connect-client-sdk)](https://www.npmjs.com/package/@robtimus/connect-client-sdk)
 [![Build Status](https://github.com/robtimus/connect-client-sdk-ts/actions/workflows/build.yml/badge.svg)](https://github.com/robtimus/connect-client-sdk-ts/actions/workflows/build.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=robtimus%3Aconnect-client-sdk&metric=alert_status)](https://sonarcloud.io/summary/overall?id=robtimus%3Aconnect-client-sdk)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=robtimus%3Aconnect-client-sdk&metric=coverage)](https://sonarcloud.io/summary/overall?id=robtimus%3Aconnect-client-sdk)
 [![Known Vulnerabilities](https://snyk.io/test/github/robtimus/connect-client-sdk-ts/badge.svg)](https://snyk.io/test/github/robtimus/connect-client-sdk-ts)
 
-An SDK for the [Ingenico Connect](https://epayments.developer-ingenico.com/) Client API. It's based on the [official SDK](https://github.com/Ingenico-ePayments/connect-sdk-client-js), but is mostly written from scratch, and provides some improvements:
+An SDK for the [Worldline Connect](https://epayments.developer-ingenico.com/) Client API. It's based on the [official SDK](https://github.com/Ingenico-ePayments/connect-sdk-client-js), but is mostly written from scratch, and provides some improvements:
 
 * No hard requirement on browser specifics. Although this is the default, with only a little work it's possible to use the SDK in React Native apps.
 * No custom code for functionality most modern browsers support like Base64 encoding/decoding.

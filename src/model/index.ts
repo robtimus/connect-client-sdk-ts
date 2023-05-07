@@ -86,7 +86,7 @@ export interface GooglePaySpecificInput {
 
 /**
  * Details about the current client session.
- * Can be provided as the response of an Ingenico Connect Server API create session call.
+ * Can be provided as the response of an Worldline Connect Server API create session call.
  */
 export interface SessionDetails {
   readonly clientSessionId: string;

@@ -117,76 +117,124 @@ describe("validation", () => {
     });
 
     describe("empty value", () => {
-      test("fiscalNumber missing", () => {
-        const request = new PaymentRequest();
-        request.setPaymentProduct(product);
-        request.setValue(fieldId, "");
-        const result = rule.validate(request, fieldId);
-        expect(result).toBe(true);
+      describe("validating PaymentRequest", () => {
+        test("fiscalNumber missing", () => {
+          const request = new PaymentRequest();
+          request.setPaymentProduct(product);
+          request.setValue(fieldId, "");
+          const result = rule.validate(request, fieldId);
+          expect(result).toBe(true);
+        });
+
+        test("fiscalNumber empty", () => {
+          const request = new PaymentRequest();
+          request.setPaymentProduct(product);
+          request.setValue(fieldId, "");
+          request.setValue(fiscalNumberFieldId, "");
+          const result = rule.validate(request, fieldId);
+          expect(result).toBe(true);
+        });
+
+        test("fiscalNumber of matching length", () => {
+          const request = new PaymentRequest();
+          request.setPaymentProduct(product);
+          request.setValue(fieldId, "");
+          request.setValue(fiscalNumberFieldId, "1234567890");
+          const result = rule.validate(request, fieldId);
+          expect(result).toBe(false);
+        });
+
+        test("fiscalNumber of non-matching length", () => {
+          const request = new PaymentRequest();
+          request.setPaymentProduct(product);
+          request.setValue(fieldId, "");
+          request.setValue(fiscalNumberFieldId, "123456789");
+          const result = rule.validate(request, fieldId);
+          expect(result).toBe(true);
+        });
       });
 
-      test("fiscalNumber empty", () => {
-        const request = new PaymentRequest();
-        request.setPaymentProduct(product);
-        request.setValue(fieldId, "");
-        request.setValue(fiscalNumberFieldId, "");
-        const result = rule.validate(request, fieldId);
-        expect(result).toBe(true);
-      });
+      describe("validating value", () => {
+        test("fiscalNumber missing", () => {
+          const result = rule.validateValue("");
+          expect(result).toBe(true);
+        });
 
-      test("fiscalNumber of matching length", () => {
-        const request = new PaymentRequest();
-        request.setPaymentProduct(product);
-        request.setValue(fieldId, "");
-        request.setValue(fiscalNumberFieldId, "1234567890");
-        const result = rule.validate(request, fieldId);
-        expect(result).toBe(false);
-      });
+        test("fiscalNumber empty", () => {
+          const result = rule.validateValue("", "");
+          expect(result).toBe(true);
+        });
 
-      test("fiscalNumber of non-matching length", () => {
-        const request = new PaymentRequest();
-        request.setPaymentProduct(product);
-        request.setValue(fieldId, "");
-        request.setValue(fiscalNumberFieldId, "123456789");
-        const result = rule.validate(request, fieldId);
-        expect(result).toBe(true);
+        test("fiscalNumber of matching length", () => {
+          const result = rule.validateValue("", "1234567890");
+          expect(result).toBe(false);
+        });
+
+        test("fiscalNumber of non-matching length", () => {
+          const result = rule.validateValue("", "123456789");
+          expect(result).toBe(true);
+        });
       });
     });
 
     describe("non-empty value", () => {
-      test("fiscalNumber missing", () => {
-        const request = new PaymentRequest();
-        request.setPaymentProduct(product);
-        request.setValue(fieldId, "foo");
-        const result = rule.validate(request, fieldId);
-        expect(result).toBe(true);
+      describe("validating PaymentRequest", () => {
+        test("fiscalNumber missing", () => {
+          const request = new PaymentRequest();
+          request.setPaymentProduct(product);
+          request.setValue(fieldId, "foo");
+          const result = rule.validate(request, fieldId);
+          expect(result).toBe(true);
+        });
+
+        test("fiscalNumber empty", () => {
+          const request = new PaymentRequest();
+          request.setPaymentProduct(product);
+          request.setValue(fieldId, "foo");
+          request.setValue(fiscalNumberFieldId, "");
+          const result = rule.validate(request, fieldId);
+          expect(result).toBe(true);
+        });
+
+        test("fiscalNumber of matching length", () => {
+          const request = new PaymentRequest();
+          request.setPaymentProduct(product);
+          request.setValue(fieldId, "foo");
+          request.setValue(fiscalNumberFieldId, "1234567890");
+          const result = rule.validate(request, fieldId);
+          expect(result).toBe(true);
+        });
+
+        test("fiscalNumber of non-matching length", () => {
+          const request = new PaymentRequest();
+          request.setPaymentProduct(product);
+          request.setValue(fieldId, "foo");
+          request.setValue(fiscalNumberFieldId, "123456789");
+          const result = rule.validate(request, fieldId);
+          expect(result).toBe(true);
+        });
       });
 
-      test("fiscalNumber empty", () => {
-        const request = new PaymentRequest();
-        request.setPaymentProduct(product);
-        request.setValue(fieldId, "foo");
-        request.setValue(fiscalNumberFieldId, "");
-        const result = rule.validate(request, fieldId);
-        expect(result).toBe(true);
-      });
+      describe("validating string", () => {
+        test("fiscalNumber not provided", () => {
+          const result = rule.validateValue("foo");
+          expect(result).toBe(true);
+        });
 
-      test("fiscalNumber of matching length", () => {
-        const request = new PaymentRequest();
-        request.setPaymentProduct(product);
-        request.setValue(fieldId, "foo");
-        request.setValue(fiscalNumberFieldId, "1234567890");
-        const result = rule.validate(request, fieldId);
-        expect(result).toBe(true);
-      });
+        test("fiscalNumber empty", () => {
+          const result = rule.validateValue("foo", "");
+          expect(result).toBe(true);
+        });
 
-      test("fiscalNumber of non-matching length", () => {
-        const request = new PaymentRequest();
-        request.setPaymentProduct(product);
-        request.setValue(fieldId, "foo");
-        request.setValue(fiscalNumberFieldId, "123456789");
-        const result = rule.validate(request, fieldId);
-        expect(result).toBe(true);
+        test("fiscalNumber of matching length", () => {
+          const result = rule.validateValue("foo", "1234567890");
+          expect(result).toBe(true);
+        });
+
+        test("fiscalNumber of non-matching length", () => {
+          const result = rule.validateValue("foo", "123456789");
+          expect(result).toBe(true);
+        });
       });
     });
   });

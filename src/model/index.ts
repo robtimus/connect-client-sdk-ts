@@ -637,6 +637,13 @@ export interface SingleValueValidationRule extends ValidationRule {
 export interface ValidationRuleBoletoBancarioRequiredness extends ValidationRule {
   readonly id: "boletoBancarioRequiredness";
   readonly fiscalNumberLength: number;
+  /**
+   * Validates a single value.
+   * @param value The value to validate.
+   * @param fiscalNumber The fiscal number that is used to determine whether or not this validation rule applies.
+   * @returns True if the value is valid for the given fiscal number, or false otherwise.
+   */
+  validateValue(value: string, fiscalNumber?: string): boolean;
 }
 
 export interface ValidationRuleEmailAddress extends SingleValueValidationRule {

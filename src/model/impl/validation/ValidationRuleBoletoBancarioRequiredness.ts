@@ -12,14 +12,22 @@ class ValidationRuleBoletoBancarioRequirednessImpl implements ValidationRuleBole
   }
 
   validate(request: PaymentRequest, fieldId: string): boolean {
+    const value = request.getValue(fieldId);
     const fiscalNumber = request.getUnmaskedValue("fiscalNumber");
+    return this.validateValueAgainstFiscalNumber(value, fiscalNumber);
+  }
+
+  validateValue(value: string, fiscalNumber?: string): boolean {
+    return this.validateValueAgainstFiscalNumber(value, fiscalNumber);
+  }
+
+  private validateValueAgainstFiscalNumber(value: string | undefined, fiscalNumber?: string): boolean {
     const fiscalNumberLength = fiscalNumber?.length || 0;
     if (fiscalNumberLength !== this.fiscalNumberLength) {
       // The field is not required for Boleto; allow anything
       return true;
     }
 
-    const value = request.getValue(fieldId);
     return !!value;
   }
 }

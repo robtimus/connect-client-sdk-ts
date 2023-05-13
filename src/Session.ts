@@ -273,7 +273,7 @@ export class Session {
    * @param useGroups True to include payment product groups, or false to only include payment products.
    * @returns A promise containing the available payment items.
    */
-  async getBasicPaymentItems(useGroups: boolean): Promise<BasicPaymentItems> {
+  async getBasicPaymentItems(useGroups = true): Promise<BasicPaymentItems> {
     if (useGroups) {
       const [products, groups] = await Promise.all([this.getBasicPaymentProducts(), this.getBasicPaymentProductGroups()]);
       return toBasicPaymentItems(products, groups);

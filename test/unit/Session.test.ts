@@ -686,7 +686,7 @@ describe("Session", () => {
               body: JSON.parse(JSON.stringify(groups)),
             });
           const session = new Session(sessionDetails, fullPaymentContext, device);
-          const result = await session.getBasicPaymentItems(true);
+          const result = await session.getBasicPaymentItems();
           expect(result.paymentItems).toHaveLength(3);
           expect(result.paymentItems[0].id).toBe("cards");
           expect(result.paymentItems[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/cards.png`);
@@ -714,7 +714,7 @@ describe("Session", () => {
             })
             .mockGooglePayClient(true);
           const session = new Session(sessionDetails, fullPaymentContext, device);
-          const result = await session.getBasicPaymentItems(true);
+          const result = await session.getBasicPaymentItems();
           expect(result.paymentItems).toHaveLength(4);
           expect(result.paymentItems[0].id).toBe("cards");
           expect(result.paymentItems[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/cards.png`);
@@ -745,7 +745,7 @@ describe("Session", () => {
             })
             .mockApplePayClient(true);
           const session = new Session(sessionDetails, fullPaymentContext, device);
-          const result = await session.getBasicPaymentItems(true);
+          const result = await session.getBasicPaymentItems();
           expect(result.paymentItems).toHaveLength(4);
           expect(result.paymentItems[0].id).toBe("cards");
           expect(result.paymentItems[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/cards.png`);
@@ -778,7 +778,7 @@ describe("Session", () => {
               .mockApplePayClient(true)
               .mockGooglePayClient(true);
             const session = new Session(sessionDetails, minimalPaymentContext, device);
-            const result = await session.getBasicPaymentItems(true);
+            const result = await session.getBasicPaymentItems();
             expect(result.paymentItems).toHaveLength(3);
             expect(result.paymentItems[0].id).toBe("cards");
             expect(result.paymentItems[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/cards.png`);
@@ -807,7 +807,7 @@ describe("Session", () => {
               .mockApplePayClient(true)
               .mockGooglePayClient(true);
             const session = new Session(sessionDetails, fullPaymentContext, device);
-            const result = await session.getBasicPaymentItems(true);
+            const result = await session.getBasicPaymentItems();
             expect(result.paymentItems).toHaveLength(5);
             expect(result.paymentItems[0].id).toBe("cards");
             expect(result.paymentItems[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/cards.png`);
@@ -839,7 +839,7 @@ describe("Session", () => {
         const session = new Session(sessionDetails, minimalPaymentContext, device);
         const onSuccess = jest.fn();
         const result = await session
-          .getBasicPaymentItems(true)
+          .getBasicPaymentItems()
           .then(onSuccess)
           .catch((reason) => reason);
         expect(onSuccess).not.toBeCalled();
@@ -856,7 +856,7 @@ describe("Session", () => {
         const session = new Session(sessionDetails, minimalPaymentContext, device);
         const onSuccess = jest.fn();
         const result = await session
-          .getBasicPaymentItems(true)
+          .getBasicPaymentItems()
           .then(onSuccess)
           .catch((reason) => reason);
         expect(onSuccess).not.toBeCalled();
@@ -876,8 +876,8 @@ describe("Session", () => {
             body: JSON.parse(JSON.stringify(groups)),
           });
         const session = new Session(sessionDetails, minimalPaymentContext, device);
-        const result1 = await session.getBasicPaymentItems(true);
-        const result2 = await session.getBasicPaymentItems(true);
+        const result1 = await session.getBasicPaymentItems();
+        const result2 = await session.getBasicPaymentItems();
         expect(result2).toStrictEqual(result1);
         expect(device.capturedRequests()).toHaveLength(2);
       });

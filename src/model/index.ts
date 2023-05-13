@@ -164,6 +164,12 @@ export interface AccountOnFile {
    * @throws If there is no such attribute.
    */
   getAttributeDisplayValue(key: string): string;
+  /**
+   * Checks whether or not an attribute should be read-only.
+   * @param key The key of the attribute to check.
+   * @return True if the given attribute should be readonly, or false if there is no such attribute, or if it can be edited.
+   */
+  isReadOnlyAttribute(key: string): boolean;
 }
 
 export interface AccountOnFileAttribute extends KeyValuePair {

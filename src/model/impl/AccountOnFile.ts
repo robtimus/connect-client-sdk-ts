@@ -60,6 +60,11 @@ class AccountOnFileImpl implements AccountOnFile {
     }
     return applyMask(wildcardMask, attribute.value).formattedValue;
   }
+
+  isReadOnlyAttribute(key: string): boolean {
+    const attribute = this.findAttribute(key);
+    return !!attribute && attribute.status === "READ_ONLY";
+  }
 }
 
 Object.freeze(AccountOnFileImpl.prototype);

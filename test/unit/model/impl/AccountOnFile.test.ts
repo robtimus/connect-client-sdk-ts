@@ -13,9 +13,15 @@ const json: api.AccountOnFile = {
       status: "READ_ONLY",
     },
     {
+      key: "cardholderName",
+      value: "John Doe",
+      status: "CAN_WRITE",
+    },
+    {
       key: "expirationDate",
       value: "12**",
-      status: "CAN_WRITE",
+      status: "MUST_WRITE",
+      mustWriteReason: "EXPIRED",
     },
   ],
   displayHints: {
@@ -50,7 +56,7 @@ describe("toAccountOnFile", () => {
 
     test("matching", () => {
       const result = accountOnFile.findAttribute("expirationDate");
-      expect(result).toBe(accountOnFile.attributes[1]);
+      expect(result).toBe(accountOnFile.attributes[2]);
     });
   });
 
@@ -61,7 +67,7 @@ describe("toAccountOnFile", () => {
 
     test("matching", () => {
       const result = accountOnFile.getAttribute("expirationDate");
-      expect(result).toBe(accountOnFile.attributes[1]);
+      expect(result).toBe(accountOnFile.attributes[2]);
     });
   });
 
@@ -115,6 +121,29 @@ describe("toAccountOnFile", () => {
     test("with wildcard mask", () => {
       const result = accountOnFile.getAttributeDisplayValue("expirationDate");
       expect(result).toBe("12-**");
+    });
+
+    test("combined", () => {
+      const result = accountOnFile.displayHints.labelTemplate.map((e) => accountOnFile.getAttributeDisplayValue(e.attributeKey)).join(" ");
+      expect(result).toBe("12-**");
+    });
+  });
+
+  describe("isReadOnlyAttribute", () => {
+    test("non-matching attribute", () => {
+      expect(accountOnFile.isReadOnlyAttribute("foo")).toBe(false);
+    });
+
+    test("read-only attribute", () => {
+      expect(accountOnFile.isReadOnlyAttribute("cardNumber")).toBe(true);
+    });
+
+    test("can-write attribute", () => {
+      expect(accountOnFile.isReadOnlyAttribute("cardholderName")).toBe(false);
+    });
+
+    test("must-write attribute", () => {
+      expect(accountOnFile.isReadOnlyAttribute("expirationDate")).toBe(false);
     });
   });
 });

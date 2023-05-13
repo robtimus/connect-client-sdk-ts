@@ -50,8 +50,8 @@ describe("Google Pay", () => {
   const mocks = Mocks.global();
 
   const googlePaySpecificInput: GooglePaySpecificInput = {
-    gatewayMerchantId: "GMID",
-    merchantId: "MID",
+    connectMerchantId: "CMID",
+    googlePayMerchantId: "GPMID",
     merchantName: "TEST",
   };
   const googlePaySpecificData: PaymentProduct320SpecificData = {
@@ -181,7 +181,7 @@ describe("Google Pay", () => {
               type: "PAYMENT_GATEWAY",
               parameters: {
                 gateway: "GW",
-                gatewayMerchantId: "GMID",
+                gatewayMerchantId: "CMID",
               },
             },
           },
@@ -192,7 +192,7 @@ describe("Google Pay", () => {
           totalPriceStatus: "NOT_CURRENTLY_KNOWN",
         },
         merchantInfo: {
-          merchantId: "MID",
+          merchantId: "GPMID",
           merchantName: "TEST",
         },
       });
@@ -230,7 +230,7 @@ describe("Google Pay", () => {
               type: "PAYMENT_GATEWAY",
               parameters: {
                 gateway: "GW",
-                gatewayMerchantId: "GMID",
+                gatewayMerchantId: "CMID",
               },
             },
           },
@@ -242,7 +242,7 @@ describe("Google Pay", () => {
           totalPriceStatus: "FINAL",
         },
         merchantInfo: {
-          merchantId: "MID",
+          merchantId: "GPMID",
           merchantName: "TEST",
         },
       });

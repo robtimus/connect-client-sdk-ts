@@ -62,11 +62,11 @@ export interface GooglePaySpecificInput {
   /**
    * The ID of the merchant account with Google Pay. Used for Google Pay payment requests.
    */
-  readonly merchantId: string;
+  readonly googlePayMerchantId: string;
   /**
-   * Your Google Pay gateway merchant ID. Used for Google Pay payment requests.
+   * Your Connect merchant ID. Used for Google Pay payment requests.
    */
-  readonly gatewayMerchantId: string;
+  readonly connectMerchantId: string;
   /**
    * Your user visible merchant name. Used for Google Pay payment requests.
    * If not set, the Business name in your Google Pay Developer Profile will be used.

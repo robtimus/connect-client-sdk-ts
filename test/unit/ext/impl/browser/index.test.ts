@@ -106,8 +106,8 @@ describe("Browser", () => {
 
   describe("getGooglePayClient", () => {
     const googlePaySpecificInput: GooglePaySpecificInput = {
-      gatewayMerchantId: "GMID",
-      merchantId: "MID",
+      connectMerchantId: "CMID",
+      googlePayMerchantId: "GPMID",
     };
     const googlePaySpecificData: PaymentProduct320SpecificData = {
       gateway: "GW",

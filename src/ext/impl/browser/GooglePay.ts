@@ -35,7 +35,7 @@ function constructTokenizationSpecification(
     type: "PAYMENT_GATEWAY",
     parameters: {
       gateway: data.gateway,
-      gatewayMerchantId: input.gatewayMerchantId,
+      gatewayMerchantId: input.connectMerchantId,
     },
   };
 }
@@ -61,7 +61,7 @@ function constructPrefetchPaymentDataRequest(
   input: GooglePaySpecificInput,
   data: PaymentProduct320SpecificData,
   context: PaymentContext
-): google.payments.api.PaymentDataRequest | undefined {
+): google.payments.api.PaymentDataRequest {
   // The cast is necessary because the TypeScript definition incorrectly makes totalPrice required
   const transactionInfo = {
     currencyCode: context.amountOfMoney.currencyCode,
@@ -81,7 +81,7 @@ function constructPrefetchPaymentDataRequest(
     ],
     transactionInfo,
     merchantInfo: {
-      merchantId: input.merchantId,
+      merchantId: input.googlePayMerchantId,
       merchantName: input.merchantName,
     },
   };
@@ -109,7 +109,7 @@ function constructPaymentDataRequest(
       totalPriceStatus: "FINAL",
     },
     merchantInfo: {
-      merchantId: input.merchantId,
+      merchantId: input.googlePayMerchantId,
       merchantName: input.merchantName,
     },
   };
@@ -131,12 +131,7 @@ class GooglePayClientImpl implements GooglePayClient {
 
   async prefetchPaymentData(): Promise<void> {
     const request = constructPrefetchPaymentDataRequest(this.googlePaySpecificInput, this.googlePaySpecificData, this.context);
-    if (request) {
-      this.client.prefetchPaymentData(request);
-    }
-    console.warn(
-      `Prefetch Google payment data not triggered due to missing information. gatewayMerchantId: ${this.googlePaySpecificInput.gatewayMerchantId}`
-    );
+    this.client.prefetchPaymentData(request);
   }
 
   async createPayment(): Promise<google.payments.api.PaymentData> {

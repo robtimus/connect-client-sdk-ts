@@ -50,8 +50,8 @@ describe("Session", () => {
         forceBasicFlow: true,
       },
       googlePay: {
-        gatewayMerchantId: "GMID",
-        merchantId: "MID",
+        connectMerchantId: "CMID",
+        googlePayMerchantId: "GPMID",
         acquirerCountry: "GB",
         merchantName: "TEST",
       },

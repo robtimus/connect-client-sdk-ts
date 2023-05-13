@@ -503,6 +503,12 @@ export interface PaymentProductField {
    * @returns The result of removing the mask.
    */
   removeMask(value: string): string;
+  /**
+   * Validates this field for a payment request. It can retrieve the field's value, but also if necessary other values, from the payment request.
+   * @param request The request to validate a single field of.
+   * @returns A list of validation rule IDs that failed validation.
+   */
+  validatePaymentRequest(request: PaymentRequest): string[];
 }
 
 export interface PaymentProductFieldDataRestrictions {
@@ -610,7 +616,8 @@ export type ValidationResult = { valid: true } | { valid: false; errors: Validat
  */
 export interface ValidationRule {
   /**
-   * The validation rule ID. This can be used for the ruleId field of {@link ValidationError}s.
+   * The validation rule ID. This can be used for the ruleId field of {@link ValidationError}s,
+   * or the result of {@link PaymentProductField.validatePaymentRequest}.
    */
   readonly id: string;
   /**
@@ -619,7 +626,7 @@ export interface ValidationRule {
    * @param fieldId The ID of the field to validate.
    * @returns True if the field's value in the payment request is valid, or false otherwise.
    */
-  validate(request: PaymentRequest, fieldId: string): boolean;
+  validatePaymentRequest(request: PaymentRequest, fieldId: string): boolean;
 }
 
 /**
@@ -999,15 +1006,15 @@ export class PaymentRequest {
     }
     const errors: ValidationError[] = [];
     for (const fieldId in this.fieldValues) {
-      const rules = paymentProduct.findField(fieldId)?.dataRestrictions.validationRules || [];
-      rules
-        .filter((rule) => !rule.validate(this, fieldId))
-        .forEach((rule) =>
-          errors.push({
-            fieldId,
-            ruleId: rule.id,
-          })
+      const field = paymentProduct.findField(fieldId);
+      if (field) {
+        errors.push(
+          ...field.validatePaymentRequest(this).map((ruleId) => ({
+            fieldId: field.id,
+            ruleId,
+          }))
         );
+      }
     }
 
     const accountOnFile = this.accountOnFile;

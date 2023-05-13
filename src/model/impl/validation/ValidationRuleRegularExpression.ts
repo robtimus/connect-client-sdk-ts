@@ -13,7 +13,7 @@ class ValidationRuleRegularExpressionImpl implements ValidationRuleRegularExpres
     this.regexp = new RegExp(`^${this.regularExpression}$`);
   }
 
-  validate(request: PaymentRequest, fieldId: string): boolean {
+  validatePaymentRequest(request: PaymentRequest, fieldId: string): boolean {
     const value = request.getUnmaskedValue(fieldId);
     return !!value && this.validateValue(value);
   }

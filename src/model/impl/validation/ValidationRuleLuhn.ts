@@ -11,7 +11,7 @@ class ValidationRuleLuhnImpl implements ValidationRuleLuhn {
 
   readonly id = ValidationRuleLuhnImpl.ID;
 
-  validate(request: PaymentRequest, fieldId: string): boolean {
+  validatePaymentRequest(request: PaymentRequest, fieldId: string): boolean {
     const value = request.getUnmaskedValue(fieldId);
     return !!value && this.validateValue(value);
   }

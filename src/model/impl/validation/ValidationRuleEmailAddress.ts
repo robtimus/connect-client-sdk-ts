@@ -8,7 +8,7 @@ class ValidationRuleEmailAddressImpl implements ValidationRuleEmailAddress {
 
   readonly id = ValidationRuleEmailAddressImpl.ID;
 
-  validate(request: PaymentRequest, fieldId: string): boolean {
+  validatePaymentRequest(request: PaymentRequest, fieldId: string): boolean {
     const value = request.getUnmaskedValue(fieldId);
     return !!value && this.validateValue(value);
   }

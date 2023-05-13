@@ -13,7 +13,7 @@ class ValidationRuleLengthImpl implements ValidationRuleLength {
     this.maxLength = definition.maxLength;
   }
 
-  validate(request: PaymentRequest, fieldId: string): boolean {
+  validatePaymentRequest(request: PaymentRequest, fieldId: string): boolean {
     // Empty values are allowed if the minimal required length is 0
     const value = request.getUnmaskedValue(fieldId) || "";
     return this.validateValue(value);

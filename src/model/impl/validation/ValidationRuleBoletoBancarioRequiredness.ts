@@ -11,7 +11,7 @@ class ValidationRuleBoletoBancarioRequirednessImpl implements ValidationRuleBole
     this.fiscalNumberLength = definition.fiscalNumberLength;
   }
 
-  validate(request: PaymentRequest, fieldId: string): boolean {
+  validatePaymentRequest(request: PaymentRequest, fieldId: string): boolean {
     const value = request.getValue(fieldId);
     const fiscalNumber = request.getUnmaskedValue("fiscalNumber");
     return this.validateValueAgainstFiscalNumber(value, fiscalNumber);

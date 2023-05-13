@@ -1,4 +1,4 @@
-import { MaskedString, PaymentProductField, PaymentProductFieldDataRestrictions, PaymentProductFieldDisplayHints } from "..";
+import { MaskedString, PaymentProductField, PaymentProductFieldDataRestrictions, PaymentProductFieldDisplayHints, PaymentRequest } from "..";
 import * as api from "../../communicator/model";
 import { applyMask, removeMask } from "../../util/masking";
 import { toPaymentProductFieldDataRestrictions } from "./PaymentProductFieldDataRestrictions";
@@ -42,6 +42,11 @@ class PaymentProductFieldImpl implements PaymentProductField {
   removeMask(value: string): string {
     const mask = this.displayHints?.mask;
     return removeMask(mask, value);
+  }
+
+  validatePaymentRequest(request: PaymentRequest): string[] {
+    const rules = this.dataRestrictions.validationRules;
+    return rules.filter((rule) => !rule.validatePaymentRequest(request, this.id)).map((rule) => rule.id);
   }
 }
 

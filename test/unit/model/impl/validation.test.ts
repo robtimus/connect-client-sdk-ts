@@ -87,7 +87,7 @@ describe("validation", () => {
       test("fiscalNumber missing", () => {
         const request = new PaymentRequest();
         request.setPaymentProduct(product);
-        const result = rule.validate(request, fieldId);
+        const result = rule.validatePaymentRequest(request, fieldId);
         expect(result).toBe(true);
       });
 
@@ -95,7 +95,7 @@ describe("validation", () => {
         const request = new PaymentRequest();
         request.setPaymentProduct(product);
         request.setValue(fiscalNumberFieldId, "");
-        const result = rule.validate(request, fieldId);
+        const result = rule.validatePaymentRequest(request, fieldId);
         expect(result).toBe(true);
       });
 
@@ -103,7 +103,7 @@ describe("validation", () => {
         const request = new PaymentRequest();
         request.setPaymentProduct(product);
         request.setValue(fiscalNumberFieldId, "1234567890");
-        const result = rule.validate(request, fieldId);
+        const result = rule.validatePaymentRequest(request, fieldId);
         expect(result).toBe(false);
       });
 
@@ -111,7 +111,7 @@ describe("validation", () => {
         const request = new PaymentRequest();
         request.setPaymentProduct(product);
         request.setValue(fiscalNumberFieldId, "123456789");
-        const result = rule.validate(request, fieldId);
+        const result = rule.validatePaymentRequest(request, fieldId);
         expect(result).toBe(true);
       });
     });
@@ -122,7 +122,7 @@ describe("validation", () => {
           const request = new PaymentRequest();
           request.setPaymentProduct(product);
           request.setValue(fieldId, "");
-          const result = rule.validate(request, fieldId);
+          const result = rule.validatePaymentRequest(request, fieldId);
           expect(result).toBe(true);
         });
 
@@ -131,7 +131,7 @@ describe("validation", () => {
           request.setPaymentProduct(product);
           request.setValue(fieldId, "");
           request.setValue(fiscalNumberFieldId, "");
-          const result = rule.validate(request, fieldId);
+          const result = rule.validatePaymentRequest(request, fieldId);
           expect(result).toBe(true);
         });
 
@@ -140,7 +140,7 @@ describe("validation", () => {
           request.setPaymentProduct(product);
           request.setValue(fieldId, "");
           request.setValue(fiscalNumberFieldId, "1234567890");
-          const result = rule.validate(request, fieldId);
+          const result = rule.validatePaymentRequest(request, fieldId);
           expect(result).toBe(false);
         });
 
@@ -149,7 +149,7 @@ describe("validation", () => {
           request.setPaymentProduct(product);
           request.setValue(fieldId, "");
           request.setValue(fiscalNumberFieldId, "123456789");
-          const result = rule.validate(request, fieldId);
+          const result = rule.validatePaymentRequest(request, fieldId);
           expect(result).toBe(true);
         });
       });
@@ -183,7 +183,7 @@ describe("validation", () => {
           const request = new PaymentRequest();
           request.setPaymentProduct(product);
           request.setValue(fieldId, "foo");
-          const result = rule.validate(request, fieldId);
+          const result = rule.validatePaymentRequest(request, fieldId);
           expect(result).toBe(true);
         });
 
@@ -192,7 +192,7 @@ describe("validation", () => {
           request.setPaymentProduct(product);
           request.setValue(fieldId, "foo");
           request.setValue(fiscalNumberFieldId, "");
-          const result = rule.validate(request, fieldId);
+          const result = rule.validatePaymentRequest(request, fieldId);
           expect(result).toBe(true);
         });
 
@@ -201,7 +201,7 @@ describe("validation", () => {
           request.setPaymentProduct(product);
           request.setValue(fieldId, "foo");
           request.setValue(fiscalNumberFieldId, "1234567890");
-          const result = rule.validate(request, fieldId);
+          const result = rule.validatePaymentRequest(request, fieldId);
           expect(result).toBe(true);
         });
 
@@ -210,7 +210,7 @@ describe("validation", () => {
           request.setPaymentProduct(product);
           request.setValue(fieldId, "foo");
           request.setValue(fiscalNumberFieldId, "123456789");
-          const result = rule.validate(request, fieldId);
+          const result = rule.validatePaymentRequest(request, fieldId);
           expect(result).toBe(true);
         });
       });
@@ -245,7 +245,7 @@ describe("validation", () => {
     test("missing value", () => {
       const request = new PaymentRequest();
       request.setPaymentProduct(product);
-      const result = rule.validate(request, fieldId);
+      const result = rule.validatePaymentRequest(request, fieldId);
       expect(result).toBe(false);
     });
 
@@ -253,7 +253,7 @@ describe("validation", () => {
       const request = new PaymentRequest();
       request.setPaymentProduct(product);
       request.setValue(fieldId, "");
-      const result = rule.validate(request, fieldId);
+      const result = rule.validatePaymentRequest(request, fieldId);
       expect(result).toBe(false);
     });
 
@@ -262,7 +262,7 @@ describe("validation", () => {
         const request = new PaymentRequest();
         request.setPaymentProduct(product);
         request.setValue(fieldId, value);
-        const result = rule.validate(request, fieldId);
+        const result = rule.validatePaymentRequest(request, fieldId);
         expect(result).toBe(true);
       });
     });
@@ -272,7 +272,7 @@ describe("validation", () => {
         const request = new PaymentRequest();
         request.setPaymentProduct(product);
         request.setValue(fieldId, value);
-        const result = rule.validate(request, fieldId);
+        const result = rule.validatePaymentRequest(request, fieldId);
         expect(result).toBe(false);
       });
     });
@@ -284,7 +284,7 @@ describe("validation", () => {
     test("missing value", () => {
       const request = new PaymentRequest();
       request.setPaymentProduct(product);
-      const result = rule.validate(request, fieldId);
+      const result = rule.validatePaymentRequest(request, fieldId);
       expect(result).toBe(false);
     });
 
@@ -292,7 +292,7 @@ describe("validation", () => {
       const request = new PaymentRequest();
       request.setPaymentProduct(product);
       request.setValue(fieldId, "");
-      const result = rule.validate(request, fieldId);
+      const result = rule.validatePaymentRequest(request, fieldId);
       expect(result).toBe(false);
     });
 
@@ -303,7 +303,7 @@ describe("validation", () => {
           const request = new PaymentRequest();
           request.setPaymentProduct(product);
           request.setValue(fieldId, dateFormat(date, format));
-          const result = rule.validate(request, fieldId);
+          const result = rule.validatePaymentRequest(request, fieldId);
           expect(result).toBe(true);
         });
       });
@@ -315,7 +315,7 @@ describe("validation", () => {
           const request = new PaymentRequest();
           request.setPaymentProduct(product);
           request.setValue(fieldId, dateFormat(date, format));
-          const result = rule.validate(request, fieldId);
+          const result = rule.validatePaymentRequest(request, fieldId);
           expect(result).toBe(true);
         });
       });
@@ -327,7 +327,7 @@ describe("validation", () => {
       const request = new PaymentRequest();
       request.setPaymentProduct(product);
       request.setValue(fieldId, dateFormat(date, "mmyy"));
-      const result = rule.validate(request, fieldId);
+      const result = rule.validatePaymentRequest(request, fieldId);
       expect(result).toBe(false);
     });
 
@@ -337,7 +337,7 @@ describe("validation", () => {
       const request = new PaymentRequest();
       request.setPaymentProduct(product);
       request.setValue(fieldId, dateFormat(date, "mmyy"));
-      const result = rule.validate(request, fieldId);
+      const result = rule.validatePaymentRequest(request, fieldId);
       expect(result).toBe(false);
     });
 
@@ -346,7 +346,7 @@ describe("validation", () => {
         const request = new PaymentRequest();
         request.setPaymentProduct(product);
         request.setValue(fieldId, value);
-        const result = rule.validate(request, fieldId);
+        const result = rule.validatePaymentRequest(request, fieldId);
         expect(result).toBe(false);
       });
     });
@@ -360,7 +360,7 @@ describe("validation", () => {
     test("missing value", () => {
       const request = new PaymentRequest();
       request.setPaymentProduct(product);
-      const result = rule.validate(request, fieldId);
+      const result = rule.validatePaymentRequest(request, fieldId);
       expect(result).toBe(false);
     });
 
@@ -368,7 +368,7 @@ describe("validation", () => {
       const request = new PaymentRequest();
       request.setPaymentProduct(product);
       request.setValue(fieldId, "");
-      const result = rule.validate(request, fieldId);
+      const result = rule.validatePaymentRequest(request, fieldId);
       expect(result).toBe(false);
     });
 
@@ -377,7 +377,7 @@ describe("validation", () => {
         const request = new PaymentRequest();
         request.setPaymentProduct(product);
         request.setValue(fieldId, value);
-        const result = rule.validate(request, fieldId);
+        const result = rule.validatePaymentRequest(request, fieldId);
         expect(result).toBe(true);
       });
     });
@@ -387,7 +387,7 @@ describe("validation", () => {
         const request = new PaymentRequest();
         request.setPaymentProduct(product);
         request.setValue(fieldId, value);
-        const result = rule.validate(request, fieldId);
+        const result = rule.validatePaymentRequest(request, fieldId);
         expect(result).toBe(false);
       });
     });
@@ -399,7 +399,7 @@ describe("validation", () => {
     test("missing value", () => {
       const request = new PaymentRequest();
       request.setPaymentProduct(product);
-      const result = rule.validate(request, fieldId);
+      const result = rule.validatePaymentRequest(request, fieldId);
       expect(result).toBe(false);
     });
 
@@ -407,7 +407,7 @@ describe("validation", () => {
       const request = new PaymentRequest();
       request.setPaymentProduct(product);
       request.setValue(fieldId, "");
-      const result = rule.validate(request, fieldId);
+      const result = rule.validatePaymentRequest(request, fieldId);
       expect(result).toBe(false);
     });
 
@@ -415,7 +415,7 @@ describe("validation", () => {
       const request = new PaymentRequest();
       request.setPaymentProduct(product);
       request.setValue(fieldId, "GB33BUKB20201555555555");
-      const result = rule.validate(request, fieldId);
+      const result = rule.validatePaymentRequest(request, fieldId);
       expect(result).toBe(true);
     });
 
@@ -424,7 +424,7 @@ describe("validation", () => {
         const request = new PaymentRequest();
         request.setPaymentProduct(product);
         request.setValue(fieldId, value);
-        const result = rule.validate(request, fieldId);
+        const result = rule.validatePaymentRequest(request, fieldId);
         expect(result).toBe(false);
       });
     });
@@ -444,14 +444,14 @@ describe("validation", () => {
       test("minLength > 0", () => {
         const request = new PaymentRequest();
         request.setPaymentProduct(product);
-        const result = rule.validate(request, fieldId);
+        const result = rule.validatePaymentRequest(request, fieldId);
         expect(result).toBe(false);
       });
 
       test("minLength === 0", () => {
         const request = new PaymentRequest();
         request.setPaymentProduct(product);
-        const result = ruleAllowingEmpty.validate(request, fieldId);
+        const result = ruleAllowingEmpty.validatePaymentRequest(request, fieldId);
         expect(result).toBe(true);
       });
     });
@@ -461,7 +461,7 @@ describe("validation", () => {
         const request = new PaymentRequest();
         request.setPaymentProduct(product);
         request.setValue(fieldId, "");
-        const result = rule.validate(request, fieldId);
+        const result = rule.validatePaymentRequest(request, fieldId);
         expect(result).toBe(false);
       });
 
@@ -469,7 +469,7 @@ describe("validation", () => {
         const request = new PaymentRequest();
         request.setPaymentProduct(product);
         request.setValue(fieldId, "");
-        const result = ruleAllowingEmpty.validate(request, fieldId);
+        const result = ruleAllowingEmpty.validatePaymentRequest(request, fieldId);
         expect(result).toBe(true);
       });
     });
@@ -479,7 +479,7 @@ describe("validation", () => {
         const request = new PaymentRequest();
         request.setPaymentProduct(product);
         request.setValue(fieldId, value);
-        const result = rule.validate(request, fieldId);
+        const result = rule.validatePaymentRequest(request, fieldId);
         expect(result).toBe(true);
       });
     });
@@ -489,7 +489,7 @@ describe("validation", () => {
         const request = new PaymentRequest();
         request.setPaymentProduct(product);
         request.setValue(fieldId, value);
-        const result = rule.validate(request, fieldId);
+        const result = rule.validatePaymentRequest(request, fieldId);
         expect(result).toBe(false);
       });
     });
@@ -501,7 +501,7 @@ describe("validation", () => {
     test("missing value", () => {
       const request = new PaymentRequest();
       request.setPaymentProduct(product);
-      const result = rule.validate(request, fieldId);
+      const result = rule.validatePaymentRequest(request, fieldId);
       expect(result).toBe(false);
     });
 
@@ -509,7 +509,7 @@ describe("validation", () => {
       const request = new PaymentRequest();
       request.setPaymentProduct(product);
       request.setValue(fieldId, "");
-      const result = rule.validate(request, fieldId);
+      const result = rule.validatePaymentRequest(request, fieldId);
       expect(result).toBe(false);
     });
 
@@ -517,7 +517,7 @@ describe("validation", () => {
       const request = new PaymentRequest();
       request.setPaymentProduct(product);
       request.setValue(fieldId, "4242424242424242");
-      const result = rule.validate(request, fieldId);
+      const result = rule.validatePaymentRequest(request, fieldId);
       expect(result).toBe(true);
     });
 
@@ -525,7 +525,7 @@ describe("validation", () => {
       const request = new PaymentRequest();
       request.setPaymentProduct(product);
       request.setValue(fieldId, "1142424242424242");
-      const result = rule.validate(request, fieldId);
+      const result = rule.validatePaymentRequest(request, fieldId);
       expect(result).toBe(false);
     });
   });
@@ -539,7 +539,7 @@ describe("validation", () => {
     test("missing value", () => {
       const request = new PaymentRequest();
       request.setPaymentProduct(product);
-      const result = rule.validate(request, fieldId);
+      const result = rule.validatePaymentRequest(request, fieldId);
       expect(result).toBe(false);
     });
 
@@ -547,7 +547,7 @@ describe("validation", () => {
       const request = new PaymentRequest();
       request.setPaymentProduct(product);
       request.setValue(fieldId, "");
-      const result = rule.validate(request, fieldId);
+      const result = rule.validatePaymentRequest(request, fieldId);
       expect(result).toBe(false);
     });
 
@@ -556,7 +556,7 @@ describe("validation", () => {
         const request = new PaymentRequest();
         request.setPaymentProduct(product);
         request.setValue(fieldId, value);
-        const result = rule.validate(request, fieldId);
+        const result = rule.validatePaymentRequest(request, fieldId);
         expect(result).toBe(true);
       });
 
@@ -571,7 +571,7 @@ describe("validation", () => {
         const request = new PaymentRequest();
         request.setPaymentProduct(product);
         request.setValue(fieldId, value);
-        const result = rule.validate(request, fieldId);
+        const result = rule.validatePaymentRequest(request, fieldId);
         expect(result).toBe(false);
       });
 
@@ -590,7 +590,7 @@ describe("validation", () => {
     test("missing value", () => {
       const request = new PaymentRequest();
       request.setPaymentProduct(product);
-      const result = rule.validate(request, fieldId);
+      const result = rule.validatePaymentRequest(request, fieldId);
       expect(result).toBe(false);
     });
 
@@ -598,7 +598,7 @@ describe("validation", () => {
       const request = new PaymentRequest();
       request.setPaymentProduct(product);
       request.setValue(fieldId, "");
-      const result = rule.validate(request, fieldId);
+      const result = rule.validatePaymentRequest(request, fieldId);
       expect(result).toBe(false);
     });
 
@@ -606,7 +606,7 @@ describe("validation", () => {
       const request = new PaymentRequest();
       request.setPaymentProduct(product);
       request.setValue(fieldId, "1234AB");
-      const result = rule.validate(request, fieldId);
+      const result = rule.validatePaymentRequest(request, fieldId);
       expect(result).toBe(true);
     });
 
@@ -615,7 +615,7 @@ describe("validation", () => {
         const request = new PaymentRequest();
         request.setPaymentProduct(product);
         request.setValue(fieldId, value);
-        const result = rule.validate(request, fieldId);
+        const result = rule.validatePaymentRequest(request, fieldId);
         expect(result).toBe(false);
       });
     });
@@ -627,7 +627,7 @@ describe("validation", () => {
     test("missing value", () => {
       const request = new PaymentRequest();
       request.setPaymentProduct(product);
-      const result = rule.validate(request, fieldId);
+      const result = rule.validatePaymentRequest(request, fieldId);
       expect(result).toBe(false);
     });
 
@@ -635,7 +635,7 @@ describe("validation", () => {
       const request = new PaymentRequest();
       request.setPaymentProduct(product);
       request.setValue(fieldId, "");
-      const result = rule.validate(request, fieldId);
+      const result = rule.validatePaymentRequest(request, fieldId);
       expect(result).toBe(false);
     });
 
@@ -653,7 +653,7 @@ describe("validation", () => {
         const request = new PaymentRequest();
         request.setPaymentProduct(product);
         request.setValue(fieldId, value);
-        const result = rule.validate(request, fieldId);
+        const result = rule.validatePaymentRequest(request, fieldId);
         expect(result).toBe(true);
       });
     });
@@ -676,7 +676,7 @@ describe("validation", () => {
         const request = new PaymentRequest();
         request.setPaymentProduct(product);
         request.setValue(fieldId, value);
-        const result = rule.validate(request, fieldId);
+        const result = rule.validatePaymentRequest(request, fieldId);
         expect(result).toBe(false);
       });
     });
@@ -688,7 +688,7 @@ describe("validation", () => {
     test("missing value", () => {
       const request = new PaymentRequest();
       request.setPaymentProduct(product);
-      const result = rule.validate(request, fieldId);
+      const result = rule.validatePaymentRequest(request, fieldId);
       expect(result).toBe(false);
     });
 
@@ -696,7 +696,7 @@ describe("validation", () => {
       const request = new PaymentRequest();
       request.setPaymentProduct(product);
       request.setValue(fieldId, "");
-      const result = rule.validate(request, fieldId);
+      const result = rule.validatePaymentRequest(request, fieldId);
       expect(result).toBe(false);
     });
 
@@ -705,7 +705,7 @@ describe("validation", () => {
         const request = new PaymentRequest();
         request.setPaymentProduct(product);
         request.setValue(fieldId, "true");
-        const result = rule.validate(request, fieldId);
+        const result = rule.validatePaymentRequest(request, fieldId);
         expect(result).toBe(true);
       });
 
@@ -720,7 +720,7 @@ describe("validation", () => {
         const request = new PaymentRequest();
         request.setPaymentProduct(product);
         request.setValue(fieldId, value);
-        const result = rule.validate(request, fieldId);
+        const result = rule.validatePaymentRequest(request, fieldId);
         expect(result).toBe(false);
       });
 

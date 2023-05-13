@@ -23,8 +23,8 @@ connectSdk.init({
 
 describe("session", () => {
   const device: Device = {
-    getPlatformIdentifier: () => process.env["OS"] + " Node.js/" + process.versions.node,
     getDeviceInformation: () => ({
+      platformIdentifier: process.env["OS"] + " Node.js/" + process.versions.node,
       colorDepth: 24,
       innerHeight: 1200,
       innerWidth: 1920,

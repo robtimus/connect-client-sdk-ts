@@ -19,18 +19,10 @@ describe("Browser", () => {
 
   afterEach(() => globalMocks.restore());
 
-  test("getPlatformIdentifier", () => {
-    globalMocks.mockIfNecessary("window", {
-      navigator: {
-        userAgent: "TestAgent",
-      },
-    });
-    expect(browser.getPlatformIdentifier()).toBe(window.navigator.userAgent);
-  });
-
   test("getDeviceInformation", () => {
     globalMocks.mockIfNecessary("window", {
       navigator: {
+        userAgent: "TestAgent",
         language: "en-GB",
         javaEnabled: () => false,
       },
@@ -43,6 +35,7 @@ describe("Browser", () => {
       innerWidth: 1920,
     });
     expect(browser.getDeviceInformation()).toStrictEqual({
+      platformIdentifier: window.navigator.userAgent,
       timezoneOffsetUtcMinutes: new Date().getTimezoneOffset(),
       locale: window.navigator.language,
       javaEnabled: window.navigator.javaEnabled(),

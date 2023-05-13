@@ -26,7 +26,7 @@ function createClientMetaInfo(device: Device): string {
   const deviceInformation = device.getDeviceInformation();
   const metadata: Metadata = {
     screenSize: `${deviceInformation.innerWidth}x${deviceInformation.innerHeight}`,
-    platformIdentifier: device.getPlatformIdentifier(),
+    platformIdentifier: deviceInformation.platformIdentifier,
     sdkIdentifier: sdkIdentifier,
     sdkCreator: "robtimus",
   };

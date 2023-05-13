@@ -19,10 +19,6 @@ import { HttpClient } from "./http";
  */
 export interface Device {
   /**
-   * @returns A string representing the platform and/or device.
-   */
-  getPlatformIdentifier(): string;
-  /**
    * @returns The necessary information about the device.
    */
   getDeviceInformation(): DeviceInformation;
@@ -58,6 +54,10 @@ export interface Device {
  * Object containing information on the device.
  */
 export interface DeviceInformation {
+  /**
+   * A string representing the platform and/or device.
+   */
+  readonly platformIdentifier: string;
   /**
    * The device's timezone offset from UTC, in minutes.
    */

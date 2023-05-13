@@ -15,12 +15,9 @@ import { newGooglePayClient } from "./GooglePay";
 class Browser implements Device {
   private readonly httpClient: HttpClient = isFetchAvailable() ? fetchHttpClient : xhrHttpClient;
 
-  getPlatformIdentifier(): string {
-    return window.navigator.userAgent;
-  }
-
   getDeviceInformation(): DeviceInformation {
     return {
+      platformIdentifier: window.navigator.userAgent,
       timezoneOffsetUtcMinutes: new Date().getTimezoneOffset(),
       locale: window.navigator.language,
       javaEnabled: window.navigator.javaEnabled(),

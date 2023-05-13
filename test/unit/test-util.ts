@@ -134,12 +134,9 @@ export class MockDevice implements Device {
   private applePayClient: Promise<ApplePayClient | undefined> = Promise.resolve(undefined);
   private googlePayClient: Promise<GooglePayClient | undefined> = Promise.resolve(undefined);
 
-  getPlatformIdentifier(): string {
-    return "MockDevice";
-  }
-
   getDeviceInformation(): DeviceInformation {
     return {
+      platformIdentifier: "MockDevice",
       timezoneOffsetUtcMinutes: 0,
       locale: "en-GB",
       javaEnabled: false,

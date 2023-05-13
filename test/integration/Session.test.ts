@@ -3,6 +3,7 @@
  */
 
 import * as connectSdk from "promiseful-connect-sdk";
+import { SessionResponse } from "connect-sdk-nodejs/lib/model/domain/sessions";
 import { PaymentContext, Session, SessionDetails } from "../../src";
 import { fetchHttpClient } from "../../src/ext/impl/http/fetch";
 import { Device } from "../../src/ext";
@@ -52,11 +53,15 @@ describe("session", () => {
     return `${config.apiEndpoint.scheme}://${config.apiEndpoint.host}${port}${url.substring(index)}`;
   }
 
+  type NoNulls<T> = {
+    [P in keyof T]: NonNullable<T[P]>;
+  };
+
   async function createSession(): Promise<Session> {
     const sessionDetails: SessionDetails = (await sessionResponse.then((response) => {
       response.clientApiUrl = replaceHost(response.clientApiUrl || "");
       return response;
-    })) as SessionDetails;
+    })) as NoNulls<Required<SessionResponse>>;
     return new Session(sessionDetails, paymentContext, device);
   }
 

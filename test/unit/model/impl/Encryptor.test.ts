@@ -62,27 +62,7 @@ describe("Encryptor", () => {
     usesRedirectionTo3rdParty: false,
   });
 
-  test("product not set", async () => {
-    const encryptor = newEncryptor(
-      clientSessionId,
-      publicKey,
-      {
-        randomString: jest.fn(),
-        encrypt: jest.fn(),
-      },
-      new MockDevice()
-    );
-    const request = new PaymentRequest();
-    const onSuccess = jest.fn();
-    const result = await encryptor
-      .encrypt(request)
-      .then(onSuccess)
-      .catch((reason) => reason);
-    expect(onSuccess).not.toBeCalled();
-    expect(result).toStrictEqual(new Error("no PaymentProduct set"));
-  });
-
-  test("validation fails", async () => {
+  test("not validated", async () => {
     const encryptor = newEncryptor(
       clientSessionId,
       publicKey,
@@ -100,7 +80,7 @@ describe("Encryptor", () => {
       .then(onSuccess)
       .catch((reason) => reason);
     expect(onSuccess).not.toBeCalled();
-    expect(result).toStrictEqual([{ fieldId: "expirationDate", ruleId: "required" }]);
+    expect(result).toStrictEqual(new Error("PaymentRequest has not been successfully validated"));
   });
 
   describe("success", () => {
@@ -128,6 +108,9 @@ describe("Encryptor", () => {
       const request = new PaymentRequest();
       request.setPaymentProduct(product);
       request.setValue("expirationDate", "1230");
+      expect(request.isValid()).toBe(false);
+      expect(request.validate().valid).toBe(true);
+      expect(request.isValid()).toBe(true);
       const input: EncryptInput = await encryptor.encrypt(request).then(JSON.parse);
       expect(input.keyId).toBe(publicKey.keyId);
       expect(input.publicKeyValue).toBe(publicKey.publicKey);
@@ -180,6 +163,9 @@ describe("Encryptor", () => {
       request.setAccountOnFile(product.accountsOnFile[0]);
       request.setValue("expirationDate", "1230");
       request.setTokenize(true);
+      expect(request.isValid()).toBe(false);
+      expect(request.validate().valid).toBe(true);
+      expect(request.isValid()).toBe(true);
       const input: EncryptInput = await encryptor.encrypt(request).then(JSON.parse);
       expect(input.keyId).toBe(publicKey.keyId);
       expect(input.publicKeyValue).toBe(publicKey.publicKey);

@@ -833,6 +833,7 @@ export class PaymentRequest {
   private paymentProduct?: PaymentProduct;
   private accountOnFile?: AccountOnFile;
   private tokenize = false;
+  private valid = false;
 
   /**
    * Returns the value for a field.
@@ -850,6 +851,7 @@ export class PaymentRequest {
    */
   setValue(fieldId: string, value: string): void {
     this.fieldValues[fieldId] = value;
+    this.valid = false;
   }
 
   /**
@@ -937,6 +939,7 @@ export class PaymentRequest {
    */
   setPaymentProduct(paymentProduct: PaymentProduct): void {
     this.paymentProduct = paymentProduct;
+    this.valid = false;
   }
 
   /**
@@ -957,6 +960,7 @@ export class PaymentRequest {
         .forEach((attribute) => delete this.fieldValues[attribute.key]);
     }
     this.accountOnFile = accountOnFile;
+    this.valid = false;
   }
 
   /**
@@ -973,6 +977,7 @@ export class PaymentRequest {
    */
   setTokenize(tokenize: boolean): void {
     this.tokenize = tokenize;
+    this.valid = false;
   }
 
   /**
@@ -1016,9 +1021,19 @@ export class PaymentRequest {
       }
     }
 
-    if (errors.length === 0) {
+    this.valid = errors.length === 0;
+
+    if (this.valid) {
       return { valid: true };
     }
     return { valid: false, errors };
+  }
+
+  /**
+   * Returns whether or not this payment request is valid, as determined by the last call to {@link validate}.\
+   * This payment request initially is not valid, and any update to this payment request (values, payment product, etc.) resets the validity.
+   */
+  isValid(): boolean {
+    return this.valid;
   }
 }

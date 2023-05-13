@@ -3194,6 +3194,9 @@ describe("Session", () => {
     request.setValue("expirationDate", "1230");
     request.setValue("cardNumber", "4242424242424242");
     request.setValue("cvv", "123");
+    expect(request.isValid()).toBe(false);
+    expect(request.validate().valid).toBe(true);
+    expect(request.isValid()).toBe(true);
     const payload = await encryptor.encrypt(request).then(JSON.parse);
     expect(payload).toHaveProperty("collectedDeviceInformation", {
       timezoneOffsetUtcMinutes: new Date().getTimezoneOffset(),

@@ -84,15 +84,11 @@ class EncryptorImpl implements Encryptor {
    * Encrypts a payment request.
    * @param paymentRequest The payment request to encrypt.
    * @returns A promise that contains the encrypted payment request.
-   * @throws If the payment request has no payment product set, or if the payment request is not valid.
+   * @throws If the payment request is not valid.
    */
   async encrypt(paymentRequest: PaymentRequest): Promise<string> {
-    if (!paymentRequest.getPaymentProduct()) {
-      throw new Error("no PaymentProduct set");
-    }
-    const validationResult = paymentRequest.validate();
-    if (!validationResult.valid) {
-      throw validationResult.errors;
+    if (!paymentRequest.isValid()) {
+      throw new Error("PaymentRequest has not been successfully validated");
     }
     const nonce = this.engine.randomString();
     const encryptedCustomerInput = createEncryptedCustomerInput(this.clientSessionId, nonce, paymentRequest, this.device);

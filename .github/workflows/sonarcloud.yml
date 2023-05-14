@@ -36,8 +36,10 @@ jobs:
           cache: 'npm'
       - name: Install packages
         run: npm ci
+      - name: Generate code
+        run: npm run generate
       - name: Run tests
-        run: npm run test:unit
+        run: npm run test
       - name: Read package.json
         run: |
           echo "projectName=`jq -r .name package.json | sed 's~@\(.*\)/~\1:~'`" >> $GITHUB_ENV
@@ -59,7 +61,7 @@ jobs:
             -Dsonar.links.issue=${{ env.projectBugUrl }}
             -Dsonar.links.scm=${{ env.projectRepositoryUrl }}
             -Dsonar.sources=src
-            -Dsonar.tests=__tests__
+            -Dsonar.tests=test
             -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info
       - name: SonarQube Quality Gate check
         uses: sonarsource/sonarqube-quality-gate-action@master

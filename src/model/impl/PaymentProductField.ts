@@ -26,7 +26,7 @@ class PaymentProductFieldImpl implements PaymentProductField {
     this.id = json.id;
     this.type = json.type;
     this.usedForLookup = json.usedForLookup;
-    this.inputType = json.displayHints && json.displayHints.obfuscate ? "password" : inputTypes[json.type] || json.type;
+    this.inputType = json.displayHints?.obfuscate ? "password" : inputTypes[json.type] || json.type;
   }
 
   applyMask(newValue: string, oldValue?: string): MaskedString {

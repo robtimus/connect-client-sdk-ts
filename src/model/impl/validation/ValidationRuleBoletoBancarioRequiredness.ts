@@ -22,7 +22,7 @@ class ValidationRuleBoletoBancarioRequirednessImpl implements ValidationRuleBole
   }
 
   private validateValueAgainstFiscalNumber(value: string | undefined, fiscalNumber?: string): boolean {
-    const fiscalNumberLength = fiscalNumber?.length || 0;
+    const fiscalNumberLength = fiscalNumber?.length ?? 0;
     if (fiscalNumberLength !== this.fiscalNumberLength) {
       // The field is not required for Boleto; allow anything
       return true;

@@ -65,7 +65,7 @@ function constructPrefetchPaymentDataRequest(
   // The cast is necessary because the TypeScript definition incorrectly makes totalPrice required
   const transactionInfo = {
     currencyCode: context.amountOfMoney.currencyCode,
-    countryCode: input.acquirerCountry || context.countryCode,
+    countryCode: input.acquirerCountry ?? context.countryCode,
     totalPriceStatus: "NOT_CURRENTLY_KNOWN",
   } as google.payments.api.TransactionInfo;
 
@@ -104,7 +104,7 @@ function constructPaymentDataRequest(
     ],
     transactionInfo: {
       currencyCode: context.amountOfMoney.currencyCode,
-      countryCode: input.acquirerCountry || context.countryCode,
+      countryCode: input.acquirerCountry ?? context.countryCode,
       totalPrice: formatAmount(context.amountOfMoney.amount),
       totalPriceStatus: "FINAL",
     },

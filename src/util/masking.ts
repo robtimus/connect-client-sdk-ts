@@ -11,7 +11,6 @@ function fillBuffer(index: number, offset: number, buffer: string[], tempMask: s
         buffer.push(tempMask[index]);
         offset--;
       } else {
-        // offset++;
         valuec.splice(index + offset, 1);
         index--;
       }

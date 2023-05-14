@@ -55,7 +55,7 @@ async function getValue<T>(cache: Record<string, unknown>, key: string, valueSup
     return (existing !== UNDEFINED_VALUE ? existing : undefined) as T;
   }
   const value = await valueSupplier();
-  cache[key] = value !== undefined ? value : UNDEFINED_VALUE;
+  cache[key] = value ?? UNDEFINED_VALUE;
   return value;
 }
 
@@ -82,7 +82,7 @@ function updateItem<T extends api.PaymentProduct | api.PaymentProductGroup>(item
 
   if (item.fields) {
     for (const field of item.fields) {
-      if (field.displayHints && field.displayHints.tooltip && field.displayHints.tooltip.image) {
+      if (field.displayHints?.tooltip?.image) {
         field.displayHints.tooltip.image = prefixWithAssetURL(field.displayHints.tooltip.image, assetURL);
       }
     }
@@ -411,10 +411,10 @@ export class Session {
     };
 
     if (filteredJson.paymentProducts.length === 0) {
-      throw {
+      return Promise.reject({
         message: "No payment products available",
         json: json,
-      };
+      });
     }
     return toBasicPaymentProducts(filteredJson);
   }
@@ -469,7 +469,7 @@ export class Session {
       if (available) {
         return toPaymentProduct(json);
       }
-      throw productNotFoundError();
+      return Promise.reject(productNotFoundError());
     }
     if (paymentProductId === PP_GOOGLE_PAY && this.paymentProductAvailability[paymentProductId] === undefined) {
       const available = await this.isGooglePayAvailable(json.paymentProduct320SpecificData);
@@ -478,11 +478,11 @@ export class Session {
       if (available) {
         return toPaymentProduct(json);
       }
-      throw productNotFoundError();
+      return Promise.reject(productNotFoundError());
     }
 
     if (this.paymentProductAvailability[paymentProductId] === false) {
-      throw productNotFoundError();
+      return Promise.reject(productNotFoundError());
     }
 
     return toPaymentProduct(json);

@@ -167,7 +167,7 @@ export class MockDevice implements Device {
     return this.mockMethod("POST", url, response, requestValidator);
   }
 
-  private mockMethod(method: string, url: string, response: HttpResponse, requestValidator?: RequestValidator): MockDevice {
+  private mockMethod(method: string, url: string, response: HttpResponse, requestValidator?: RequestValidator): this {
     const matcher = this.httpClient.matchers[method] || new RequestMatcher();
     this.httpClient.matchers[method] = matcher;
     matcher.handlers.push({
@@ -178,7 +178,7 @@ export class MockDevice implements Device {
     return this;
   }
 
-  mockApplePayClient(applePayClient?: true | "throw" | ApplePayClient): MockDevice {
+  mockApplePayClient(applePayClient?: true | "throw" | ApplePayClient): this {
     if (applePayClient === true) {
       this.applePayClient = Promise.resolve({
         createPayment: jest.fn(),
@@ -191,7 +191,7 @@ export class MockDevice implements Device {
     return this;
   }
 
-  mockGooglePayClient(googlePayClient?: true | "throw" | GooglePayClient): MockDevice {
+  mockGooglePayClient(googlePayClient?: true | "throw" | GooglePayClient): this {
     if (googlePayClient === true) {
       this.googlePayClient = Promise.resolve({
         createButton: jest.fn(),
@@ -216,7 +216,7 @@ export class Mocks {
 
   private constructor(private readonly o: object) {}
 
-  mock(name: string, value: unknown): Mocks {
+  mock(name: string, value: unknown): this {
     const oldValue = this.o[name];
     Object.defineProperty(this.o, name, {
       value,
@@ -226,7 +226,7 @@ export class Mocks {
     return this;
   }
 
-  mockIfNecessary(name: string, value: unknown): Mocks {
+  mockIfNecessary(name: string, value: unknown): this {
     const oldValue = this.o[name];
     if (oldValue === undefined) {
       this.mock(name, value);

@@ -24,7 +24,7 @@ function xhr(): XMLHttpRequest {
 }
 
 function toHttpResponse(request: XMLHttpRequest): HttpResponse {
-  const contentType = request.getResponseHeader("content-type") || undefined;
+  const contentType = request.getResponseHeader("content-type") ?? undefined;
   if (contentType && /json/.test(contentType)) {
     return {
       statusCode: request.status,

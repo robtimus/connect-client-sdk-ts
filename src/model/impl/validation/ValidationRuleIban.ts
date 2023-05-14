@@ -1,7 +1,7 @@
 import { PaymentRequest, ValidationRuleIban } from "../..";
 import * as api from "../../../communicator/model";
 
-const IBAN_REGEXP = /^[A-Z]{2}[0-9]{2}[A-Z0-9]{4}[0-9]{7}([A-Z0-9]?){0,16}$/;
+const IBAN_REGEXP = /^[A-Z]{2}\d{2}[A-Z0-9]{4}\d{7}[A-Z0-9]{0,16}$/;
 
 function moveFirstCharactersToEnd(value: string): string {
   return value.substring(4) + value.substring(0, 4);
@@ -37,7 +37,7 @@ class ValidationRuleIbanImpl implements ValidationRuleIban {
   }
 
   validateValue(value: string): boolean {
-    value = value.replace(/[^\d\w]+/g, "").toUpperCase();
+    value = value.replace(/[^\w]+/g, "").toUpperCase();
     if (!IBAN_REGEXP.test(value)) {
       return false;
     }

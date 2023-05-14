@@ -22,7 +22,7 @@ export class URLBuilder {
    * @param value The value for the query parameter.
    * @returns This URL builder object.
    */
-  queryParam(name: string, value?: string | number | boolean): URLBuilder {
+  queryParam(name: string, value?: string | number | boolean): this {
     if (value !== undefined) {
       this.queryString += `${this.queryStringSeparator}${name}=${value}`;
       this.queryStringSeparator = "&";
@@ -35,7 +35,7 @@ export class URLBuilder {
    * @param values The values for the query parameters.
    * @returns This URL builder object.
    */
-  queryParams(name: string, values?: string[] | number[] | boolean[]): URLBuilder {
+  queryParams(name: string, values?: string[] | number[] | boolean[]): this {
     if (values !== undefined) {
       for (const value of values) {
         this.queryString += `${this.queryStringSeparator}${name}=${value}`;

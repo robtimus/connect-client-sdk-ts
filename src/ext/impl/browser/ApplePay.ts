@@ -20,9 +20,9 @@ class ApplePayClientImpl implements ApplePayClient {
   ): Promise<ApplePayJS.ApplePayPaymentToken> {
     const paymentRequest: ApplePayJS.ApplePayPaymentRequest = {
       currencyCode: this.context.amountOfMoney.currencyCode,
-      countryCode: this.applePaySpecificInput.acquirerCountry || this.context.countryCode,
+      countryCode: this.applePaySpecificInput.acquirerCountry ?? this.context.countryCode,
       total: {
-        label: this.applePaySpecificInput.lineItem || this.applePaySpecificInput.merchantName,
+        label: this.applePaySpecificInput.lineItem ?? this.applePaySpecificInput.merchantName,
         amount: formatAmount(this.context.amountOfMoney.amount),
       },
       supportedNetworks: this.applePaySpecificData.networks,

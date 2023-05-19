@@ -3,8 +3,9 @@
  */
 
 import * as connectSdk from "promiseful-connect-sdk";
+import { CreatePaymentRequest } from "connect-sdk-nodejs/lib/model/domain/payment";
 import { SessionResponse } from "connect-sdk-nodejs/lib/model/domain/sessions";
-import { PaymentContext, Session, SessionDetails } from "../../src";
+import { PaymentContext, PaymentRequest, Session, SessionDetails } from "../../src";
 import { fetchHttpClient } from "../../src/ext/impl/http/fetch";
 import { Device } from "../../src/ext";
 
@@ -47,21 +48,12 @@ describe("session", () => {
     countryCode: "NL",
   };
 
-  function replaceHost(url: string): string {
-    const index = url.indexOf("/client");
-    const port = config.apiEndpoint.port === -1 ? "" : ":" + config.apiEndpoint.port;
-    return `${config.apiEndpoint.scheme}://${config.apiEndpoint.host}${port}${url.substring(index)}`;
-  }
-
   type NoNulls<T> = {
     [P in keyof T]: NonNullable<T[P]>;
   };
 
   async function createSession(): Promise<Session> {
-    const sessionDetails: SessionDetails = (await sessionResponse.then((response) => {
-      response.clientApiUrl = replaceHost(response.clientApiUrl || "");
-      return response;
-    })) as NoNulls<Required<SessionResponse>>;
+    const sessionDetails: SessionDetails = (await sessionResponse) as NoNulls<Required<SessionResponse>>;
     return new Session(sessionDetails, paymentContext, device);
   }
 
@@ -123,5 +115,47 @@ describe("session", () => {
         expect(result.errors[0].id).toBe("IIN_NOT_FOUND");
       }
     });
+  });
+
+  test("encryptor", async () => {
+    const session = await createSession();
+
+    const cardNumber = "4242424242424242";
+    const iinDetails = await session.getIINDetails(cardNumber);
+    expect(iinDetails.status).toBe("SUPPORTED");
+    // Add an if statement so TypeScript allows us to access properties that exist when status === SUPPORTED
+    if (iinDetails.status !== "SUPPORTED") {
+      return;
+    }
+    const product = await session.getPaymentProduct(iinDetails.paymentProductId);
+
+    const paymentRequest = new PaymentRequest();
+    paymentRequest.setPaymentProduct(product);
+    paymentRequest.setValue("cardNumber", cardNumber);
+    paymentRequest.setValue("expiryDate", "1230");
+    paymentRequest.setValue("cvv", "123");
+    paymentRequest.setValue("cardholderName", "John Doe");
+    expect(paymentRequest.validate().valid).toBe(true);
+
+    const encryptedCustomerInput = await session.getEncryptor().then((encryptor) => encryptor.encrypt(paymentRequest));
+
+    const createPaymentRequest: CreatePaymentRequest = {
+      encryptedCustomerInput,
+      order: {
+        amountOfMoney: paymentContext.amountOfMoney,
+        customer: {
+          billingAddress: {
+            countryCode: "NL",
+          },
+        },
+      },
+    };
+    // A 402 response is allowed; that means that the encryption / decryption mechanism works
+    try {
+      const createPaymentResult = await connectSdk.payments.create(config.merchantId, createPaymentRequest);
+      expect(createPaymentResult.payment?.id).toBeTruthy();
+    } catch (reason) {
+      expect(reason).toHaveProperty("status", 402);
+    }
   });
 });

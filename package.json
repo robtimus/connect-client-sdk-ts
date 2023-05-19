@@ -13,6 +13,7 @@
   ],
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
+  "umd:main": "lib/connect-client-sdk.umd.js",
   "browser": {
     "./lib/ext/impl/crypto/native-crypto.js": "./lib/ext/impl/crypto/native-crypto-browser.js"
   },
@@ -22,11 +23,12 @@
   },
   "scripts": {
     "generate": "node ./scripts/generate-metadata.ts",
-    "compile": "tsc",
+    "compile": "tsc --declaration",
+    "bundle": "microbundle -i lib/index.js -o lib/connect-client-sdk.js -f umd --target web",
     "lint": "eslint ./src --ext .ts",
     "format": "prettier --write \"**/*.+(json|ts|tsx)\"",
     "format:check": "prettier --check \"**/*.+(json|ts|tsx)\"",
-    "build": "npm run generate && npm run format:check && npm run lint && npm run compile",
+    "build": "npm run generate && npm run format:check && npm run lint && npm run compile && npm run bundle",
     "typedoc": "npm run generate && typedoc",
     "test": "jest --group=unit",
     "test:integration": "jest --group=integration",
@@ -55,6 +57,7 @@
     "jest-each": "^29.5.0",
     "jest-junit": "^15.0.0",
     "jest-runner-groups": "^2.2.0",
+    "microbundle": "^0.15.1",
     "mock-xmlhttprequest": "^8.2.0",
     "node-jose": "^2.2.0",
     "prettier": "^2.8.7",

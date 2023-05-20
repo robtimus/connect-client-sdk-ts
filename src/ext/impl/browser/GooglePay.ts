@@ -1,10 +1,10 @@
-import { GooglePayButtonOptions, GooglePayClient } from "../..";
-import { GooglePaySpecificInput, PaymentContext, PaymentProduct320SpecificData } from "../../../model";
+import { GooglePayButtonOptions, GooglePayClient, GooglePaySpecificData } from "../..";
+import { GooglePaySpecificInput, PaymentContext } from "../../../model";
 import { formatAmount } from "../../../util/amounts";
 
 function getPaymentsClient(
   googlePaySpecificInput: GooglePaySpecificInput,
-  googlePaySpecificData: PaymentProduct320SpecificData
+  googlePaySpecificData: GooglePaySpecificData
 ): google.payments.api.PaymentsClient | undefined {
   if (googlePaySpecificData.networks.length === 0) {
     console.warn("No Google Pay networks available");
@@ -20,7 +20,11 @@ function getPaymentsClient(
 const API_VERSION = 2;
 const API_VERSION_MINOR = 0;
 
-function constructCardParameters(data: PaymentProduct320SpecificData): google.payments.api.CardParameters {
+function determineCountryCode(input: GooglePaySpecificInput, data: GooglePaySpecificData, context: PaymentContext): string {
+  return data.acquirerCountry ?? input.transactionCountryCode ?? context.countryCode;
+}
+
+function constructCardParameters(data: GooglePaySpecificData): google.payments.api.CardParameters {
   return {
     allowedAuthMethods: ["PAN_ONLY", "CRYPTOGRAM_3DS"],
     allowedCardNetworks: data.networks as google.payments.api.CardNetwork[],
@@ -29,7 +33,7 @@ function constructCardParameters(data: PaymentProduct320SpecificData): google.pa
 
 function constructTokenizationSpecification(
   input: GooglePaySpecificInput,
-  data: PaymentProduct320SpecificData
+  data: GooglePaySpecificData
 ): google.payments.api.PaymentMethodTokenizationSpecification {
   return {
     type: "PAYMENT_GATEWAY",
@@ -40,7 +44,7 @@ function constructTokenizationSpecification(
   };
 }
 
-function constructAllowedPaymentMethods(data: PaymentProduct320SpecificData): google.payments.api.IsReadyToPayPaymentMethodSpecification[] {
+function constructAllowedPaymentMethods(data: GooglePaySpecificData): google.payments.api.IsReadyToPayPaymentMethodSpecification[] {
   return [
     {
       type: "CARD",
@@ -49,7 +53,7 @@ function constructAllowedPaymentMethods(data: PaymentProduct320SpecificData): go
   ];
 }
 
-function constructIsReadyToPayRequest(data: PaymentProduct320SpecificData): google.payments.api.IsReadyToPayRequest {
+function constructIsReadyToPayRequest(data: GooglePaySpecificData): google.payments.api.IsReadyToPayRequest {
   return {
     apiVersion: API_VERSION,
     apiVersionMinor: API_VERSION_MINOR,
@@ -59,13 +63,13 @@ function constructIsReadyToPayRequest(data: PaymentProduct320SpecificData): goog
 
 function constructPrefetchPaymentDataRequest(
   input: GooglePaySpecificInput,
-  data: PaymentProduct320SpecificData,
+  data: GooglePaySpecificData,
   context: PaymentContext
 ): google.payments.api.PaymentDataRequest {
   // The cast is necessary because the TypeScript definition incorrectly makes totalPrice required
   const transactionInfo = {
     currencyCode: context.amountOfMoney.currencyCode,
-    countryCode: input.acquirerCountry ?? context.countryCode,
+    countryCode: determineCountryCode(input, data, context),
     totalPriceStatus: "NOT_CURRENTLY_KNOWN",
   } as google.payments.api.TransactionInfo;
 
@@ -89,7 +93,7 @@ function constructPrefetchPaymentDataRequest(
 
 function constructPaymentDataRequest(
   input: GooglePaySpecificInput,
-  data: PaymentProduct320SpecificData,
+  data: GooglePaySpecificData,
   context: PaymentContext
 ): google.payments.api.PaymentDataRequest {
   return {
@@ -104,7 +108,7 @@ function constructPaymentDataRequest(
     ],
     transactionInfo: {
       currencyCode: context.amountOfMoney.currencyCode,
-      countryCode: input.acquirerCountry ?? context.countryCode,
+      countryCode: determineCountryCode(input, data, context),
       totalPrice: formatAmount(context.amountOfMoney.amount),
       totalPriceStatus: "FINAL",
     },
@@ -118,13 +122,13 @@ function constructPaymentDataRequest(
 class GooglePayClientImpl implements GooglePayClient {
   readonly #client: google.payments.api.PaymentsClient;
   readonly #googlePaySpecificInput: GooglePaySpecificInput;
-  readonly #googlePaySpecificData: PaymentProduct320SpecificData;
+  readonly #googlePaySpecificData: GooglePaySpecificData;
   readonly #context: PaymentContext;
 
   constructor(
     client: google.payments.api.PaymentsClient,
     googlePaySpecificInput: GooglePaySpecificInput,
-    googlePaySpecificData: PaymentProduct320SpecificData,
+    googlePaySpecificData: GooglePaySpecificData,
     context: PaymentContext
   ) {
     this.#client = client;
@@ -153,7 +157,7 @@ Object.freeze(GooglePayClientImpl.prototype);
 
 export async function newGooglePayClient(
   googlePaySpecificInput: GooglePaySpecificInput,
-  googlePaySpecificData: PaymentProduct320SpecificData,
+  googlePaySpecificData: GooglePaySpecificData,
   context: PaymentContext
 ): Promise<GooglePayClient | undefined> {
   const client = getPaymentsClient(googlePaySpecificInput, googlePaySpecificData);

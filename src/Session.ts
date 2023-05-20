@@ -1,6 +1,6 @@
 import { Communicator } from "./communicator";
 import * as api from "./communicator/model";
-import { ApplePayClient, Device, GooglePayButtonOptions, GooglePayClient } from "./ext";
+import { ApplePayClient, ApplePaySpecificData, Device, GooglePayButtonOptions, GooglePayClient, GooglePaySpecificData } from "./ext";
 import { CryptoEngine } from "./ext/crypto";
 import { HttpResponse } from "./ext/http";
 import { browser } from "./ext/impl/browser";
@@ -123,6 +123,19 @@ function productNotFoundError(): HttpResponse {
   };
 }
 
+interface ApplePayProduct {
+  id: number;
+  acquirerCountry?: string;
+  paymentProduct302SpecificData?: PaymentProduct302SpecificData;
+}
+
+function toApplePaySpecificData(applePayProduct: ApplePayProduct): ApplePaySpecificData {
+  if (applePayProduct.id !== PP_APPLE_PAY || !applePayProduct.paymentProduct302SpecificData) {
+    throw new Error("Not a valid Apple Pay product: " + JSON.stringify(applePayProduct));
+  }
+  return Object.assign({ acquirerCountry: applePayProduct.acquirerCountry }, applePayProduct.paymentProduct302SpecificData);
+}
+
 /**
  * A helper for working with Apple Pay.
  */
@@ -132,6 +145,19 @@ export interface ApplePayHelper {
    * @return A promise that contains the payment result.
    */
   createPayment(): Promise<ApplePayJS.ApplePayPaymentToken>;
+}
+
+interface GooglePayProduct {
+  id: number;
+  acquirerCountry?: string;
+  paymentProduct320SpecificData?: PaymentProduct320SpecificData;
+}
+
+function toGooglePaySpecificData(googlePayProduct: GooglePayProduct): GooglePaySpecificData {
+  if (googlePayProduct.id !== PP_GOOGLE_PAY || !googlePayProduct.paymentProduct320SpecificData) {
+    throw new Error("Not a valid Google Pay product: " + JSON.stringify(googlePayProduct));
+  }
+  return Object.assign({ acquirerCountry: googlePayProduct.acquirerCountry }, googlePayProduct.paymentProduct320SpecificData);
 }
 
 /**
@@ -400,8 +426,9 @@ export class Session {
     const checks: Promise<void>[] = [];
     const applePayProduct = json.paymentProducts.find((product) => product.id === PP_APPLE_PAY);
     if (applePayProduct && this.#paymentProductAvailability[applePayProduct.id] === undefined) {
+      const applePaySpecificData = toApplePaySpecificData(applePayProduct);
       checks.push(
-        this.isApplePayAvailable(applePayProduct.paymentProduct302SpecificData).then((result) => {
+        this.isApplePayAvailable(applePaySpecificData).then((result) => {
           this.#paymentProductAvailability[applePayProduct.id] = result;
           console.debug(`Apple Pay is available: ${result}`);
         })
@@ -409,8 +436,9 @@ export class Session {
     }
     const googlePayProduct = json.paymentProducts.find((product) => product.id === PP_GOOGLE_PAY);
     if (googlePayProduct && this.#paymentProductAvailability[googlePayProduct.id] === undefined) {
+      const googlePaySpecificData = toGooglePaySpecificData(googlePayProduct);
       checks.push(
-        this.isGooglePayAvailable(googlePayProduct.paymentProduct320SpecificData).then((result) => {
+        this.isGooglePayAvailable(googlePaySpecificData).then((result) => {
           this.#paymentProductAvailability[googlePayProduct.id] = result;
           console.debug(`Google Pay is available: ${result}`);
         })
@@ -475,7 +503,8 @@ export class Session {
     });
 
     if (paymentProductId === PP_APPLE_PAY && this.#paymentProductAvailability[paymentProductId] === undefined) {
-      const available = await this.isApplePayAvailable(json.paymentProduct302SpecificData);
+      const applePaySpecificData = toApplePaySpecificData(json);
+      const available = await this.isApplePayAvailable(applePaySpecificData);
       this.#paymentProductAvailability[paymentProductId] = available;
       console.debug(`Apple Pay is available: ${available}`);
       if (available) {
@@ -484,7 +513,8 @@ export class Session {
       return Promise.reject(productNotFoundError());
     }
     if (paymentProductId === PP_GOOGLE_PAY && this.#paymentProductAvailability[paymentProductId] === undefined) {
-      const available = await this.isGooglePayAvailable(json.paymentProduct320SpecificData);
+      const googlePaySpecificData = toGooglePaySpecificData(json);
+      const available = await this.isGooglePayAvailable(googlePaySpecificData);
       this.#paymentProductAvailability[paymentProductId] = available;
       console.debug(`Google Pay is available: ${available}`);
       if (available) {
@@ -690,10 +720,8 @@ export class Session {
    * @throws If the given product does not have the correct ID, or is missing the Apple Pay (302) specific data.
    */
   async ApplePay(applePayProduct: PaymentProduct | BasicPaymentProduct): Promise<ApplePayHelper> {
-    if (applePayProduct.id !== PP_APPLE_PAY || !applePayProduct.paymentProduct302SpecificData) {
-      throw new Error("Not a valid Apple Pay product: " + JSON.stringify(applePayProduct));
-    }
-    const client = await this.getApplePayClient(applePayProduct.paymentProduct302SpecificData);
+    const applePaySpecificData = toApplePaySpecificData(applePayProduct);
+    const client = await this.getApplePayClient(applePaySpecificData);
     if (!client) {
       throw new Error("Apple Pay is not available");
     }
@@ -702,7 +730,7 @@ export class Session {
     };
   }
 
-  private async getApplePayClient(applePaySpecificData?: PaymentProduct302SpecificData): Promise<ApplePayClient | undefined> {
+  private async getApplePayClient(applePaySpecificData?: ApplePaySpecificData): Promise<ApplePayClient | undefined> {
     const applePaySpecificInput = this.#paymentContext.paymentProductSpecificInputs?.applePay;
     if (!applePaySpecificInput || !applePaySpecificData) {
       return undefined;
@@ -713,7 +741,7 @@ export class Session {
     return getValue(this.#cache, cacheKey, () => this.#device.getApplePayClient(applePaySpecificInput, applePaySpecificData, this.#paymentContext));
   }
 
-  private async isApplePayAvailable(applePaySpecificData?: PaymentProduct302SpecificData): Promise<boolean> {
+  private async isApplePayAvailable(applePaySpecificData?: ApplePaySpecificData): Promise<boolean> {
     return this.getApplePayClient(applePaySpecificData)
       .then((client) => !!client)
       .catch((reason) => {
@@ -732,10 +760,8 @@ export class Session {
    * @throws If the given product does not have the correct ID, or is missing the Google Pay (320) specific data.
    */
   async GooglePay(googlePayProduct: PaymentProduct | BasicPaymentProduct): Promise<GooglePayHelper> {
-    if (googlePayProduct.id !== PP_GOOGLE_PAY || !googlePayProduct.paymentProduct320SpecificData) {
-      throw new Error("Not a valid Google Pay product: " + JSON.stringify(googlePayProduct));
-    }
-    const client = await this.getGooglePayClient(googlePayProduct.paymentProduct320SpecificData);
+    const googlePaySpecificData = toGooglePaySpecificData(googlePayProduct);
+    const client = await this.getGooglePayClient(googlePaySpecificData);
     if (!client) {
       throw new Error("Google Pay is not available");
     }
@@ -746,7 +772,7 @@ export class Session {
     };
   }
 
-  private async getGooglePayClient(googlePaySpecificData?: PaymentProduct320SpecificData): Promise<GooglePayClient | undefined> {
+  private async getGooglePayClient(googlePaySpecificData?: GooglePaySpecificData): Promise<GooglePayClient | undefined> {
     const googlePaySpecificInput = this.#paymentContext.paymentProductSpecificInputs?.googlePay;
     if (!googlePaySpecificInput || !googlePaySpecificData) {
       return undefined;
@@ -759,7 +785,7 @@ export class Session {
     );
   }
 
-  private async isGooglePayAvailable(googlePaySpecificData?: PaymentProduct320SpecificData): Promise<boolean> {
+  private async isGooglePayAvailable(googlePaySpecificData?: GooglePaySpecificData): Promise<boolean> {
     return this.getGooglePayClient(googlePaySpecificData)
       .then((client) => !!client)
       .catch((reason) => {

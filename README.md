@@ -178,7 +178,9 @@ const paymentContext: PaymentContext = {
   paymentProductSpecificInputs: {
     applePay: {
       merchantName: "Your name",
-      acquirerCountry: "Optional 2-letter ISO country code where you reside; if not set the country code from the payment context will be used",
+      merchantCountryCode: "Your optional 2-letter ISO country code;\
+                            the acquirer country as returned by the Worldline Connect Client API will be used if available,\
+                            otherwise this value if specified, otherwise the country code from the payment context",
       lineItem: "Optional line item; if not set the merchant name will be used",
     }
   }
@@ -210,7 +212,9 @@ const paymentContext: PaymentContext = {
     googlePay: {
       connectMerchantId: "Your Connect merchant id",
       googlePayMerchantId: "Your Google Pay merchant id",
-      acquirerCountry: "Optional 2-letter ISO country code where you reside; if not set the country code from the payment context will be used",
+      transactionCountryCode: "ISO 3166-1 alpha-2 country code for the country where the transaction will be completed/processed;\
+                               the acquirer country as returned by the Worldline Connect Client API will be used if available,\
+                               otherwise this value if specified, otherwise the country code from the payment context",
       merchantName: "Your optional user visible merchant name; if not set the Business name in your Google Pay Developer Profile will be used",
       environment: "PRODUCTION", // or "TEST" for test purposes
     }

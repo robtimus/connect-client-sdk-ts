@@ -1,11 +1,5 @@
-import { ApplePayClient, Device, DeviceInformation, GooglePayClient } from "../..";
-import {
-  ApplePaySpecificInput,
-  GooglePaySpecificInput,
-  PaymentContext,
-  PaymentProduct302SpecificData,
-  PaymentProduct320SpecificData,
-} from "../../../model";
+import { ApplePayClient, ApplePaySpecificData, Device, DeviceInformation, GooglePayClient, GooglePaySpecificData } from "../..";
+import { ApplePaySpecificInput, GooglePaySpecificInput, PaymentContext } from "../../../model";
 import { HttpClient } from "../../http";
 import { fetchHttpClient } from "../http/fetch";
 import { xhrHttpClient } from "../http/xhr";
@@ -35,7 +29,7 @@ class Browser implements Device {
 
   getApplePayClient(
     applePaySpecificInput: ApplePaySpecificInput,
-    applePaySpecificData: PaymentProduct302SpecificData,
+    applePaySpecificData: ApplePaySpecificData,
     context: PaymentContext
   ): Promise<ApplePayClient | undefined> {
     return Promise.resolve(newApplePayClient(applePaySpecificInput, applePaySpecificData, context));
@@ -43,7 +37,7 @@ class Browser implements Device {
 
   getGooglePayClient(
     googlePaySpecificInput: GooglePaySpecificInput,
-    googlePaySpecificData: PaymentProduct320SpecificData,
+    googlePaySpecificData: GooglePaySpecificData,
     context: PaymentContext
   ): Promise<GooglePayClient | undefined> {
     return Promise.resolve(newGooglePayClient(googlePaySpecificInput, googlePaySpecificData, context));

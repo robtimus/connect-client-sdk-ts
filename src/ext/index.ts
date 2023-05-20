@@ -34,7 +34,7 @@ export interface Device {
    */
   getApplePayClient(
     applePaySpecificInput: ApplePaySpecificInput,
-    applePaySpecificData: PaymentProduct302SpecificData,
+    applePaySpecificData: ApplePaySpecificData,
     context: PaymentContext
   ): Promise<ApplePayClient | undefined>;
   /**
@@ -45,7 +45,7 @@ export interface Device {
    */
   getGooglePayClient(
     googlePaySpecificInput: GooglePaySpecificInput,
-    googlePaySpecificData: PaymentProduct320SpecificData,
+    googlePaySpecificData: GooglePaySpecificData,
     context: PaymentContext
   ): Promise<GooglePayClient | undefined>;
 }
@@ -93,6 +93,13 @@ export interface DeviceInformation {
 }
 
 /**
+ * Object containing Apple Pay specific data provided by the Worldline Connect Client API.
+ */
+export interface ApplePaySpecificData extends PaymentProduct302SpecificData {
+  readonly acquirerCountry?: string;
+}
+
+/**
  * An Apple Pay specific client.
  */
 export interface ApplePayClient {
@@ -106,6 +113,13 @@ export interface ApplePayClient {
   createPayment(
     sessionFactory: (input: MobilePaymentProductSession302SpecificInput) => Promise<MobilePaymentProductSession302SpecificOutput>
   ): Promise<ApplePayJS.ApplePayPaymentToken>;
+}
+
+/**
+ * Object containing Google Pay specific data provided by the Worldline Connect Client API.
+ */
+export interface GooglePaySpecificData extends PaymentProduct320SpecificData {
+  readonly acquirerCountry?: string;
 }
 
 /**

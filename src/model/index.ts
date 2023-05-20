@@ -53,9 +53,11 @@ export interface ApplePaySpecificInput {
    */
   readonly lineItem?: string;
   /**
-   * Your two-letter ISO 3166 country code. Used for Apple Pay payment requests, and defaults to the {@link PaymentContext}'s country code.
+   * Your two-letter ISO 3166 country code.
+   * Used for Apple Pay payment requests in case no acquirer country is returned for the Apple Pay payment product,
+   * and defaults to the {@link PaymentContext}'s country code.
    */
-  readonly acquirerCountry?: string;
+  readonly merchantCountryCode?: string;
 }
 
 export interface GooglePaySpecificInput {
@@ -73,9 +75,11 @@ export interface GooglePaySpecificInput {
    */
   readonly merchantName?: string;
   /**
-   * Your two-letter ISO 3166 country code. Used for Google Pay payment requests, and defaults to the {@link PaymentContext}'s country code.
+   * ISO 3166-1 alpha-2 country code for the country where the transaction will be completed/processed.
+   * Used for Google Pay payment requests in case no acquirer country is returned for the Google Pay payment product,
+   * and defaults to the {@link PaymentContext}'s country code.
    */
-  readonly acquirerCountry?: string;
+  readonly transactionCountryCode?: string;
   /**
    * The Google Pay environment to target. Defaults to "TEST".
    */

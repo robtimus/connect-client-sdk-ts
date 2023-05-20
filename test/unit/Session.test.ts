@@ -44,7 +44,7 @@ describe("Session", () => {
     paymentProductSpecificInputs: {
       applePay: {
         merchantName: "TEST",
-        acquirerCountry: "GB",
+        merchantCountryCode: "GB",
       },
       bancontact: {
         forceBasicFlow: true,
@@ -52,7 +52,7 @@ describe("Session", () => {
       googlePay: {
         connectMerchantId: "CMID",
         googlePayMerchantId: "GPMID",
-        acquirerCountry: "GB",
+        transactionCountryCode: "GB",
         merchantName: "TEST",
       },
     },

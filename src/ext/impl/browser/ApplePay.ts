@@ -1,19 +1,18 @@
-import { ApplePayClient } from "../..";
+import { ApplePayClient, ApplePaySpecificData } from "../..";
 import {
   ApplePaySpecificInput,
   MobilePaymentProductSession302SpecificInput,
   MobilePaymentProductSession302SpecificOutput,
   PaymentContext,
-  PaymentProduct302SpecificData,
 } from "../../../model";
 import { formatAmount } from "../../../util/amounts";
 
 class ApplePayClientImpl implements ApplePayClient {
   readonly #applePaySpecificInput: ApplePaySpecificInput;
-  readonly #applePaySpecificData: PaymentProduct302SpecificData;
+  readonly #applePaySpecificData: ApplePaySpecificData;
   readonly #context: PaymentContext;
 
-  constructor(applePaySpecificInput: ApplePaySpecificInput, applePaySpecificData: PaymentProduct302SpecificData, context: PaymentContext) {
+  constructor(applePaySpecificInput: ApplePaySpecificInput, applePaySpecificData: ApplePaySpecificData, context: PaymentContext) {
     this.#applePaySpecificInput = applePaySpecificInput;
     this.#applePaySpecificData = applePaySpecificData;
     this.#context = context;
@@ -24,7 +23,7 @@ class ApplePayClientImpl implements ApplePayClient {
   ): Promise<ApplePayJS.ApplePayPaymentToken> {
     const paymentRequest: ApplePayJS.ApplePayPaymentRequest = {
       currencyCode: this.#context.amountOfMoney.currencyCode,
-      countryCode: this.#applePaySpecificInput.acquirerCountry ?? this.#context.countryCode,
+      countryCode: this.#applePaySpecificData.acquirerCountry ?? this.#applePaySpecificInput.merchantCountryCode ?? this.#context.countryCode,
       total: {
         label: this.#applePaySpecificInput.lineItem ?? this.#applePaySpecificInput.merchantName,
         amount: formatAmount(this.#context.amountOfMoney.amount),
@@ -76,7 +75,7 @@ Object.freeze(ApplePayClientImpl.prototype);
 
 export function newApplePayClient(
   applePaySpecificInput: ApplePaySpecificInput,
-  applePaySpecificData: PaymentProduct302SpecificData,
+  applePaySpecificData: ApplePaySpecificData,
   context: PaymentContext
 ): ApplePayClient | undefined {
   if (typeof ApplePaySession !== "undefined" && ApplePaySession.canMakePayments()) {

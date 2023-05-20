@@ -2,9 +2,9 @@
  * @group unit:browser
  */
 
-import { GooglePayClient } from "../../../../../src/ext";
+import { GooglePayClient, GooglePaySpecificData } from "../../../../../src/ext";
 import { newGooglePayClient } from "../../../../../src/ext/impl/browser/GooglePay";
-import { GooglePaySpecificInput, PaymentContext, PaymentProduct320SpecificData } from "../../../../../src/model";
+import { GooglePaySpecificInput, PaymentContext } from "../../../../../src/model";
 import { Mocks } from "../../../test-util";
 
 class PaymentsClientMock {
@@ -54,7 +54,7 @@ describe("Google Pay", () => {
     googlePayMerchantId: "GPMID",
     merchantName: "TEST",
   };
-  const googlePaySpecificData: PaymentProduct320SpecificData = {
+  const googlePaySpecificData: GooglePaySpecificData = {
     gateway: "GW",
     networks: ["1"],
   };
@@ -149,102 +149,138 @@ describe("Google Pay", () => {
       });
     });
 
-    test("prefetchPaymentData", async () => {
-      const result = (await newGooglePayClient(googlePaySpecificInput, googlePaySpecificData, context)) as GooglePayClient;
-      expect(result).toBeTruthy();
+    describe("prefetchPaymentData", () => {
+      async function runTest(input: GooglePaySpecificInput, data: GooglePaySpecificData, expectedCountryCode?: string): Promise<void> {
+        const result = (await newGooglePayClient(input, data, context)) as GooglePayClient;
+        expect(result).toBeTruthy();
 
-      await result.prefetchPaymentData();
-      expect(PaymentsClientMock.capturedReadyToPayRequest).toStrictEqual({
-        apiVersion: 2,
-        apiVersionMinor: 0,
-        allowedPaymentMethods: [
-          {
-            type: "CARD",
-            parameters: {
-              allowedAuthMethods: ["PAN_ONLY", "CRYPTOGRAM_3DS"],
-              allowedCardNetworks: ["1"],
-            },
-          },
-        ],
-      });
-      expect(PaymentsClientMock.capturedPaymentDataRequest).toStrictEqual({
-        apiVersion: 2,
-        apiVersionMinor: 0,
-        allowedPaymentMethods: [
-          {
-            type: "CARD",
-            parameters: {
-              allowedAuthMethods: ["PAN_ONLY", "CRYPTOGRAM_3DS"],
-              allowedCardNetworks: ["1"],
-            },
-            tokenizationSpecification: {
-              type: "PAYMENT_GATEWAY",
+        await result.prefetchPaymentData();
+        expect(PaymentsClientMock.capturedReadyToPayRequest).toStrictEqual({
+          apiVersion: 2,
+          apiVersionMinor: 0,
+          allowedPaymentMethods: [
+            {
+              type: "CARD",
               parameters: {
-                gateway: "GW",
-                gatewayMerchantId: "CMID",
+                allowedAuthMethods: ["PAN_ONLY", "CRYPTOGRAM_3DS"],
+                allowedCardNetworks: ["1"],
               },
             },
+          ],
+        });
+        expect(PaymentsClientMock.capturedPaymentDataRequest).toStrictEqual({
+          apiVersion: 2,
+          apiVersionMinor: 0,
+          allowedPaymentMethods: [
+            {
+              type: "CARD",
+              parameters: {
+                allowedAuthMethods: ["PAN_ONLY", "CRYPTOGRAM_3DS"],
+                allowedCardNetworks: ["1"],
+              },
+              tokenizationSpecification: {
+                type: "PAYMENT_GATEWAY",
+                parameters: {
+                  gateway: "GW",
+                  gatewayMerchantId: "CMID",
+                },
+              },
+            },
+          ],
+          transactionInfo: {
+            currencyCode: "EUR",
+            countryCode: expectedCountryCode,
+            totalPriceStatus: "NOT_CURRENTLY_KNOWN",
           },
-        ],
-        transactionInfo: {
-          currencyCode: "EUR",
-          countryCode: "NL",
-          totalPriceStatus: "NOT_CURRENTLY_KNOWN",
-        },
-        merchantInfo: {
-          merchantId: "GPMID",
-          merchantName: "TEST",
-        },
+          merchantInfo: {
+            merchantId: "GPMID",
+            merchantName: "TEST",
+          },
+        });
+      }
+
+      test("countryCode from input", async () => {
+        await runTest(Object.assign({ transactionCountryCode: "US" }, googlePaySpecificInput), googlePaySpecificData, "US");
+      });
+
+      test("countryCode from data", async () => {
+        await runTest(
+          Object.assign({ transactionCountryCode: "US" }, googlePaySpecificInput),
+          Object.assign({ acquirerCountry: "GB" }, googlePaySpecificData),
+          "GB"
+        );
+      });
+
+      test("countryCode from context", async () => {
+        await runTest(googlePaySpecificInput, googlePaySpecificData, "NL");
       });
     });
 
-    test("createPayment", async () => {
-      const result = (await newGooglePayClient(googlePaySpecificInput, googlePaySpecificData, context)) as GooglePayClient;
-      expect(result).toBeTruthy();
+    describe("createPayment", () => {
+      async function runTest(input: GooglePaySpecificInput, data: GooglePaySpecificData, expectedCountryCode?: string): Promise<void> {
+        const result = (await newGooglePayClient(input, data, context)) as GooglePayClient;
+        expect(result).toBeTruthy();
 
-      await result.createPayment();
-      expect(PaymentsClientMock.capturedReadyToPayRequest).toStrictEqual({
-        apiVersion: 2,
-        apiVersionMinor: 0,
-        allowedPaymentMethods: [
-          {
-            type: "CARD",
-            parameters: {
-              allowedAuthMethods: ["PAN_ONLY", "CRYPTOGRAM_3DS"],
-              allowedCardNetworks: ["1"],
-            },
-          },
-        ],
-      });
-      expect(PaymentsClientMock.capturedPaymentDataRequest).toStrictEqual({
-        apiVersion: 2,
-        apiVersionMinor: 0,
-        allowedPaymentMethods: [
-          {
-            type: "CARD",
-            parameters: {
-              allowedAuthMethods: ["PAN_ONLY", "CRYPTOGRAM_3DS"],
-              allowedCardNetworks: ["1"],
-            },
-            tokenizationSpecification: {
-              type: "PAYMENT_GATEWAY",
+        await result.createPayment();
+        expect(PaymentsClientMock.capturedReadyToPayRequest).toStrictEqual({
+          apiVersion: 2,
+          apiVersionMinor: 0,
+          allowedPaymentMethods: [
+            {
+              type: "CARD",
               parameters: {
-                gateway: "GW",
-                gatewayMerchantId: "CMID",
+                allowedAuthMethods: ["PAN_ONLY", "CRYPTOGRAM_3DS"],
+                allowedCardNetworks: ["1"],
               },
             },
+          ],
+        });
+        expect(PaymentsClientMock.capturedPaymentDataRequest).toStrictEqual({
+          apiVersion: 2,
+          apiVersionMinor: 0,
+          allowedPaymentMethods: [
+            {
+              type: "CARD",
+              parameters: {
+                allowedAuthMethods: ["PAN_ONLY", "CRYPTOGRAM_3DS"],
+                allowedCardNetworks: ["1"],
+              },
+              tokenizationSpecification: {
+                type: "PAYMENT_GATEWAY",
+                parameters: {
+                  gateway: "GW",
+                  gatewayMerchantId: "CMID",
+                },
+              },
+            },
+          ],
+          transactionInfo: {
+            currencyCode: "EUR",
+            countryCode: expectedCountryCode,
+            totalPrice: "10.00",
+            totalPriceStatus: "FINAL",
           },
-        ],
-        transactionInfo: {
-          currencyCode: "EUR",
-          countryCode: "NL",
-          totalPrice: "10.00",
-          totalPriceStatus: "FINAL",
-        },
-        merchantInfo: {
-          merchantId: "GPMID",
-          merchantName: "TEST",
-        },
+          merchantInfo: {
+            merchantId: "GPMID",
+            merchantName: "TEST",
+          },
+        });
+      }
+
+      test("countryCode from input", async () => {
+        await runTest(Object.assign({ transactionCountryCode: "US" }, googlePaySpecificInput), googlePaySpecificData, "US");
+      });
+
+      test("countryCode from data", async () => {
+        await runTest(
+          Object.assign({ transactionCountryCode: "US" }, googlePaySpecificInput),
+          Object.assign({ acquirerCountry: "GB" }, googlePaySpecificData),
+          "GB"
+        );
+      });
+
+      test("countryCode from context", async () => {
+        await runTest(googlePaySpecificInput, googlePaySpecificData, "NL");
       });
     });
   });

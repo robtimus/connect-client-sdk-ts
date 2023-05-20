@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 /**
  * @group unit:crypto
  */
@@ -54,5 +56,5 @@ describe("forge", () => {
 });
 
 describe("Web Crypto API", () => {
-  testCryptoEngine(webCryptoCryptoEngine);
+  testCryptoEngine(webCryptoCryptoEngine!);
 });

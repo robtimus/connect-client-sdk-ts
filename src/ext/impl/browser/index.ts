@@ -7,13 +7,13 @@ import {
   PaymentProduct320SpecificData,
 } from "../../../model";
 import { HttpClient } from "../../http";
-import { fetchHttpClient, isFetchAvailable } from "../http/fetch";
+import { fetchHttpClient } from "../http/fetch";
 import { xhrHttpClient } from "../http/xhr";
 import { newApplePayClient } from "./ApplePay";
 import { newGooglePayClient } from "./GooglePay";
 
 class Browser implements Device {
-  private readonly httpClient: HttpClient = isFetchAvailable() ? fetchHttpClient : xhrHttpClient;
+  private readonly httpClient: HttpClient = fetchHttpClient ?? xhrHttpClient;
 
   getDeviceInformation(): DeviceInformation {
     return {

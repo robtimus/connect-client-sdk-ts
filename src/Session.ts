@@ -4,7 +4,7 @@ import { ApplePayClient, Device, GooglePayButtonOptions, GooglePayClient } from 
 import { CryptoEngine } from "./ext/crypto";
 import { HttpResponse } from "./ext/http";
 import { browser } from "./ext/impl/browser";
-import { isWebCryptoAvailable, webCryptoCryptoEngine } from "./ext/impl/crypto/WebCrypto";
+import { webCryptoCryptoEngine } from "./ext/impl/crypto/WebCrypto";
 import {
   BasicPaymentItems,
   BasicPaymentProduct,
@@ -175,9 +175,7 @@ export class Session {
   constructor(private readonly sessionDetails: SessionDetails, private paymentContext: PaymentContext, private readonly device: Device = browser) {
     this.communicator = new Communicator(sessionDetails, device);
 
-    if (isWebCryptoAvailable()) {
-      this.cryptoEngine = webCryptoCryptoEngine;
-    }
+    this.cryptoEngine = webCryptoCryptoEngine;
   }
 
   /**

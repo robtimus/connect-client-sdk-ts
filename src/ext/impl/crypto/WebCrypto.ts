@@ -162,17 +162,7 @@ class WebCryptoCryptoEngine implements CryptoEngine {
 Object.freeze(WebCryptoCryptoEngine.prototype);
 
 /**
- * Returns whether or not the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API">Web Crypto API</a> is available.
- * This can be used to determine whether or not {@link webCryptoCryptoEngine} can be used.
- * @returns True if {@link webCryptoCryptoEngine} can be used, or false otherwise.
- */
-export function isWebCryptoAvailable(): boolean {
-  return crypto.isAvailable();
-}
-
-/**
  * A crypto engine backed by the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API">Web Crypto API</a>.
- * This will work in modern browsers and supported Node.js versions. Attempting to use it in older browsers or Node.js versions will fail.
- * If needed, use {@link isWebCryptoAvailable} to determine whether or not this crypto engine can be used.
+ * This will work in modern browsers and supported Node.js versions. In older browsers or Node.js versions, this will be undefined.
  */
-export const webCryptoCryptoEngine: CryptoEngine = new WebCryptoCryptoEngine();
+export const webCryptoCryptoEngine: CryptoEngine | undefined = crypto.isAvailable() ? new WebCryptoCryptoEngine() : undefined;

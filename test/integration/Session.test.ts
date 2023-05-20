@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 /**
  * @group integration
  */
@@ -35,7 +37,7 @@ describe("session", () => {
       screenWidth: 1920,
       timezoneOffsetUtcMinutes: new Date().getTimezoneOffset(),
     }),
-    getHttpClient: () => fetchHttpClient,
+    getHttpClient: () => fetchHttpClient!,
     getApplePayClient: () => Promise.resolve(undefined),
     getGooglePayClient: () => Promise.resolve(undefined),
   };

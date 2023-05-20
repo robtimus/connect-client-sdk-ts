@@ -378,11 +378,11 @@ If the Web Crypto API is not available, it's possible to use [node-forge](https:
 
 ```typescript
 import { forgeCryptoEngine } from "@robtimus/connect-client-sdk/lib/ext/impl/crypto/forge";
-import { isWebCryptoAvailable, webCryptoCryptoEngine } from "@robtimus/connect-client-sdk/lib/ext/impl/crypto/WebCrypto";
+import { webCryptoCryptoEngine } from "@robtimus/connect-client-sdk/lib/ext/impl/crypto/WebCrypto";
 
 // create session as usual
 
-session.setCryptoEngine(isWebCryptoAvailable() ? webCryptoCryptoEngine : forgeCryptoEngine);
+session.setCryptoEngine(webCryptoCryptoEngine ?? forgeCryptoEngine);
 ```
 
 ### Node.js

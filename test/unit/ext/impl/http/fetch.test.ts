@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 /**
  * @group unit:http
  */
@@ -6,14 +8,18 @@ import { Server } from "http";
 import { AddressInfo } from "net";
 import * as express from "express";
 import * as bodyParser from "body-parser";
-import { fetchHttpClient, isFetchAvailable } from "../../../../../src/ext/impl/http/fetch";
+import { fetchHttpClient } from "../../../../../src/ext/impl/http/fetch";
 import { isMinNode, minNode } from "../../../test-util";
 
 describe("fetch", () => {
   // Fetch is natively available only from Node.js 18 on
 
   test("available", () => {
-    expect(isFetchAvailable()).toBe(isMinNode(18));
+    if (isMinNode(18)) {
+      expect(fetchHttpClient).toBeTruthy();
+    } else {
+      expect(fetchHttpClient).toBeUndefined();
+    }
   });
 
   minNode(18).describe("HttpClient", () => {
@@ -77,7 +83,7 @@ describe("fetch", () => {
     });
 
     test("GET", async () => {
-      const response = await fetchHttpClient
+      const response = await fetchHttpClient!
         .get(`${baseUrl}/echo`)
         .queryParam("name", "value")
         .queryParams("repeated", [1, 2])
@@ -94,7 +100,7 @@ describe("fetch", () => {
     });
 
     test("DELETE", async () => {
-      const response = await fetchHttpClient
+      const response = await fetchHttpClient!
         .delete(`${baseUrl}/echo`)
         .queryParam("name", "value")
         .queryParams("repeated", [1, 2])
@@ -112,7 +118,7 @@ describe("fetch", () => {
 
     describe("POST", () => {
       test("without body", async () => {
-        const response = await fetchHttpClient
+        const response = await fetchHttpClient!
           .post(`${baseUrl}/echo`)
           .queryParam("name", "value")
           .queryParams("repeated", [1, 2])
@@ -133,7 +139,7 @@ describe("fetch", () => {
           key: "expirationDate",
           value: "1230",
         };
-        const response = await fetchHttpClient
+        const response = await fetchHttpClient!
           .post(`${baseUrl}/echo`, body)
           .queryParam("name", "value")
           .queryParams("repeated", [1, 2])
@@ -152,7 +158,7 @@ describe("fetch", () => {
 
     describe("PUT", () => {
       test("without body", async () => {
-        const response = await fetchHttpClient
+        const response = await fetchHttpClient!
           .put(`${baseUrl}/echo`)
           .queryParam("name", "value")
           .queryParams("repeated", [1, 2])
@@ -173,7 +179,7 @@ describe("fetch", () => {
           key: "expirationDate",
           value: "1230",
         };
-        const response = await fetchHttpClient
+        const response = await fetchHttpClient!
           .put(`${baseUrl}/echo`, body)
           .queryParam("name", "value")
           .queryParams("repeated", [1, 2])
@@ -191,14 +197,14 @@ describe("fetch", () => {
     });
 
     test("non-JSON response", async () => {
-      const response = await fetchHttpClient.get(`${baseUrl}/error`).send();
+      const response = await fetchHttpClient!.get(`${baseUrl}/error`).send();
       expect(response.statusCode).toBe(500);
       expect(response.contentType).toMatch(/text\/plain.*/);
       expect(response.body).toBe(`Error: /error`);
     });
 
     test("empty response", async () => {
-      const response = await fetchHttpClient.get(`${baseUrl}/empty`).send();
+      const response = await fetchHttpClient!.get(`${baseUrl}/empty`).send();
       expect(response.statusCode).toBe(204);
       expect(response.contentType).toBeUndefined();
       expect(response.body).toBeFalsy();

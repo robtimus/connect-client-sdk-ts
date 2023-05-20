@@ -123,5 +123,6 @@ Object.freeze(XhrHttpClient.prototype);
 
 /**
  * An HTTP client backed by <a href="https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest">XMLHttpRequest</a>.
+ * Note that this client should only be used in browsers, not in Node.js environments.
  */
 export const xhrHttpClient: HttpClient = new XhrHttpClient();

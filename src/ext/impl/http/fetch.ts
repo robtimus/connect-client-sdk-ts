@@ -80,17 +80,7 @@ class FetchHttpClient implements HttpClient {
 Object.freeze(FetchHttpClient.prototype);
 
 /**
- * Returns whether or not the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API">Fetch API</a> is available.
- * This can be used to determine whether or not {@link fetchHttpClient} can be used.
- * @returns True if {@link fetchHttpClient} can be used, or false otherwise.
- */
-export function isFetchAvailable(): boolean {
-  return typeof fetch !== "undefined";
-}
-
-/**
  * An HTTP client backed by the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API">Fetch API</a>.
- * This will work in modern browsers and supported Node.js versions. Attempting to use it in older browsers or Node.js versions will fail.
- * If needed, use {@link isFetchAvailable} to determine whether or not this crypto engine can be used.
+ * This will work in modern browsers and supported Node.js versions. In older browsers or Node.js versions, this will be undefined.
  */
-export const fetchHttpClient: HttpClient = new FetchHttpClient();
+export const fetchHttpClient: HttpClient | undefined = typeof fetch !== "undefined" ? new FetchHttpClient() : undefined;

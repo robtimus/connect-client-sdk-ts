@@ -159,6 +159,12 @@ export interface GooglePayHelper {
  * The main entry point for communicating with the Worldline Connect Client API.
  */
 export class Session {
+  /**
+   * The default ctypto engine to use.
+   * By default this will be {@link webCryptoCryptoEngine} if available, or undefined otherwise.
+   */
+  static defaultCryptoEngine?: CryptoEngine = webCryptoCryptoEngine;
+
   readonly #sessionDetails: SessionDetails;
   #paymentContext: PaymentContext;
   readonly #device: Device;
@@ -169,8 +175,8 @@ export class Session {
   #paymentProductAvailability: Record<number, boolean | undefined> = {};
 
   /**
-   * Creates a new session. This will use {@link webCryptoCryptoEngine} if available.
-   * Otherwise, no crypto engine will be set, unless one is explicitly provided using {@link setCryptoEngine}.
+   * Creates a new session.\
+   * This will use {@link defaultCryptoEngine}. A different crypto one can be provided using {@link setCryptoEngine}.
    * @param #sessionDetails The session details, as returned by an Worldline Connect Server API create session call.
    * @param #paymentContext The context for the current payment.
    * @param #device An object representing the current device. If not given, it is assumed that the current device is a browser.
@@ -181,7 +187,7 @@ export class Session {
     this.#device = device;
     this.#communicator = new Communicator(this.#sessionDetails, this.#device);
 
-    this.#cryptoEngine = webCryptoCryptoEngine;
+    this.#cryptoEngine = Session.defaultCryptoEngine;
   }
 
   /**
@@ -232,7 +238,8 @@ export class Session {
   /**
    * Returns an object that can be used to encrypt {@link PaymentRequest} objects.
    * @returns A promise containing an {@link Encryptor}.
-   * @throws If {@link webCryptoCryptoEngine} is not available and no other crypto engine has been set using {@link setCryptoEngine}.
+   * @throws If {@link webCryptoCryptoEngine} is not available,
+   *         and no other crypto engine has been set using either {@link defaultCryptoEngine} or {@link setCryptoEngine}.
    */
   async getEncryptor(): Promise<Encryptor> {
     if (!this.#cryptoEngine) {
@@ -243,7 +250,8 @@ export class Session {
   }
 
   /**
-   * Sets the crypto engine to use. This method should be used to provide a crypto engine in case {@link webCryptoCryptoEngine} is not available.
+   * Sets the crypto engine to use.\
+   * This method can be used to provide a crypto engine that's different from {@link defaultCryptoEngine}.
    * @param cryptoEngine The crypto engine to set.
    */
   setCryptoEngine(cryptoEngine?: CryptoEngine): void {

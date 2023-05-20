@@ -15,11 +15,43 @@ An SDK for the [Worldline Connect](https://epayments.developer-ingenico.com/) Cl
 * No deprecated legacy code.
 * More support for creating Apple Pay and Google Pay payments.
 
-## Initialization
+## Installation
 
 Install this SDK using your preferred Node.js package manager like `npm`, `yarn` or `pnpm`. For instance:
 
     npm i @robtimus/connect-client-sdk
+
+## Packaging
+
+The SDK's default packaging is as separate ES modules. This can be used by most bundlers, but also in non-browser environments.
+The default export contains the most important types:
+
+```typescript
+import { PaymentContext, PaymentRequest, Session, SessionDetails } from "@robtimus/connect-client-sdk";
+```
+
+### Usage Universal Module Definition (UMD)
+
+The SDK is available under global namespace `connectClientSdk`, and can be imported in the following way:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    ...
+    <script src="./node_modules/@robtimus/connect-client-sdk/lib/connect-client-sdk.umd.js"></script>
+  </head>
+  <body>
+    <script>
+      const session = new connectClientSdk.Session({
+        ...
+      }, {
+        ...
+      })
+    </script>
+  </body>
+</html>
+```
 
 ## Getting started
 
@@ -28,8 +60,6 @@ Install this SDK using your preferred Node.js package manager like `npm`, `yarn`
 2. Create a [SessionDetails](https://robtimus.github.io/connect-client-sdk-ts/interfaces/model.SessionDetails.html) object using the Create session response:
 
 ```typescript
-import { SessionDetails } from "@robtimus/connect-client-sdk";
-
 const sessionDetails: SessionDetails = {
   assetUrl: "https://payment.pay1.secured-by-ingenico.com/",
   clientApiUrl: "https://eu.api-ingenico.com/client",
@@ -43,8 +73,6 @@ const sessionDetails: SessionDetails = {
 3. Create a [PaymentContext](https://robtimus.github.io/connect-client-sdk-ts/interfaces/model.PaymentContext.html) object with the necessary values (more properties can be added as necessary):
 
 ```typescript
-import { PaymentContext } from "@robtimus/connect-client-sdk";
-
 const paymentContext: PaymentContext = {
   amountOfMoney: {
     amount: 1000,
@@ -57,8 +85,6 @@ const paymentContext: PaymentContext = {
 4. Create a [Session](https://robtimus.github.io/connect-client-sdk-ts/classes/Session.Session.html) object with the created `SessionDetails` and `PaymentContext` objects:
 
 ```typescript
-import { Session } from "@robtimus/connect-client-sdk";
-
 const session = new Session(sessionDetails, paymentContext);
 ```
 
@@ -115,7 +141,7 @@ const payload = encryptor.encrypt(paymentRequest);
 
 ### IIN details
 
-When using the `cards` payment product group, it's important to know which payment product a card belongs to. This can be done by retrieving the IIN details, and checking the status property:
+When using the `cards` payment product group, it's important to know which payment product a card belongs to. This can be done by retrieving the [IIN details](https://epayments-api.developer-ingenico.com/c2sapi/v1/en_US/json/services/getIINdetails.html), and checking the status property:
 
 ```typescript
 const iinDetails = await session.getIINDetails("4567 35");
@@ -128,7 +154,7 @@ switch (iinDetails.status) {
     break;
   case "NOT_ALLOWED":
     // The card is known but not allowed within the current payment context.
-    // like SUPPORTED, but iinDetails.isAllowedInContext is false.
+    // Like SUPPORTED, but iinDetails.isAllowedInContext is false.
     break;
   case "NOT_ENOUGH_DIGITS":
     // Fewever than 6 digits were provided. No additional properties are available.
@@ -148,11 +174,7 @@ if Apple Pay (302) is one of your available payment products, you need to provid
 
 ```typescript
 const paymentContext: PaymentContext = {
-  amountOfMoney: {
-    amount: 1000,
-    currencyCode: "EUR",
-  },
-  countryCode: "NL",
+  ...
   paymentProductSpecificInputs: {
     applePay: {
       merchantName: "Your name",
@@ -183,11 +205,7 @@ If Google Pay (320) is one of your available payment products, you need to provi
 
 ```typescript
 const paymentContext: PaymentContext = {
-  amountOfMoney: {
-    amount: 1000,
-    currencyCode: "EUR",
-  },
-  countryCode: "NL",
+  ...
   paymentProductSpecificInputs: {
     googlePay: {
       connectMerchantId: "Your Connect merchant id",
@@ -224,11 +242,7 @@ By default, retrieving the Bancontact (3012) product will not return the fields 
 
 ```typescript
 const paymentContext: PaymentContext = {
-  amountOfMoney: {
-    amount: 1000,
-    currencyCode: "EUR",
-  },
-  countryCode: "NL",
+  ...
   paymentProductSpecificInputs: {
     bancontact: {
       forceBasicFlow: true,
@@ -380,9 +394,15 @@ If the Web Crypto API is not available, it's possible to use [node-forge](https:
 import { forgeCryptoEngine } from "@robtimus/connect-client-sdk/lib/ext/impl/crypto/forge";
 import { webCryptoCryptoEngine } from "@robtimus/connect-client-sdk/lib/ext/impl/crypto/WebCrypto";
 
-// create session as usual
+Session.defaultCryptoEngine = webCryptoCryptoEngine ?? forgeCryptoEngine;
 
-session.setCryptoEngine(webCryptoCryptoEngine ?? forgeCryptoEngine);
+// create session as usual
+```
+
+When using UMD, this is done automatically when using `connect-client-sdk.forge.umd.js` instead of `connect-client-sdk.umd.js`:
+
+```html
+<script src="./node_modules/@robtimus/connect-client-sdk/lib/connect-client-sdk.forge.umd.js"></script>
 ```
 
 ### Node.js

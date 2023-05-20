@@ -23,8 +23,8 @@
   },
   "scripts": {
     "generate": "node ./scripts/generate-metadata.ts",
-    "compile": "tsc --declaration",
-    "bundle": "microbundle -i lib/index.js -o lib/connect-client-sdk.js -f umd --target web",
+    "compile": "tsc",
+    "bundle": "microbundle -i lib/index.js -o lib/connect-client-sdk.js -f umd --target web --generateTypes false",
     "lint": "eslint ./src --ext .ts",
     "format": "prettier --write \"**/*.+(json|ts|tsx)\"",
     "format:check": "prettier --check \"**/*.+(json|ts|tsx)\"",

@@ -377,10 +377,8 @@ describe("Session", () => {
       );
       const session = new Session(sessionDetails, minimalPaymentContext, device);
       // In Node.js environments (16+), crypto.subtle is always available, therefore the default crypto engine will always be set
-      // Set it to undefined this way instead, to mock the case where crypto.subtle is not available
-      Object.defineProperty(session, "cryptoEngine", {
-        value: undefined,
-      });
+      // Set it to undefined instead, to mock the case where crypto.subtle is not available
+      session.setCryptoEngine(undefined);
       const onSuccess = jest.fn();
       const result = await session
         .getEncryptor()

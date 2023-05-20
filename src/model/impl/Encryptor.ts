@@ -73,12 +73,17 @@ function createEncryptedCustomerInput(
 }
 
 class EncryptorImpl implements Encryptor {
-  constructor(
-    private readonly clientSessionId: string,
-    private readonly publicKey: PublicKey,
-    private readonly engine: CryptoEngine,
-    private readonly device: Device
-  ) {}
+  readonly #clientSessionId: string;
+  readonly #publicKey: PublicKey;
+  readonly #engine: CryptoEngine;
+  readonly #device: Device;
+
+  constructor(clientSessionId: string, publicKey: PublicKey, engine: CryptoEngine, device: Device) {
+    this.#clientSessionId = clientSessionId;
+    this.#publicKey = publicKey;
+    this.#engine = engine;
+    this.#device = device;
+  }
 
   /**
    * Encrypts a payment request.
@@ -90,10 +95,10 @@ class EncryptorImpl implements Encryptor {
     if (!paymentRequest.isValid()) {
       throw new Error("PaymentRequest has not been successfully validated");
     }
-    const nonce = this.engine.randomString();
-    const encryptedCustomerInput = createEncryptedCustomerInput(this.clientSessionId, nonce, paymentRequest, this.device);
+    const nonce = this.#engine.randomString();
+    const encryptedCustomerInput = createEncryptedCustomerInput(this.#clientSessionId, nonce, paymentRequest, this.#device);
     const payload = JSON.stringify(encryptedCustomerInput);
-    return this.engine.encrypt(payload, this.publicKey.keyId, this.publicKey.publicKey);
+    return this.#engine.encrypt(payload, this.#publicKey.keyId, this.#publicKey.publicKey);
   }
 }
 

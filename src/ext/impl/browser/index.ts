@@ -13,7 +13,7 @@ import { newApplePayClient } from "./ApplePay";
 import { newGooglePayClient } from "./GooglePay";
 
 class Browser implements Device {
-  private readonly httpClient: HttpClient = fetchHttpClient ?? xhrHttpClient;
+  readonly #httpClient: HttpClient = fetchHttpClient ?? xhrHttpClient;
 
   getDeviceInformation(): DeviceInformation {
     return {
@@ -30,7 +30,7 @@ class Browser implements Device {
   }
 
   getHttpClient(): HttpClient {
-    return this.httpClient;
+    return this.#httpClient;
   }
 
   getApplePayClient(

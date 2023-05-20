@@ -116,26 +116,36 @@ function constructPaymentDataRequest(
 }
 
 class GooglePayClientImpl implements GooglePayClient {
+  readonly #client: google.payments.api.PaymentsClient;
+  readonly #googlePaySpecificInput: GooglePaySpecificInput;
+  readonly #googlePaySpecificData: PaymentProduct320SpecificData;
+  readonly #context: PaymentContext;
+
   constructor(
-    private readonly client: google.payments.api.PaymentsClient,
-    private readonly googlePaySpecificInput: GooglePaySpecificInput,
-    private readonly googlePaySpecificData: PaymentProduct320SpecificData,
-    private readonly context: PaymentContext
-  ) {}
+    client: google.payments.api.PaymentsClient,
+    googlePaySpecificInput: GooglePaySpecificInput,
+    googlePaySpecificData: PaymentProduct320SpecificData,
+    context: PaymentContext
+  ) {
+    this.#client = client;
+    this.#googlePaySpecificInput = googlePaySpecificInput;
+    this.#googlePaySpecificData = googlePaySpecificData;
+    this.#context = context;
+  }
 
   createButton(options: GooglePayButtonOptions): HTMLElement {
     const buttonOptions: google.payments.api.ButtonOptions = Object.assign({}, options);
-    buttonOptions.allowedPaymentMethods = constructAllowedPaymentMethods(this.googlePaySpecificData);
-    return this.client.createButton(buttonOptions);
+    buttonOptions.allowedPaymentMethods = constructAllowedPaymentMethods(this.#googlePaySpecificData);
+    return this.#client.createButton(buttonOptions);
   }
 
   async prefetchPaymentData(): Promise<void> {
-    const request = constructPrefetchPaymentDataRequest(this.googlePaySpecificInput, this.googlePaySpecificData, this.context);
-    this.client.prefetchPaymentData(request);
+    const request = constructPrefetchPaymentDataRequest(this.#googlePaySpecificInput, this.#googlePaySpecificData, this.#context);
+    this.#client.prefetchPaymentData(request);
   }
 
   async createPayment(): Promise<google.payments.api.PaymentData> {
-    return this.client.loadPaymentData(constructPaymentDataRequest(this.googlePaySpecificInput, this.googlePaySpecificData, this.context));
+    return this.#client.loadPaymentData(constructPaymentDataRequest(this.#googlePaySpecificInput, this.#googlePaySpecificData, this.#context));
   }
 }
 

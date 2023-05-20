@@ -21,41 +21,43 @@ async function toHttpResonse(response: Response): Promise<HttpResponse> {
 }
 
 class FetchHttpRequest implements HttpRequest {
-  private readonly urlBuilder: URLBuilder;
-  private readonly headers: HeadersInit = {};
-  private readonly body?: string;
+  readonly #method: string;
+  readonly #urlBuilder: URLBuilder;
+  readonly #headers: HeadersInit = {};
+  readonly #body?: string;
 
-  constructor(private readonly method: string, url: string, body?: object) {
-    this.urlBuilder = new URLBuilder(url);
-    this.body = body ? JSON.stringify(body) : undefined;
+  constructor(method: string, url: string, body?: object) {
+    this.#method = method;
+    this.#urlBuilder = new URLBuilder(url);
+    this.#body = body ? JSON.stringify(body) : undefined;
   }
 
   queryParam(name: string, value?: string | number | boolean): HttpRequest {
-    this.urlBuilder.queryParam(name, value);
+    this.#urlBuilder.queryParam(name, value);
     return this;
   }
   queryParams(name: string, values?: string[] | number[] | boolean[]): HttpRequest {
-    this.urlBuilder.queryParams(name, values);
+    this.#urlBuilder.queryParams(name, values);
     return this;
   }
   header(name: string, value: string): HttpRequest {
-    this.headers[name] = value;
+    this.#headers[name] = value;
     return this;
   }
   async send(): Promise<HttpResponse> {
     const init: RequestInit = {
-      method: this.method,
-      headers: this.headers,
-      body: this.body,
+      method: this.#method,
+      headers: this.#headers,
+      body: this.#body,
       mode: "cors",
       cache: "no-cache",
       redirect: "error",
     };
-    if (this.body) {
+    if (this.#body) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       init.headers!["Content-Type"] = "application/json";
     }
-    const response = await fetch(this.urlBuilder.build(), init);
+    const response = await fetch(this.#urlBuilder.build(), init);
     return toHttpResonse(response);
   }
 }

@@ -849,11 +849,11 @@ export interface ErrorResponse {
  * A container for all the values the user provided.
  */
 export class PaymentRequest {
-  private readonly fieldValues: Record<string, string | undefined> = {};
-  private paymentProduct?: PaymentProduct;
-  private accountOnFile?: AccountOnFile;
-  private tokenize = false;
-  private valid = false;
+  readonly #fieldValues: Record<string, string | undefined> = {};
+  #paymentProduct?: PaymentProduct;
+  #accountOnFile?: AccountOnFile;
+  #tokenize = false;
+  #valid = false;
 
   /**
    * Returns the value for a field.
@@ -861,7 +861,7 @@ export class PaymentRequest {
    * @returns The (unmodified) value for the field, or undefined if no such value has been set.
    */
   getValue(fieldId: string): string | undefined {
-    return this.fieldValues[fieldId];
+    return this.#fieldValues[fieldId];
   }
 
   /**
@@ -870,8 +870,8 @@ export class PaymentRequest {
    * @param value The (unmodified) value for the field.
    */
   setValue(fieldId: string, value: string): void {
-    this.fieldValues[fieldId] = value;
-    this.valid = false;
+    this.#fieldValues[fieldId] = value;
+    this.#valid = false;
   }
 
   /**
@@ -880,8 +880,8 @@ export class PaymentRequest {
    */
   getValues(): Record<string, string | undefined> {
     const result: Record<string, string | undefined> = {};
-    for (const fieldId in this.fieldValues) {
-      result[fieldId] = this.fieldValues[fieldId];
+    for (const fieldId in this.#fieldValues) {
+      result[fieldId] = this.#fieldValues[fieldId];
     }
     return result;
   }
@@ -892,7 +892,7 @@ export class PaymentRequest {
    * @returns The masked value for the field, or undefined if no such value has been set or no such field exists in the currently set payment product (if any).
    */
   getMaskedValue(fieldId: string): string | undefined {
-    const field = this.paymentProduct?.findField(fieldId);
+    const field = this.#paymentProduct?.findField(fieldId);
     if (!field) {
       return undefined;
     }
@@ -909,7 +909,7 @@ export class PaymentRequest {
    */
   getMaskedValues(): Record<string, string | undefined> {
     const result: Record<string, string | undefined> = {};
-    for (const fieldId in this.fieldValues) {
+    for (const fieldId in this.#fieldValues) {
       result[fieldId] = this.getMaskedValue(fieldId);
     }
     return result;
@@ -921,7 +921,7 @@ export class PaymentRequest {
    * @returns The unmasked value for the field, or undefined if no such value has been set or no such field exists in the currently set payment product (if any).
    */
   getUnmaskedValue(fieldId: string): string | undefined {
-    const field = this.paymentProduct?.findField(fieldId);
+    const field = this.#paymentProduct?.findField(fieldId);
     if (!field) {
       return undefined;
     }
@@ -938,7 +938,7 @@ export class PaymentRequest {
    */
   getUnmaskedValues(): Record<string, string | undefined> {
     const result: Record<string, string | undefined> = {};
-    for (const fieldId in this.fieldValues) {
+    for (const fieldId in this.#fieldValues) {
       result[fieldId] = this.getUnmaskedValue(fieldId);
     }
     return result;
@@ -948,7 +948,7 @@ export class PaymentRequest {
    * Returns the currently set payment product.
    */
   getPaymentProduct(): PaymentProduct | undefined {
-    return this.paymentProduct;
+    return this.#paymentProduct;
   }
 
   /**
@@ -958,15 +958,15 @@ export class PaymentRequest {
    * payment product before querying masked and unmasked values or validating.
    */
   setPaymentProduct(paymentProduct: PaymentProduct): void {
-    this.paymentProduct = paymentProduct;
-    this.valid = false;
+    this.#paymentProduct = paymentProduct;
+    this.#valid = false;
   }
 
   /**
    * Returns the currently set account on file.
    */
   getAccountOnFile(): AccountOnFile | undefined {
-    return this.accountOnFile;
+    return this.#accountOnFile;
   }
 
   /**
@@ -977,10 +977,10 @@ export class PaymentRequest {
     if (accountOnFile) {
       accountOnFile.attributes
         .filter((attribute) => attribute.status !== "MUST_WRITE")
-        .forEach((attribute) => delete this.fieldValues[attribute.key]);
+        .forEach((attribute) => delete this.#fieldValues[attribute.key]);
     }
-    this.accountOnFile = accountOnFile;
-    this.valid = false;
+    this.#accountOnFile = accountOnFile;
+    this.#valid = false;
   }
 
   /**
@@ -988,7 +988,7 @@ export class PaymentRequest {
    * @returns True to tokenize payments, or false otherwise.
    */
   getTokenize(): boolean {
-    return this.tokenize;
+    return this.#tokenize;
   }
 
   /**
@@ -996,8 +996,8 @@ export class PaymentRequest {
    * @param tokenize True to tokenize payments, or false otherwise.
    */
   setTokenize(tokenize: boolean): void {
-    this.tokenize = tokenize;
-    this.valid = false;
+    this.#tokenize = tokenize;
+    this.#valid = false;
   }
 
   /**
@@ -1006,12 +1006,12 @@ export class PaymentRequest {
    * @throws If no payment product has been set yet.
    */
   validate(): ValidationResult {
-    const paymentProduct = this.paymentProduct;
+    const paymentProduct = this.#paymentProduct;
     if (!paymentProduct) {
       throw new Error("no PaymentProduct set");
     }
     const errors: ValidationError[] = [];
-    for (const fieldId in this.fieldValues) {
+    for (const fieldId in this.#fieldValues) {
       const field = paymentProduct.findField(fieldId);
       if (field) {
         errors.push(
@@ -1023,7 +1023,7 @@ export class PaymentRequest {
       }
     }
 
-    const accountOnFile = this.accountOnFile;
+    const accountOnFile = this.#accountOnFile;
     const hasValueInAof = (fieldId: string): boolean => {
       if (accountOnFile?.paymentProductId !== paymentProduct.id) {
         // the account-on-file does not belong to the payment product; ignore it
@@ -1041,9 +1041,9 @@ export class PaymentRequest {
       }
     }
 
-    this.valid = errors.length === 0;
+    this.#valid = errors.length === 0;
 
-    if (this.valid) {
+    if (this.#valid) {
       return { valid: true };
     }
     return { valid: false, errors };
@@ -1054,6 +1054,6 @@ export class PaymentRequest {
    * This payment request initially is not valid, and any update to this payment request (values, payment product, etc.) resets the validity.
    */
   isValid(): boolean {
-    return this.valid;
+    return this.#valid;
   }
 }

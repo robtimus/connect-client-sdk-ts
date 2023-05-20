@@ -6,11 +6,11 @@ class ValidationRuleRegularExpressionImpl implements ValidationRuleRegularExpres
 
   readonly id = ValidationRuleRegularExpressionImpl.ID;
   readonly regularExpression: string;
-  private readonly regexp: RegExp;
+  readonly #regexp: RegExp;
 
   constructor(definition: api.RegularExpressionValidator) {
     this.regularExpression = definition.regularExpression;
-    this.regexp = new RegExp(`^${this.regularExpression}$`);
+    this.#regexp = new RegExp(`^${this.regularExpression}$`);
   }
 
   validatePaymentRequest(request: PaymentRequest, fieldId: string): boolean {
@@ -19,7 +19,7 @@ class ValidationRuleRegularExpressionImpl implements ValidationRuleRegularExpres
   }
 
   validateValue(value: string): boolean {
-    return this.regexp.test(value);
+    return this.#regexp.test(value);
   }
 }
 

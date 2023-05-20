@@ -45,33 +45,39 @@ function processResponse<T>(response: HttpResponse): Promise<T> {
 }
 
 export class Communicator {
-  constructor(private readonly config: CommunicatorConfiguration, private readonly device: Device) {}
+  readonly #config: CommunicatorConfiguration;
+  readonly #device: Device;
+
+  constructor(config: CommunicatorConfiguration, device: Device) {
+    this.#config = config;
+    this.#device = device;
+  }
 
   async getPublicKey(): Promise<api.PublicKey> {
-    const url = createURL(this.config, "v1", "crypto/publickey");
-    return this.device
+    const url = createURL(this.#config, "v1", "crypto/publickey");
+    return this.#device
       .getHttpClient()
       .get(url)
-      .header("X-GCS-ClientMetaInfo", createClientMetaInfo(this.device))
-      .header("Authorization", createAuthorization(this.config))
+      .header("X-GCS-ClientMetaInfo", createClientMetaInfo(this.#device))
+      .header("Authorization", createAuthorization(this.#config))
       .send()
       .then((response) => processResponse(response));
   }
 
   async getThirdPartyStatus(paymentId: string): Promise<api.ThirdPartyStatusResponse> {
-    const url = createURL(this.config, "v1", `payments/${paymentId}/thirdpartystatus`);
-    return this.device
+    const url = createURL(this.#config, "v1", `payments/${paymentId}/thirdpartystatus`);
+    return this.#device
       .getHttpClient()
       .get(url)
-      .header("X-GCS-ClientMetaInfo", createClientMetaInfo(this.device))
-      .header("Authorization", createAuthorization(this.config))
+      .header("X-GCS-ClientMetaInfo", createClientMetaInfo(this.#device))
+      .header("Authorization", createAuthorization(this.#config))
       .send()
       .then((response) => processResponse(response));
   }
 
   async getPaymentProductGroups(params: api.PaymentProductGroupsParams): Promise<api.PaymentProductGroups> {
-    const url = createURL(this.config, "v1", "productgroups");
-    return this.device
+    const url = createURL(this.#config, "v1", "productgroups");
+    return this.#device
       .getHttpClient()
       .get(url)
       .queryParam("countryCode", params.countryCode)
@@ -80,15 +86,15 @@ export class Communicator {
       .queryParam("amount", params.amount)
       .queryParam("isRecurring", params.isRecurring)
       .queryParams("hide", params.hide)
-      .header("X-GCS-ClientMetaInfo", createClientMetaInfo(this.device))
-      .header("Authorization", createAuthorization(this.config))
+      .header("X-GCS-ClientMetaInfo", createClientMetaInfo(this.#device))
+      .header("Authorization", createAuthorization(this.#config))
       .send()
       .then((response) => processResponse(response));
   }
 
   async getPaymentProductGroup(paymentProductGroupId: string, params: api.PaymentProductGroupParams): Promise<api.PaymentProductGroup> {
-    const url = createURL(this.config, "v1", `productgroups/${paymentProductGroupId}`);
-    return this.device
+    const url = createURL(this.#config, "v1", `productgroups/${paymentProductGroupId}`);
+    return this.#device
       .getHttpClient()
       .get(url)
       .queryParam("countryCode", params.countryCode)
@@ -97,8 +103,8 @@ export class Communicator {
       .queryParam("amount", params.amount)
       .queryParam("isRecurring", params.isRecurring)
       .queryParams("hide", params.hide)
-      .header("X-GCS-ClientMetaInfo", createClientMetaInfo(this.device))
-      .header("Authorization", createAuthorization(this.config))
+      .header("X-GCS-ClientMetaInfo", createClientMetaInfo(this.#device))
+      .header("Authorization", createAuthorization(this.#config))
       .send()
       .then((response) => processResponse(response));
   }
@@ -107,19 +113,19 @@ export class Communicator {
     paymentProductGroupId: string,
     request: api.DeviceFingerprintRequest
   ): Promise<api.DeviceFingerprintResponse> {
-    const url = createURL(this.config, "v1", `productgroups/${paymentProductGroupId}/deviceFingerprint`);
-    return this.device
+    const url = createURL(this.#config, "v1", `productgroups/${paymentProductGroupId}/deviceFingerprint`);
+    return this.#device
       .getHttpClient()
       .post(url, request)
-      .header("X-GCS-ClientMetaInfo", createClientMetaInfo(this.device))
-      .header("Authorization", createAuthorization(this.config))
+      .header("X-GCS-ClientMetaInfo", createClientMetaInfo(this.#device))
+      .header("Authorization", createAuthorization(this.#config))
       .send()
       .then((response) => processResponse(response));
   }
 
   async getPaymentProducts(params: api.PaymentProductsParams): Promise<api.PaymentProducts> {
-    const url = createURL(this.config, "v1", "products");
-    return this.device
+    const url = createURL(this.#config, "v1", "products");
+    return this.#device
       .getHttpClient()
       .get(url)
       .queryParam("countryCode", params.countryCode)
@@ -128,15 +134,15 @@ export class Communicator {
       .queryParam("amount", params.amount)
       .queryParam("isRecurring", params.isRecurring)
       .queryParams("hide", params.hide)
-      .header("X-GCS-ClientMetaInfo", createClientMetaInfo(this.device))
-      .header("Authorization", createAuthorization(this.config))
+      .header("X-GCS-ClientMetaInfo", createClientMetaInfo(this.#device))
+      .header("Authorization", createAuthorization(this.#config))
       .send()
       .then((response) => processResponse(response));
   }
 
   async getPaymentProduct(paymentProductId: number, params: api.PaymentProductParams): Promise<api.PaymentProduct> {
-    const url = createURL(this.config, "v1", `products/${paymentProductId}`);
-    return this.device
+    const url = createURL(this.#config, "v1", `products/${paymentProductId}`);
+    return this.#device
       .getHttpClient()
       .get(url)
       .queryParam("countryCode", params.countryCode)
@@ -146,58 +152,58 @@ export class Communicator {
       .queryParam("isRecurring", params.isRecurring)
       .queryParams("hide", params.hide)
       .queryParam("forceBasicFlow", params.forceBasicFlow)
-      .header("X-GCS-ClientMetaInfo", createClientMetaInfo(this.device))
-      .header("Authorization", createAuthorization(this.config))
+      .header("X-GCS-ClientMetaInfo", createClientMetaInfo(this.#device))
+      .header("Authorization", createAuthorization(this.#config))
       .send()
       .then((response) => processResponse(response));
   }
 
   async getPaymentProductDirectory(paymentProductId: number, params: api.DirectoryParams): Promise<api.Directory> {
-    const url = createURL(this.config, "v1", `products/${paymentProductId}/directory`);
-    return this.device
+    const url = createURL(this.#config, "v1", `products/${paymentProductId}/directory`);
+    return this.#device
       .getHttpClient()
       .get(url)
       .queryParam("countryCode", params.countryCode)
       .queryParam("currencyCode", params.currencyCode)
-      .header("X-GCS-ClientMetaInfo", createClientMetaInfo(this.device))
-      .header("Authorization", createAuthorization(this.config))
+      .header("X-GCS-ClientMetaInfo", createClientMetaInfo(this.#device))
+      .header("Authorization", createAuthorization(this.#config))
       .send()
       .then((response) => processResponse(response));
   }
 
   async getCustomerDetails(paymentProductId: number, request: api.GetCustomerDetailsRequest): Promise<api.GetCustomerDetailsResponse> {
-    const url = createURL(this.config, "v1", `products/${paymentProductId}/customerDetails`);
-    return this.device
+    const url = createURL(this.#config, "v1", `products/${paymentProductId}/customerDetails`);
+    return this.#device
       .getHttpClient()
       .post(url, request)
-      .header("X-GCS-ClientMetaInfo", createClientMetaInfo(this.device))
-      .header("Authorization", createAuthorization(this.config))
+      .header("X-GCS-ClientMetaInfo", createClientMetaInfo(this.#device))
+      .header("Authorization", createAuthorization(this.#config))
       .send()
       .then((response) => processResponse(response));
   }
 
   async getPaymentProductDeviceFingerprint(paymentProductId: number, request: api.DeviceFingerprintRequest): Promise<api.DeviceFingerprintResponse> {
-    const url = createURL(this.config, "v1", `products/${paymentProductId}/deviceFingerprint`);
-    return this.device
+    const url = createURL(this.#config, "v1", `products/${paymentProductId}/deviceFingerprint`);
+    return this.#device
       .getHttpClient()
       .post(url, request)
-      .header("X-GCS-ClientMetaInfo", createClientMetaInfo(this.device))
-      .header("Authorization", createAuthorization(this.config))
+      .header("X-GCS-ClientMetaInfo", createClientMetaInfo(this.#device))
+      .header("Authorization", createAuthorization(this.#config))
       .send()
       .then((response) => processResponse(response));
   }
 
   async getPaymentProductNetworks(paymentProductId: number, params: api.PaymentProductNetworksParams): Promise<api.PaymentProductNetworksResponse> {
-    const url = createURL(this.config, "v1", `products/${paymentProductId}/networks`);
-    return this.device
+    const url = createURL(this.#config, "v1", `products/${paymentProductId}/networks`);
+    return this.#device
       .getHttpClient()
       .get(url)
       .queryParam("countryCode", params.countryCode)
       .queryParam("currencyCode", params.currencyCode)
       .queryParam("amount", params.amount)
       .queryParam("isRecurring", params.isRecurring)
-      .header("X-GCS-ClientMetaInfo", createClientMetaInfo(this.device))
-      .header("Authorization", createAuthorization(this.config))
+      .header("X-GCS-ClientMetaInfo", createClientMetaInfo(this.#device))
+      .header("Authorization", createAuthorization(this.#config))
       .send()
       .then((response) => processResponse(response));
   }
@@ -206,37 +212,37 @@ export class Communicator {
     paymentProductId: number,
     request: api.CreatePaymentProductSessionRequest
   ): Promise<api.CreatePaymentProductSessionResponse> {
-    const url = createURL(this.config, "v1", `products/${paymentProductId}/sessions`);
-    return this.device
+    const url = createURL(this.#config, "v1", `products/${paymentProductId}/sessions`);
+    return this.#device
       .getHttpClient()
       .post(url, request)
-      .header("X-GCS-ClientMetaInfo", createClientMetaInfo(this.device))
-      .header("Authorization", createAuthorization(this.config))
+      .header("X-GCS-ClientMetaInfo", createClientMetaInfo(this.#device))
+      .header("Authorization", createAuthorization(this.#config))
       .send()
       .then((response) => processResponse(response));
   }
 
   async convertAmount(params: api.ConvertAmountParams): Promise<api.ConvertAmountResponse> {
-    const url = createURL(this.config, "v1", `services/convert/amount`);
-    return this.device
+    const url = createURL(this.#config, "v1", `services/convert/amount`);
+    return this.#device
       .getHttpClient()
       .get(url)
       .queryParam("source", params.source)
       .queryParam("target", params.target)
       .queryParam("amount", params.amount)
-      .header("X-GCS-ClientMetaInfo", createClientMetaInfo(this.device))
-      .header("Authorization", createAuthorization(this.config))
+      .header("X-GCS-ClientMetaInfo", createClientMetaInfo(this.#device))
+      .header("Authorization", createAuthorization(this.#config))
       .send()
       .then((response) => processResponse(response));
   }
 
   async getIINDetails(request: api.GetIINDetailsRequest): Promise<api.GetIINDetailsResult> {
-    const url = createURL(this.config, "v1", `services/getIINdetails`);
-    return this.device
+    const url = createURL(this.#config, "v1", `services/getIINdetails`);
+    return this.#device
       .getHttpClient()
       .post(url, request)
-      .header("X-GCS-ClientMetaInfo", createClientMetaInfo(this.device))
-      .header("Authorization", createAuthorization(this.config))
+      .header("X-GCS-ClientMetaInfo", createClientMetaInfo(this.#device))
+      .header("Authorization", createAuthorization(this.#config))
       .send()
       .then((response) => {
         if (response.statusCode / 100 === 2) {
@@ -254,14 +260,14 @@ export class Communicator {
   }
 
   async getPrivacyPolicy(params: api.GetPrivacyPolicyParams): Promise<api.GetPrivacyPolicyResponse> {
-    const url = createURL(this.config, "v1", `services/privacypolicy`);
-    return this.device
+    const url = createURL(this.#config, "v1", `services/privacypolicy`);
+    return this.#device
       .getHttpClient()
       .get(url)
       .queryParam("locale", params.locale)
       .queryParam("paymentProductId", params.paymentProductId)
-      .header("X-GCS-ClientMetaInfo", createClientMetaInfo(this.device))
-      .header("Authorization", createAuthorization(this.config))
+      .header("X-GCS-ClientMetaInfo", createClientMetaInfo(this.#device))
+      .header("Authorization", createAuthorization(this.#config))
       .send()
       .then((response) => processResponse(response));
   }

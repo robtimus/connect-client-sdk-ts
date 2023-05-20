@@ -361,16 +361,16 @@ The following are the minimum supported browsers:
 
 | Browser             | Min version |
 |---------------------|-------------|
-| Chrome              | 69+         |
+| Chrome              | 74+         |
 | Edge                | 79+         |
-| Safari              | 12+         |
-| Firefox             | 62+         |
-| Opera               | 56+         |
-| Chrome for Android  | 112+        |
-| Safari on iOS       | 12+         |
+| Safari              | 14.1+       |
+| Firefox             | 90+         |
+| Opera               | 62+         |
+| Chrome for Android  | 113+        |
+| Safari on iOS       | 14.5+       |
 | Opera Mobile        | 73+         |
-| Android Browser     | 112+        |
-| Firefox for Android | 110+        |
+| Android Browser     | 113+        |
+| Firefox for Android | 113+        |
 
 Internet Explorer and older versions of these browser can become supported by using a polyfill like [core-js](https://www.npmjs.com/package/core-js).
 

@@ -68,7 +68,6 @@ describe("xhrHttpRequest", () => {
   });
 
   const globalMocks = Mocks.global();
-  const clientMocks = Mocks.for(xhrHttpClient);
 
   beforeAll(() => {
     server.install();
@@ -80,7 +79,7 @@ describe("xhrHttpRequest", () => {
   afterAll(() => {
     server.remove();
     globalMocks.restore();
-    clientMocks.restore();
+    xhrHttpClient["setTimeout"](undefined);
   });
 
   test("GET", async () => {
@@ -235,7 +234,7 @@ describe("xhrHttpRequest", () => {
   });
 
   test("timeout", async () => {
-    clientMocks.mock("timeout", 1000);
+    xhrHttpClient["setTimeout"](1000);
 
     const onSuccess = jest.fn();
     const result = await xhrHttpClient

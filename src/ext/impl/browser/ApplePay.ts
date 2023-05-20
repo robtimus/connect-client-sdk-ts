@@ -9,23 +9,27 @@ import {
 import { formatAmount } from "../../../util/amounts";
 
 class ApplePayClientImpl implements ApplePayClient {
-  constructor(
-    private readonly applePaySpecificInput: ApplePaySpecificInput,
-    private readonly applePaySpecificData: PaymentProduct302SpecificData,
-    private readonly context: PaymentContext
-  ) {}
+  readonly #applePaySpecificInput: ApplePaySpecificInput;
+  readonly #applePaySpecificData: PaymentProduct302SpecificData;
+  readonly #context: PaymentContext;
+
+  constructor(applePaySpecificInput: ApplePaySpecificInput, applePaySpecificData: PaymentProduct302SpecificData, context: PaymentContext) {
+    this.#applePaySpecificInput = applePaySpecificInput;
+    this.#applePaySpecificData = applePaySpecificData;
+    this.#context = context;
+  }
 
   async createPayment(
     sessionFactory: (input: MobilePaymentProductSession302SpecificInput) => Promise<MobilePaymentProductSession302SpecificOutput>
   ): Promise<ApplePayJS.ApplePayPaymentToken> {
     const paymentRequest: ApplePayJS.ApplePayPaymentRequest = {
-      currencyCode: this.context.amountOfMoney.currencyCode,
-      countryCode: this.applePaySpecificInput.acquirerCountry ?? this.context.countryCode,
+      currencyCode: this.#context.amountOfMoney.currencyCode,
+      countryCode: this.#applePaySpecificInput.acquirerCountry ?? this.#context.countryCode,
       total: {
-        label: this.applePaySpecificInput.lineItem ?? this.applePaySpecificInput.merchantName,
-        amount: formatAmount(this.context.amountOfMoney.amount),
+        label: this.#applePaySpecificInput.lineItem ?? this.#applePaySpecificInput.merchantName,
+        amount: formatAmount(this.#context.amountOfMoney.amount),
       },
-      supportedNetworks: this.applePaySpecificData.networks,
+      supportedNetworks: this.#applePaySpecificData.networks,
       merchantCapabilities: ["supports3DS"],
     };
 
@@ -41,7 +45,7 @@ class ApplePayClientImpl implements ApplePayClient {
       const applePaySession = new ApplePaySession(version, paymentRequest);
       applePaySession.onvalidatemerchant = (event) => {
         const input: MobilePaymentProductSession302SpecificInput = {
-          displayName: this.applePaySpecificInput.merchantName,
+          displayName: this.#applePaySpecificInput.merchantName,
           validationUrl: event.validationURL,
           domainName: window.location.hostname,
         };

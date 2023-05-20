@@ -47,53 +47,55 @@ class RequestMatcher {
 }
 
 class MockHttpRequest implements HttpRequest {
-  private readonly urlBuilder: URLBuilder;
-  private readonly params: Record<string, string | number | boolean | string[] | number[] | boolean[] | undefined> = {};
-  private readonly headers: Record<string, string | undefined> = {};
+  readonly #client: MockHttpClient;
+  readonly #matcher: RequestMatcher;
+  readonly #method: string;
+  readonly #urlBuilder: URLBuilder;
+  readonly #params: Record<string, string | number | boolean | string[] | number[] | boolean[] | undefined> = {};
+  readonly #headers: Record<string, string | undefined> = {};
+  readonly #body?: object;
 
-  constructor(
-    private readonly method: string,
-    url: string,
-    private readonly matcher: RequestMatcher,
-    private readonly client: MockHttpClient,
-    private readonly body?: object
-  ) {
-    this.urlBuilder = new URLBuilder(url);
+  constructor(client: MockHttpClient, matcher: RequestMatcher, method: string, url: string, body?: object) {
+    this.#client = client;
+    this.#matcher = matcher;
+    this.#method = method;
+    this.#urlBuilder = new URLBuilder(url);
+    this.#body = body;
   }
 
   queryParam(name: string, value?: string | number | boolean | undefined): HttpRequest {
-    this.urlBuilder.queryParam(name, value);
+    this.#urlBuilder.queryParam(name, value);
     if (value !== undefined) {
-      this.params[name] = value;
+      this.#params[name] = value;
     }
     return this;
   }
 
   queryParams(name: string, values?: string[] | number[] | boolean[] | undefined): HttpRequest {
-    this.urlBuilder.queryParams(name, values);
+    this.#urlBuilder.queryParams(name, values);
     if (values !== undefined) {
-      this.params[name] = values;
+      this.#params[name] = values;
     }
     return this;
   }
 
   header(name: string, value: string): HttpRequest {
-    this.headers[name] = value;
+    this.#headers[name] = value;
     return this;
   }
 
   send(): Promise<HttpResponse> {
-    const url = this.urlBuilder.build();
+    const url = this.#urlBuilder.build();
     const request = {
-      method: this.method,
+      method: this.#method,
       url,
-      params: this.params,
-      headers: this.headers,
-      body: this.body,
+      params: this.#params,
+      headers: this.#headers,
+      body: this.#body,
     };
-    this.client.requests.push(request);
+    this.#client.requests.push(request);
 
-    const handler = this.matcher.findHandler(url);
+    const handler = this.#matcher.findHandler(url);
     if (handler) {
       if (handler.requestValidator) {
         handler.requestValidator(request);
@@ -110,29 +112,29 @@ class MockHttpClient implements HttpClient {
 
   get(url: string): HttpRequest {
     const matcher = this.matchers["GET"] || new RequestMatcher();
-    return new MockHttpRequest("GET", url, matcher, this);
+    return new MockHttpRequest(this, matcher, "GET", url);
   }
 
   delete(url: string): HttpRequest {
     const matcher = this.matchers["DELETE"] || new RequestMatcher();
-    return new MockHttpRequest("DELETE", url, matcher, this);
+    return new MockHttpRequest(this, matcher, "DELETE", url);
   }
 
   post(url: string, body?: object): HttpRequest {
     const matcher = this.matchers["POST"] || new RequestMatcher();
-    return new MockHttpRequest("POST", url, matcher, this, body);
+    return new MockHttpRequest(this, matcher, "POST", url, body);
   }
 
   put(url: string, body?: object): HttpRequest {
     const matcher = this.matchers["PUT"] || new RequestMatcher();
-    return new MockHttpRequest("PUT", url, matcher, this, body);
+    return new MockHttpRequest(this, matcher, "PUT", url, body);
   }
 }
 
 export class MockDevice implements Device {
-  private readonly httpClient = new MockHttpClient();
-  private applePayClient: Promise<ApplePayClient | undefined> = Promise.resolve(undefined);
-  private googlePayClient: Promise<GooglePayClient | undefined> = Promise.resolve(undefined);
+  readonly #httpClient = new MockHttpClient();
+  #applePayClient: Promise<ApplePayClient | undefined> = Promise.resolve(undefined);
+  #googlePayClient: Promise<GooglePayClient | undefined> = Promise.resolve(undefined);
 
   getDeviceInformation(): DeviceInformation {
     return {
@@ -149,14 +151,14 @@ export class MockDevice implements Device {
   }
 
   getHttpClient(): HttpClient {
-    return this.httpClient;
+    return this.#httpClient;
   }
 
   getApplePayClient(): Promise<ApplePayClient | undefined> {
-    return this.applePayClient;
+    return this.#applePayClient;
   }
   getGooglePayClient(): Promise<GooglePayClient | undefined> {
-    return this.googlePayClient;
+    return this.#googlePayClient;
   }
 
   mockGet(url: string, response: HttpResponse, requestValidator?: RequestValidator): MockDevice {
@@ -168,8 +170,8 @@ export class MockDevice implements Device {
   }
 
   private mockMethod(method: string, url: string, response: HttpResponse, requestValidator?: RequestValidator): this {
-    const matcher = this.httpClient.matchers[method] || new RequestMatcher();
-    this.httpClient.matchers[method] = matcher;
+    const matcher = this.#httpClient.matchers[method] || new RequestMatcher();
+    this.#httpClient.matchers[method] = matcher;
     matcher.handlers.push({
       url,
       response,
@@ -180,54 +182,57 @@ export class MockDevice implements Device {
 
   mockApplePayClient(applePayClient?: true | "throw" | ApplePayClient): this {
     if (applePayClient === true) {
-      this.applePayClient = Promise.resolve({
+      this.#applePayClient = Promise.resolve({
         createPayment: jest.fn(),
       });
     } else if (applePayClient === "throw") {
-      this.applePayClient = Promise.reject("cannot provide Apple Pay client");
+      this.#applePayClient = Promise.reject("cannot provide Apple Pay client");
     } else {
-      this.applePayClient = Promise.resolve(applePayClient);
+      this.#applePayClient = Promise.resolve(applePayClient);
     }
     return this;
   }
 
   mockGooglePayClient(googlePayClient?: true | "throw" | GooglePayClient): this {
     if (googlePayClient === true) {
-      this.googlePayClient = Promise.resolve({
+      this.#googlePayClient = Promise.resolve({
         createButton: jest.fn(),
         prefetchPaymentData: jest.fn(),
         createPayment: jest.fn(),
       });
     } else if (googlePayClient === "throw") {
-      this.googlePayClient = Promise.reject("cannot provide Google Pay client");
+      this.#googlePayClient = Promise.reject("cannot provide Google Pay client");
     } else {
-      this.googlePayClient = Promise.resolve(googlePayClient);
+      this.#googlePayClient = Promise.resolve(googlePayClient);
     }
     return this;
   }
 
   capturedRequests(): CapturedHttpRequest[] {
-    return this.httpClient.requests;
+    return this.#httpClient.requests;
   }
 }
 
 export class Mocks {
-  private readonly oldValues: Record<string, unknown> = {};
+  readonly #object: object;
+  readonly #oldValues: Record<string, unknown> = {};
 
-  private constructor(private readonly o: object) {}
+  private constructor(o: object) {
+    this.#object = o;
+  }
 
   mock(name: string, value: unknown): this {
-    const oldValue = this.o[name];
-    Object.defineProperty(this.o, name, {
+    const oldValue = this.#object[name];
+    Object.defineProperty(this.#object, name, {
       value,
       configurable: true,
     });
-    this.oldValues[name] = oldValue;
+    this.#oldValues[name] = oldValue;
     return this;
   }
 
   mockIfNecessary(name: string, value: unknown): this {
-    const oldValue = this.o[name];
+    const oldValue = this.#object[name];
     if (oldValue === undefined) {
       this.mock(name, value);
     }
@@ -235,17 +240,17 @@ export class Mocks {
   }
 
   restore(): void {
-    const names = Object.keys(this.oldValues);
+    const names = Object.keys(this.#oldValues);
     for (const name of names) {
-      const oldValue = this.oldValues[name];
+      const oldValue = this.#oldValues[name];
       if (oldValue === undefined) {
-        delete this.o[name];
+        delete this.#object[name];
       } else {
-        Object.defineProperty(this.o, name, {
+        Object.defineProperty(this.#object, name, {
           value: oldValue,
         });
       }
-      delete this.oldValues[name];
+      delete this.#oldValues[name];
     }
   }
 

@@ -40,32 +40,34 @@ function toHttpResponse(request: XMLHttpRequest): HttpResponse {
 }
 
 class XhrHttpRequest implements HttpRequest {
-  private readonly urlBuilder: URLBuilder;
-  private readonly headers: Record<string, string> = {};
-  private readonly body?: string;
-  private readonly timeout?: number;
+  readonly #method: string;
+  readonly #urlBuilder: URLBuilder;
+  readonly #headers: Record<string, string> = {};
+  readonly #body?: string;
+  readonly #timeout?: number;
 
-  constructor(client: XhrHttpClient, private readonly method: string, url: string, body?: object) {
-    this.urlBuilder = new URLBuilder(url);
-    this.body = body ? JSON.stringify(body) : undefined;
-    this.timeout = client.getTimeout();
+  constructor(client: XhrHttpClient, method: string, url: string, body?: object) {
+    this.#method = method;
+    this.#urlBuilder = new URLBuilder(url);
+    this.#body = body ? JSON.stringify(body) : undefined;
+    this.#timeout = client.getTimeout();
   }
 
   queryParam(name: string, value?: string | number | boolean): HttpRequest {
-    this.urlBuilder.queryParam(name, value);
+    this.#urlBuilder.queryParam(name, value);
     return this;
   }
   queryParams(name: string, values?: string[] | number[] | boolean[]): HttpRequest {
-    this.urlBuilder.queryParams(name, values);
+    this.#urlBuilder.queryParams(name, values);
     return this;
   }
   header(name: string, value: string): HttpRequest {
-    this.headers[name] = value;
+    this.#headers[name] = value;
     return this;
   }
   send(): Promise<HttpResponse> {
     return new Promise<HttpResponse>((resolve, reject) => {
-      const url = this.urlBuilder.queryParam("cacheBust", new Date().getTime()).build();
+      const url = this.#urlBuilder.queryParam("cacheBust", new Date().getTime()).build();
 
       const request = xhr();
       request.onreadystatechange = () => {
@@ -80,18 +82,18 @@ class XhrHttpRequest implements HttpRequest {
       request.onabort = (event) => reject(event);
       request.onerror = (event) => reject(event);
       request.ontimeout = (event) => reject(event);
-      if (this.timeout) {
-        request.timeout = this.timeout;
+      if (this.#timeout) {
+        request.timeout = this.#timeout;
       }
 
-      request.open(this.method, url, true);
-      for (const name in this.headers) {
-        request.setRequestHeader(name, this.headers[name]);
+      request.open(this.#method, url, true);
+      for (const name in this.#headers) {
+        request.setRequestHeader(name, this.#headers[name]);
       }
-      if (this.body) {
+      if (this.#body) {
         request.setRequestHeader("Content-Type", "application/json");
       }
-      request.send(this.body);
+      request.send(this.#body);
     });
   }
 }
@@ -99,7 +101,7 @@ class XhrHttpRequest implements HttpRequest {
 Object.freeze(XhrHttpRequest.prototype);
 
 class XhrHttpClient implements HttpClient {
-  private timeout?: number;
+  #timeout?: number;
 
   get(url: string): HttpRequest {
     return new XhrHttpRequest(this, "GET", url);
@@ -115,7 +117,11 @@ class XhrHttpClient implements HttpClient {
   }
 
   getTimeout(): number | undefined {
-    return this.timeout;
+    return this.#timeout;
+  }
+
+  setTimeout(timeout?: number) {
+    this.#timeout = timeout;
   }
 }
 

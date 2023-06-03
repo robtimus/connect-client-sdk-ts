@@ -31,7 +31,8 @@ describe("session", () => {
   });
 
   beforeAll(async () => {
-    driver = await new Builder().forBrowser("chrome").build();
+    const browser = process.env.SELENIUM_BROWSER ?? "chrome";
+    driver = await new Builder().forBrowser(browser).build();
   });
 
   beforeAll(async () => {

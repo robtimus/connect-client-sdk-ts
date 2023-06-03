@@ -426,7 +426,7 @@ npm run typedoc
 
 ## Testing
 
-There are two types of tests:
+There are three types of tests:
 
 1. Unit tests. These will work out-of-the-box.\
    Run these tests as follows:
@@ -440,7 +440,13 @@ There are two types of tests:
     ```
     npm run test:integration
     ```
+3. Selenium (in-browser) tests. Before you can run these, you first need to copy file `test/config.json.dist` to `test/config.json` and replace all values as needed.\
+   Run these tests as follows:
 
-You can also run both types of tests together as follows:
+    ```
+    npm run test:selenium
+    ```
+
+You can also run all these types of tests together as follows:
 
     npm run test:all

@@ -4,25 +4,11 @@
  * @group integration
  */
 
-import * as connectSdk from "promiseful-connect-sdk";
 import { CreatePaymentRequest } from "connect-sdk-nodejs/lib/model/domain/payment";
-import { SessionResponse } from "connect-sdk-nodejs/lib/model/domain/sessions";
-import { PaymentContext, PaymentRequest, Session, SessionDetails } from "../../src";
+import { PaymentContext, PaymentRequest, Session } from "../../src";
 import { fetchHttpClient } from "../../src/ext/impl/http/fetch";
 import { Device } from "../../src/ext";
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const config = require("../config.json");
-
-connectSdk.init({
-  host: config.apiEndpoint.host,
-  scheme: config.apiEndpoint.scheme,
-  port: config.apiEndpoint.port,
-  enableLogging: config.enableLogging,
-  apiKeyId: config.apiKeyId,
-  secretApiKey: config.secretApiKey,
-  integrator: config.integrator,
-});
+import { createPayment, getSessionDetails } from "../s2s-api-util";
 
 describe("session", () => {
   const device: Device = {
@@ -41,7 +27,6 @@ describe("session", () => {
     getApplePayClient: () => Promise.resolve(undefined),
     getGooglePayClient: () => Promise.resolve(undefined),
   };
-  const sessionResponse = connectSdk.sessions.create(config.merchantId, {});
   const paymentContext: PaymentContext = {
     amountOfMoney: {
       amount: 1000,
@@ -50,28 +35,23 @@ describe("session", () => {
     countryCode: "NL",
   };
 
-  type NoNulls<T> = {
-    [P in keyof T]: NonNullable<T[P]>;
-  };
+  let session: Session;
 
-  async function createSession(): Promise<Session> {
-    const sessionDetails: SessionDetails = (await sessionResponse) as NoNulls<Required<SessionResponse>>;
-    return new Session(sessionDetails, paymentContext, device);
-  }
+  beforeAll(async () => {
+    const sessionDetails = await getSessionDetails();
+    session = new Session(sessionDetails, paymentContext, device);
+  });
 
   test("get public key", async () => {
-    const session = await createSession();
     expect(async () => await session.getPublicKey()).not.toThrow();
   });
 
   test("get products", async () => {
-    const session = await createSession();
     const products = await session.getBasicPaymentProducts();
     expect(products.paymentProducts).not.toHaveLength(0);
   }, 30000);
 
   test("get product groups", async () => {
-    const session = await createSession();
     const groups = await session.getBasicPaymentProductGroups();
     expect(groups.paymentProductGroups).toHaveLength(1);
     const group = groups.findPaymentProductGroup("cards");
@@ -79,7 +59,6 @@ describe("session", () => {
   }, 30000);
 
   test("get items", async () => {
-    const session = await createSession();
     const items = await session.getBasicPaymentItems(true);
     expect(items.paymentItems).not.toHaveLength(0);
     expect(items.findPaymentItem("cards")).toBeTruthy();
@@ -87,14 +66,12 @@ describe("session", () => {
   });
 
   test("convert amount", async () => {
-    const session = await createSession();
     const result = await session.convertAmount(1000, "EUR", "USD");
     expect(result.convertedAmount).toBeGreaterThan(0);
   });
 
   describe("get IIN details", () => {
     test("supported", async () => {
-      const session = await createSession();
       const result = await session.getIINDetails("424242");
       expect(result.status).toBe("SUPPORTED");
       // Add an if statement so TypeScript allows us to access properties that exist when status === SUPPORTED
@@ -108,7 +85,6 @@ describe("session", () => {
     });
 
     test("not supported", async () => {
-      const session = await createSession();
       const result = await session.getIINDetails("123456");
       expect(result.status).toBe("UNKNOWN");
       // Add an if statement so TypeScript allows us to access properties that exist when status === SUPPORTED
@@ -120,8 +96,6 @@ describe("session", () => {
   });
 
   test("encryptor", async () => {
-    const session = await createSession();
-
     const cardNumber = "4242424242424242";
     const iinDetails = await session.getIINDetails(cardNumber);
     expect(iinDetails.status).toBe("SUPPORTED");
@@ -154,7 +128,7 @@ describe("session", () => {
     };
     // A 402 response is allowed; that means that the encryption / decryption mechanism works
     try {
-      const createPaymentResult = await connectSdk.payments.create(config.merchantId, createPaymentRequest);
+      const createPaymentResult = await createPayment(createPaymentRequest);
       expect(createPaymentResult.payment?.id).toBeTruthy();
     } catch (reason) {
       expect(reason).toHaveProperty("status", 402);

@@ -4,11 +4,10 @@
  * @group integration
  */
 
-import { CreatePaymentRequest } from "connect-sdk-nodejs/lib/model/domain/payment";
 import { PaymentContext, PaymentRequest, Session } from "../../src";
 import { fetchHttpClient } from "../../src/ext/impl/http/fetch";
 import { Device } from "../../src/ext";
-import { createPayment, getSessionDetails } from "../s2s-api-util";
+import { createPaymentWithEncryptedCustomerInput, getSessionDetails } from "../s2s-api-util";
 
 describe("session", () => {
   const device: Device = {
@@ -115,20 +114,9 @@ describe("session", () => {
 
     const encryptedCustomerInput = await session.getEncryptor().then((encryptor) => encryptor.encrypt(paymentRequest));
 
-    const createPaymentRequest: CreatePaymentRequest = {
-      encryptedCustomerInput,
-      order: {
-        amountOfMoney: paymentContext.amountOfMoney,
-        customer: {
-          billingAddress: {
-            countryCode: "NL",
-          },
-        },
-      },
-    };
     // A 402 response is allowed; that means that the encryption / decryption mechanism works
     try {
-      const createPaymentResult = await createPayment(createPaymentRequest);
+      const createPaymentResult = await createPaymentWithEncryptedCustomerInput(encryptedCustomerInput, paymentContext.amountOfMoney);
       expect(createPaymentResult.payment?.id).toBeTruthy();
     } catch (reason) {
       expect(reason).toHaveProperty("status", 402);

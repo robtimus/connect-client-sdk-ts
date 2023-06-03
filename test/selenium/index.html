@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Connect Client SDK test page</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+  <script src="lib/connect-client-sdk.forge.umd.js"></script>
+  <style>
+  </style>
+</head>
+
+<body>
+  <form id="session-details">
+    <div class="mb-3">
+      <label for="assetUrl" class="form-label">assetUrl</label>
+      <input type="text" id="assetUrl" class="form-control" value="https://assets.pay1.sandbox.secured-by-ingenico.com/">
+    </div>
+    <div class="mb-3">
+      <label for="clientApiUrl" class="form-label">clientApiUrl</label>
+      <input type="text" id="clientApiUrl" class="form-control" value="https://eu.sandbox.api-ingenico.com/client">
+    </div>
+    <div class="mb-3">
+      <label for="clientSessionId" class="form-label">clientSessionId</label>
+      <input type="text" id="clientSessionId" class="form-control" value="6e807b8d2d0047259604e37566157b0d">
+    </div>
+    <div class="mb-3">
+      <label for="customerId" class="form-label">customerId</label>
+      <input type="text" id="customerId" class="form-control" value="1249-9a27180eab4c469dbb979d2f6c1282cf">
+    </div>
+    <button class="btn btn-primary" id="start">Start</button>
+    <div class="mb-3">
+      <pre><code id="start-error"></code></pre>
+    </div>
+  </form>
+
+  <form id="payment-product" style="display: none;">
+    <div id="payment-product-fields"></div>
+    <button class="btn btn-primary" id="encrypt" disabled>Encrypt</button>
+    <div class="mb-3" id="encrypted-payload-div" style="display: none;">
+      <label for="encrypted-payload" class="form-label">Encrypted payload</label>
+      <input type="text" id="encrypted-payload" class="form-control" disabled>
+    </div>
+    <div class="mb-3">
+      <pre><code id="product-error"></code></pre>
+    </div>
+  </form>
+
+  <script>
+    $(function () {
+      let session = undefined;
+      let paymentRequest = undefined;
+
+      function fetchProductForCardNumber(cardNumber) {
+        session.getIINDetails(cardNumber).then((result) => {
+          console.log('IIN details result:', result);
+          if (result.status !== 'SUPPORTED') {
+            $('#product-error').text("IIN: " + JSON.stringify(result));
+            return;
+          }
+          session.getPaymentProduct(result.paymentProductId).then((product) => {
+            console.log('Product:', product);
+            paymentRequest.setPaymentProduct(product);
+            $('#payment-product-field-cardNumber-logo').attr('src', product.displayHints.logo + '?size=37x37').show();
+            product.fields.forEach((field) => {
+              if ($('#payment-product-field-' + field.id).length === 0) {
+                const fieldsDiv = $('#payment-product-fields');
+                addField(field, fieldsDiv);
+              }
+            });
+            setEncryptEnabledStatus();
+          }).catch ((reason) => {
+            $('#product-error').text("Product: " + reason + ", " + JSON.stringify(reason));
+          });
+        }).catch ((reason) => {
+          $('#product-error').text("IIN: " + reason + ", " + JSON.stringify(reason));
+        });
+      }
+
+      function setEncryptEnabledStatus() {
+        const valid = paymentRequest && paymentRequest.getPaymentProduct() && paymentRequest.validate().valid && paymentRequest.isValid();
+        $('#encrypt').attr('disabled', !valid);
+      }
+
+      function addField(field, fieldsDiv) {
+        const fieldId = 'payment-product-field-' + field.id;
+        const fieldLabel = $('<label>').attr('for', fieldId).addClass('form-label').text(field.displayHints.label);
+        const fieldInput = $('<input>').attr('id', fieldId).attr('placeholder', field.displayHints.placeholderLabel).addClass('form-control')
+        const fieldInputDiv = $('<div>').addClass('form-control').append(fieldInput);
+        if (field.id === 'cardNumber') {
+          const fieldImage = $('<img>').attr('id', fieldId + '-logo').hide();
+          fieldInputDiv.append(fieldImage);
+        } else if (field.displayHints.tooltip?.image) {
+          const fieldImage = $('<img>').attr('id', fieldId + '-tooltip').attr('src', field.displayHints.tooltip.image + '?size=240x160');
+          fieldInputDiv.append(fieldImage);
+        }
+        const fieldDiv = $('<div>').addClass('mb-3').append(fieldLabel).append(fieldInputDiv);
+        fieldsDiv.append(fieldDiv);
+
+        fieldInput.on('keyup', () => {
+          let fieldValue = fieldInput.val();
+          fieldValue = field.applyMask(fieldValue).formattedValue;
+          fieldInput.val(fieldValue);
+          paymentRequest.setValue(field.id, fieldValue);
+          setEncryptEnabledStatus();
+        });
+        if (field.id === 'cardNumber') {
+          fieldInput.on('blur', () => {
+            fetchProductForCardNumber(fieldInput.val())
+          });
+        }
+      }
+
+      function showProductGroup(group) {
+        paymentRequest = new connectClientSdk.PaymentRequest();
+
+        const fieldsDiv = $('#payment-product-fields');
+        fieldsDiv.find('div').remove();
+        group.fields.forEach((field) => {
+          addField(field, fieldsDiv);
+        });
+        $('#payment-product').show();
+      }
+
+      $('#encrypt').on('click', () => {
+        $('#encrypted-payload-div').hide();
+        $('#product-error').text("");
+
+        session.getEncryptor().then((encryptor) => {
+          return encryptor.encrypt(paymentRequest);
+        }).then((encryptedPayload) => {
+          $('#encrypted-payload').val(encryptedPayload);
+          $('#encrypted-payload-div').show();
+        }).catch((reason) => {
+          $('#product-error').text("Encrypt: " + reason + ", " + JSON.stringify(reason));
+        });
+
+        return false;
+      });
+
+      $("#start").on('click', () => {
+        $('#session-details').find('input, button').prop('disabled', true);
+
+        const sessionDetails = {
+          clientSessionId: $('#clientSessionId').val(),
+          assetUrl: $('#assetUrl').val(),
+          clientApiUrl: $('#clientApiUrl').val(),
+          customerId: $('#customerId').val(),
+        };
+        const paymentContext = {
+          amountOfMoney: {
+            amount: 1000,
+            currencyCode: 'EUR',
+          },
+          countryCode: 'NL',
+        };
+
+        session = new connectClientSdk.Session(sessionDetails, paymentContext);
+        session.getPublicKey().then(() => session.getEncryptor()).then((encryptor) => {
+          const req = new connectClientSdk.PaymentRequest();
+          req.setPaymentProduct({
+            fields: []
+          });
+          req.validate();
+          return encryptor.encrypt(req);
+        }).then((payload) => console.log("payload:", payload));
+        session.getPaymentProductGroup('cards').then((group) => {
+          $('#session-details').hide();
+          console.log('Group:', group);
+          showProductGroup(group);
+        }).catch((reason) => {
+          $('#start-error').text(reason + ": " + JSON.stringify(reason));
+        }).finally(() => {
+          $('#session-details').find('input, button').prop('disabled', false);
+        });
+
+        return false;
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 import * as connectSdk from "promiseful-connect-sdk";
 import { CreatePaymentRequest } from "connect-sdk-nodejs/lib/model/domain/payment";
 import { SessionResponse } from "connect-sdk-nodejs/lib/model/domain/sessions";
-import { SessionDetails } from "../src/model";
+import { AmountOfMoney, SessionDetails } from "../src/model";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const config = require("./config.json");
@@ -28,4 +28,19 @@ export async function getSessionDetails(): Promise<SessionDetails> {
 
 export function createPayment(createPaymentRequest: CreatePaymentRequest) {
   return connectSdk.payments.create(config.merchantId, createPaymentRequest);
+}
+
+export function createPaymentWithEncryptedCustomerInput(encryptedCustomerInput: string, amountOfMoney: AmountOfMoney) {
+  const createPaymentRequest: CreatePaymentRequest = {
+    encryptedCustomerInput,
+    order: {
+      amountOfMoney,
+      customer: {
+        billingAddress: {
+          countryCode: "NL",
+        },
+      },
+    },
+  };
+  return createPayment(createPaymentRequest);
 }

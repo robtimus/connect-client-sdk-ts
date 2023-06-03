@@ -33,6 +33,7 @@
     "typedoc": "npm run generate && typedoc",
     "test": "jest --group=unit",
     "test:integration": "jest --group=integration",
+    "test:selenium": "jest --group=selenium",
     "test:all": "jest"
   },
   "dependencies": {
@@ -47,6 +48,7 @@
     "@types/node": "^16.18.24",
     "@types/node-forge": "^1.3.2",
     "@types/node-jose": "^1.1.10",
+    "@types/selenium-webdriver": "^4.1.15",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
     "dateformat": "^4.6.3",
@@ -63,6 +65,7 @@
     "node-jose": "^2.2.0",
     "prettier": "^2.8.7",
     "promiseful-connect-sdk": "^1.2.0",
+    "selenium-webdriver": "^4.9.2",
     "semver": "^7.5.0",
     "ts-jest": "^29.1.0",
     "typedoc": "^0.24.6",
@@ -101,6 +104,18 @@
     "testPathIgnorePatterns": [
       "__tests__/integration/init.ts"
     ],
+    "transform": {
+      "^.+.tsx?$": [
+        "ts-jest",
+        {
+          "diagnostics": {
+            "ignoreCodes": [
+              151001
+            ]
+          }
+        }
+      ]
+    },
     "collectCoverage": true
   },
   "jest-junit": {

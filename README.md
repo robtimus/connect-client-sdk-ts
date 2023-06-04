@@ -39,7 +39,7 @@ The SDK is available under global namespace `connectClientSdk`, and can be impor
 <html lang="en">
   <head>
     ...
-    <script src="./node_modules/@robtimus/connect-client-sdk/lib/connect-client-sdk.umd.js"></script>
+    <script src="./node_modules/@robtimus/connect-client-sdk/dist/connect-client-sdk.umd.js"></script>
   </head>
   <body>
     <script>
@@ -395,8 +395,8 @@ Internet Explorer and older versions of these browser can become supported by us
 If the Web Crypto API is not available, it's possible to use [node-forge](https://www.npmjs.com/package/node-forge) instead. For instance:
 
 ```typescript
-import { forgeCryptoEngine } from "@robtimus/connect-client-sdk/lib/ext/impl/crypto/forge";
-import { webCryptoCryptoEngine } from "@robtimus/connect-client-sdk/lib/ext/impl/crypto/WebCrypto";
+import { forgeCryptoEngine } from "@robtimus/connect-client-sdk/dist/ext/impl/crypto/forge";
+import { webCryptoCryptoEngine } from "@robtimus/connect-client-sdk/dist/ext/impl/crypto/WebCrypto";
 
 Session.defaultCryptoEngine = webCryptoCryptoEngine ?? forgeCryptoEngine;
 
@@ -406,7 +406,7 @@ Session.defaultCryptoEngine = webCryptoCryptoEngine ?? forgeCryptoEngine;
 When using UMD, this is done automatically when using `connect-client-sdk.forge.umd.js` instead of `connect-client-sdk.umd.js`:
 
 ```html
-<script src="./node_modules/@robtimus/connect-client-sdk/lib/connect-client-sdk.forge.umd.js"></script>
+<script src="./node_modules/@robtimus/connect-client-sdk/dist/connect-client-sdk.forge.umd.js"></script>
 ```
 
 ### Node.js

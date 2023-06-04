@@ -3,7 +3,7 @@
     "target": "ESNext",
     "module": "ESNext",
     "declaration": true,
-    "outDir": "lib",
+    "outDir": "dist",
     "strict": true,
     "moduleResolution": "node",
     "sourceMap": true,
@@ -14,5 +14,5 @@
     "noImplicitAny": false
   },
   "include": ["src"],
-  "exclude": ["node_modules", ".npm", "lib", "**/__tests__/*"]
+  "exclude": ["node_modules", ".npm", "dist", "**/__tests__/*"]
 }

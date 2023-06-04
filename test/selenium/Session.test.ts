@@ -20,7 +20,7 @@ describe("session", () => {
   let sessionDetails: SessionDetails;
 
   app.use(express.static("test/selenium"));
-  app.use("/lib", express.static("lib"));
+  app.use("/dist", express.static("dist"));
 
   jest.setTimeout(60 * 1000 * 10);
 

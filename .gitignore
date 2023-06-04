@@ -1,7 +1,7 @@
 node_modules
 /coverage
 /docs
-/lib
+/dist
 /src/util/metadata.ts
 logfile.txt
 .vscode

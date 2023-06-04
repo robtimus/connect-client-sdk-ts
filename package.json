@@ -9,13 +9,13 @@
   "license": "MIT",
   "author": "Rob Spoor",
   "files": [
-    "lib"
+    "dist"
   ],
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
-  "umd:main": "lib/connect-client-sdk.umd.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "umd:main": "dist/connect-client-sdk.umd.js",
   "browser": {
-    "./lib/ext/impl/crypto/native-crypto.js": "./lib/ext/impl/crypto/native-crypto-browser.js"
+    "./dist/ext/impl/crypto/native-crypto.js": "./dist/ext/impl/crypto/native-crypto-browser.js"
   },
   "repository": {
     "type": "git",
@@ -24,8 +24,8 @@
   "scripts": {
     "generate": "node ./scripts/generate-metadata.ts",
     "compile": "tsc",
-    "bundle": "microbundle -i lib/index.js -o lib/connect-client-sdk.js -f umd --target web --generateTypes false",
-    "bundle-forge": "microbundle -i lib/index.forge.js -o lib/connect-client-sdk.forge.js -f umd --target web --generateTypes false --external none",
+    "bundle": "microbundle -i dist/index.js -o dist/connect-client-sdk.js -f umd --target web --generateTypes false",
+    "bundle-forge": "microbundle -i dist/index.forge.js -o dist/connect-client-sdk.forge.js -f umd --target web --generateTypes false --external none",
     "lint": "eslint ./src --ext .ts",
     "format": "prettier --write \"**/*.+(json|ts|tsx)\"",
     "format:check": "prettier --check \"**/*.+(json|ts|tsx)\"",

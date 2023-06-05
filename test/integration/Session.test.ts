@@ -65,7 +65,11 @@ describe("session", () => {
   });
 
   test("convert amount", async () => {
-    const result = await session.convertAmount(1000, "EUR", "USD");
+    const result = await session.convertAmount({
+      amount: 1000,
+      source: "EUR",
+      target: "USD",
+    });
     expect(result.convertedAmount).toBeGreaterThan(0);
   });
 

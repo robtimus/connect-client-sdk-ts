@@ -10,6 +10,7 @@ import {
   BasicPaymentProduct,
   BasicPaymentProductGroups,
   BasicPaymentProducts,
+  ConvertAmountRequest,
   ConvertAmountResult,
   CustomerDetailsRequest,
   CustomerDetailsResult,
@@ -614,13 +615,9 @@ export class Session {
    * @param target The target currency.
    * @returns A promise containing the convert amount result.
    */
-  async convertAmount(amount: number, source: string, target: string): Promise<ConvertAmountResult> {
-    const params: api.ConvertAmountParams = {
-      source,
-      target,
-      amount,
-    };
-    const cacheKey = constructCacheKey("ConvertAmount", amount, source, target);
+  async convertAmount(request: ConvertAmountRequest): Promise<ConvertAmountResult> {
+    const params: api.ConvertAmountParams = request;
+    const cacheKey = constructCacheKey("ConvertAmount", request.amount, request.source, request.target);
     return getValue(this.#cache, cacheKey, () => this.#communicator.convertAmount(params));
   }
 

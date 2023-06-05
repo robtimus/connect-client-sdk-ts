@@ -2474,7 +2474,11 @@ describe("Session", () => {
           })
       );
       const session = new Session(sessionDetails, minimalPaymentContext, device);
-      const result = await session.convertAmount(1000, "EUR", "USD");
+      const result = await session.convertAmount({
+        amount: 1000,
+        source: "EUR",
+        target: "USD",
+      });
       expect(result).toStrictEqual(convertAmountResponse);
     });
 
@@ -2483,7 +2487,11 @@ describe("Session", () => {
       const session = new Session(sessionDetails, minimalPaymentContext, new MockDevice());
       const onSuccess = jest.fn();
       const result = await session
-        .convertAmount(1000, "EUR", "USD")
+        .convertAmount({
+          amount: 1000,
+          source: "EUR",
+          target: "USD",
+        })
         .then(onSuccess)
         .catch((reason) => reason);
       expect(onSuccess).not.toBeCalled();
@@ -2502,8 +2510,16 @@ describe("Session", () => {
           body: JSON.parse(JSON.stringify(convertAmountResponse)),
         });
         const session = new Session(sessionDetails, minimalPaymentContext, device);
-        const result1 = await session.convertAmount(1000, "EUR", "USD");
-        const result2 = await session.convertAmount(1000, "EUR", "USD");
+        const result1 = await session.convertAmount({
+          amount: 1000,
+          source: "EUR",
+          target: "USD",
+        });
+        const result2 = await session.convertAmount({
+          amount: 1000,
+          source: "EUR",
+          target: "USD",
+        });
         expect(result2).toBe(result1);
         expect(device.capturedRequests()).toHaveLength(1);
       });
@@ -2515,10 +2531,26 @@ describe("Session", () => {
           body: JSON.parse(JSON.stringify(convertAmountResponse)),
         });
         const session = new Session(sessionDetails, minimalPaymentContext, device);
-        await session.convertAmount(1000, "EUR", "USD");
-        await session.convertAmount(1001, "EUR", "USD");
-        await session.convertAmount(1000, "GBP", "USD");
-        await session.convertAmount(1000, "EUR", "GBP");
+        await session.convertAmount({
+          amount: 1000,
+          source: "EUR",
+          target: "USD",
+        });
+        await session.convertAmount({
+          amount: 1001,
+          source: "EUR",
+          target: "USD",
+        });
+        await session.convertAmount({
+          amount: 1000,
+          source: "GBP",
+          target: "USD",
+        });
+        await session.convertAmount({
+          amount: 1000,
+          source: "EUR",
+          target: "GBP",
+        });
         expect(device.capturedRequests()).toHaveLength(4);
       });
     });

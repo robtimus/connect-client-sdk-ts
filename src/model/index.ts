@@ -775,6 +775,12 @@ export interface MobilePaymentProductSession302SpecificOutput {
 
 // Services - convert amount
 
+export interface ConvertAmountRequest {
+  amount: number;
+  source: string;
+  target: string;
+}
+
 export interface ConvertAmountResult {
   readonly convertedAmount: number;
 }

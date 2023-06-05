@@ -281,6 +281,8 @@ const accountOnFile = ...;
 const displayValue = accountOnFile.displayHints.labelTemplate
   .map((e) => accountOnFile.getAttributeDisplayValue(e.attributeKey))
   .join(" ");
+// or equivalent:
+const label = accountOnFile.getLabel();
 ```
 
 To render an account on file's detail page, fetch its matching payment product and display it mostly as usual. However, some fields should not be editable. [AccountOnFile](https://robtimus.github.io/connect-client-sdk-ts/interfaces/model.AccountOnFile.html) has method `isReadOnlyAttribute` that can be used. For instance:

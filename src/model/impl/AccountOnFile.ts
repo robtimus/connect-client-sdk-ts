@@ -16,6 +16,10 @@ class AccountOnFileImpl implements AccountOnFile {
     this.paymentProductId = json.paymentProductId;
   }
 
+  getLabel(): string {
+    return this.displayHints.labelTemplate.map((e) => this.getAttributeDisplayValue(e.attributeKey)).join(" ");
+  }
+
   findAttribute(key: string): AccountOnFileAttribute | undefined {
     return this.attributes.find((attribute) => attribute.key === key);
   }

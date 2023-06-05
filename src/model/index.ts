@@ -133,6 +133,10 @@ export interface AccountOnFile {
   readonly id: number;
   readonly paymentProductId: number;
   /**
+   * Returns a label based on the label templates and attributes.
+   */
+  getLabel(): string;
+  /**
    * Finds an attribute based on key.
    * @param key The key of the attribute to look for.
    * @returns The matching attribute, or undefined if there is no such attribute.

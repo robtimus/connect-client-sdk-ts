@@ -48,6 +48,11 @@ describe("toAccountOnFile", () => {
     expect(accountOnFile.paymentProductId).toBe(json.paymentProductId);
   });
 
+  test("getLabel", () => {
+    const result = accountOnFile.getLabel();
+    expect(result).toBe("12-**");
+  });
+
   describe("findAttribute", () => {
     test("non-matching", () => {
       const result = accountOnFile.findAttribute("foo");
@@ -120,11 +125,6 @@ describe("toAccountOnFile", () => {
 
     test("with wildcard mask", () => {
       const result = accountOnFile.getAttributeDisplayValue("expirationDate");
-      expect(result).toBe("12-**");
-    });
-
-    test("combined", () => {
-      const result = accountOnFile.displayHints.labelTemplate.map((e) => accountOnFile.getAttributeDisplayValue(e.attributeKey)).join(" ");
       expect(result).toBe("12-**");
     });
   });

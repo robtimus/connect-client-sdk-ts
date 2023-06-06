@@ -10,76 +10,82 @@ const fieldIdWithoutMask = "cardNumber";
 const fieldIdWithMask = "expirationDate";
 const optionalField = "cardHolderName";
 
-const product = toPaymentProduct({
-  allowsInstallments: false,
-  allowsRecurring: false,
-  allowsTokenization: false,
-  autoTokenized: false,
-  deviceFingerprintEnabled: false,
-  displayHints: {
-    displayOrder: 0,
-    logo: "",
+const product = toPaymentProduct(
+  {
+    allowsInstallments: false,
+    allowsRecurring: false,
+    allowsTokenization: false,
+    autoTokenized: false,
+    deviceFingerprintEnabled: false,
+    displayHints: {
+      displayOrder: 0,
+      logo: "",
+    },
+    fields: [
+      {
+        dataRestrictions: {
+          isRequired: true,
+          validators: {
+            luhn: {},
+          },
+        },
+        id: fieldIdWithoutMask,
+        type: "",
+      },
+      {
+        dataRestrictions: {
+          isRequired: true,
+          validators: {
+            expirationDate: {},
+          },
+        },
+        displayHints: {
+          alwaysShow: false,
+          displayOrder: 0,
+          formElement: {
+            type: "",
+          },
+          obfuscate: false,
+          mask: "{{99}}-{{99}}",
+        },
+        id: fieldIdWithMask,
+        type: "",
+      },
+      {
+        dataRestrictions: {
+          isRequired: false,
+          validators: {},
+        },
+        id: optionalField,
+        type: "",
+      },
+    ],
+    id: 1,
+    mobileIntegrationLevel: "",
+    paymentMethod: "",
+    usesRedirectionTo3rdParty: false,
   },
-  fields: [
-    {
-      dataRestrictions: {
-        isRequired: true,
-        validators: {
-          luhn: {},
-        },
-      },
-      id: fieldIdWithoutMask,
-      type: "",
-    },
-    {
-      dataRestrictions: {
-        isRequired: true,
-        validators: {
-          expirationDate: {},
-        },
-      },
-      displayHints: {
-        alwaysShow: false,
-        displayOrder: 0,
-        formElement: {
-          type: "",
-        },
-        obfuscate: false,
-        mask: "{{99}}-{{99}}",
-      },
-      id: fieldIdWithMask,
-      type: "",
-    },
-    {
-      dataRestrictions: {
-        isRequired: false,
-        validators: {},
-      },
-      id: optionalField,
-      type: "",
-    },
-  ],
-  id: 1,
-  mobileIntegrationLevel: "",
-  paymentMethod: "",
-  usesRedirectionTo3rdParty: false,
-});
+  "http://localhost"
+);
 
-const productWithoutFields = toPaymentProduct({
-  allowsInstallments: false,
-  allowsRecurring: false,
-  allowsTokenization: false,
-  autoTokenized: false,
-  deviceFingerprintEnabled: false,
-  displayHints: {
-    displayOrder: 0,
-    logo: "",
+const productWithoutFields = toPaymentProduct(
+  {
+    allowsInstallments: false,
+    allowsRecurring: false,
+    allowsTokenization: false,
+    autoTokenized: false,
+    deviceFingerprintEnabled: false,
+    displayHints: {
+      displayOrder: 0,
+      logo: "",
+    },
+    id: 1,
+    mobileIntegrationLevel: "",
+    paymentMethod: "",
+    usesRedirectionTo3rdParty: false,
   },
-  id: 1,
-  mobileIntegrationLevel: "",
-  paymentMethod: "",
-  usesRedirectionTo3rdParty: false,
-});
+  "http://localhost"
+);
 
 describe("PaymentRequest", () => {
   describe("getValue", () => {
@@ -306,15 +312,18 @@ describe("PaymentRequest", () => {
     });
 
     test("account on file set", () => {
-      const accountOnFile = toAccountOnFile({
-        attributes: [],
-        displayHints: {
-          labelTemplate: [],
-          logo: "",
+      const accountOnFile = toAccountOnFile(
+        {
+          attributes: [],
+          displayHints: {
+            labelTemplate: [],
+            logo: "",
+          },
+          id: 1,
+          paymentProductId: product.id,
         },
-        id: 1,
-        paymentProductId: product.id,
-      });
+        "http://localhost"
+      );
 
       const request = new PaymentRequest();
       request.setPaymentProduct(product);
@@ -325,27 +334,30 @@ describe("PaymentRequest", () => {
   });
 
   describe("setAccountOnFile", () => {
-    const accountOnFile = toAccountOnFile({
-      attributes: [
-        {
-          key: fieldIdWithoutMask,
-          value: "****",
-          status: "READ_ONLY",
+    const accountOnFile = toAccountOnFile(
+      {
+        attributes: [
+          {
+            key: fieldIdWithoutMask,
+            value: "****",
+            status: "READ_ONLY",
+          },
+          {
+            key: fieldIdWithMask,
+            value: "1225",
+            status: "MUST_WRITE",
+            mustWriteReason: "expired",
+          },
+        ],
+        displayHints: {
+          labelTemplate: [],
+          logo: "",
         },
-        {
-          key: fieldIdWithMask,
-          value: "1225",
-          status: "MUST_WRITE",
-          mustWriteReason: "expired",
-        },
-      ],
-      displayHints: {
-        labelTemplate: [],
-        logo: "",
+        id: 1,
+        paymentProductId: product.id,
       },
-      id: 1,
-      paymentProductId: product.id,
-    });
+      "http://localhost"
+    );
 
     test("provided attributes are reset", () => {
       const request = new PaymentRequest();
@@ -468,27 +480,30 @@ describe("PaymentRequest", () => {
     });
 
     describe("non-matching account on file set", () => {
-      const accountOnFile = toAccountOnFile({
-        attributes: [
-          {
-            key: fieldIdWithoutMask,
-            value: "****",
-            status: "READ_ONLY",
+      const accountOnFile = toAccountOnFile(
+        {
+          attributes: [
+            {
+              key: fieldIdWithoutMask,
+              value: "****",
+              status: "READ_ONLY",
+            },
+            {
+              key: fieldIdWithMask,
+              value: "1225",
+              status: "MUST_WRITE",
+              mustWriteReason: "expired",
+            },
+          ],
+          displayHints: {
+            labelTemplate: [],
+            logo: "",
           },
-          {
-            key: fieldIdWithMask,
-            value: "1225",
-            status: "MUST_WRITE",
-            mustWriteReason: "expired",
-          },
-        ],
-        displayHints: {
-          labelTemplate: [],
-          logo: "",
+          id: 1,
+          paymentProductId: product.id + 1,
         },
-        id: 1,
-        paymentProductId: product.id + 1,
-      });
+        "http://localhost"
+      );
 
       test("all fields set", () => {
         const request = new PaymentRequest();
@@ -555,27 +570,30 @@ describe("PaymentRequest", () => {
     });
 
     describe("matching account on file set", () => {
-      const accountOnFile = toAccountOnFile({
-        attributes: [
-          {
-            key: fieldIdWithoutMask,
-            value: "****",
-            status: "READ_ONLY",
+      const accountOnFile = toAccountOnFile(
+        {
+          attributes: [
+            {
+              key: fieldIdWithoutMask,
+              value: "****",
+              status: "READ_ONLY",
+            },
+            {
+              key: fieldIdWithMask,
+              value: "1225",
+              status: "MUST_WRITE",
+              mustWriteReason: "expired",
+            },
+          ],
+          displayHints: {
+            labelTemplate: [],
+            logo: "",
           },
-          {
-            key: fieldIdWithMask,
-            value: "1225",
-            status: "MUST_WRITE",
-            mustWriteReason: "expired",
-          },
-        ],
-        displayHints: {
-          labelTemplate: [],
-          logo: "",
+          id: 1,
+          paymentProductId: product.id,
         },
-        id: 1,
-        paymentProductId: product.id,
-      });
+        "http://localhost"
+      );
 
       test("all fields set", () => {
         const request = new PaymentRequest();

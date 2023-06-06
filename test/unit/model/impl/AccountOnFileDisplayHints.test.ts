@@ -16,13 +16,15 @@ const json: api.AccountOnFileDisplayHints = {
 };
 
 describe("toAccountOnFileDisplayHints", () => {
-  const displayHints = toAccountOnFileDisplayHints(json);
+  const displayHints = toAccountOnFileDisplayHints(json, "http://localhost");
 
   test("property mapping", () => {
     expect(displayHints.labelTemplate).toHaveLength(1);
     expect(displayHints.labelTemplate[0].attributeKey).toBe(json.labelTemplate[0].attributeKey);
     expect(displayHints.labelTemplate[0].mask).toBe(json.labelTemplate[0].mask);
     expect(displayHints.labelTemplate[0].wildcardMask).toBe("{{**}}-{{**}}");
+    expect(displayHints.logo.path).toBe(json.logo);
+    expect(displayHints.logo.url).toBe("http://localhost/" + json.logo);
   });
 
   describe("findLabelTemplate", () => {

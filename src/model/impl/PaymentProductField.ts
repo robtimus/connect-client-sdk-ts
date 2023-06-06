@@ -20,9 +20,9 @@ class PaymentProductFieldImpl implements PaymentProductField {
   readonly usedForLookup?: boolean;
   readonly inputType: string;
 
-  constructor(json: api.PaymentProductField) {
+  constructor(json: api.PaymentProductField, assetUrl: string) {
     this.dataRestrictions = toPaymentProductFieldDataRestrictions(json.dataRestrictions);
-    this.displayHints = json.displayHints ? toPaymentProductFieldDisplayHints(json.displayHints) : undefined;
+    this.displayHints = json.displayHints ? toPaymentProductFieldDisplayHints(json.displayHints, assetUrl) : undefined;
     this.id = json.id;
     this.type = json.type;
     this.usedForLookup = json.usedForLookup;
@@ -52,6 +52,16 @@ class PaymentProductFieldImpl implements PaymentProductField {
 
 Object.freeze(PaymentProductFieldImpl.prototype);
 
-export function toPaymentProductField(json: api.PaymentProductField): PaymentProductField {
-  return new PaymentProductFieldImpl(json);
+export function toPaymentProductField(json: api.PaymentProductField, assetUrl: string): PaymentProductField {
+  return new PaymentProductFieldImpl(json, assetUrl);
+}
+
+export function toPaymentProductFields(json: api.PaymentProductField[], assetUrl: string): PaymentProductField[] {
+  return json
+    .map((field) => toPaymentProductField(field, assetUrl))
+    .sort((f1, f2) => {
+      const displayOrder1 = f1.displayHints?.displayOrder ?? 0;
+      const displayOrder2 = f2.displayHints?.displayOrder ?? 0;
+      return displayOrder1 - displayOrder2;
+    });
 }

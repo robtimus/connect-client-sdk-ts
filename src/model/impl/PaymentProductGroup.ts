@@ -8,7 +8,8 @@ import {
 } from "..";
 import * as api from "../../communicator/model";
 import { toAccountOnFile } from "./AccountOnFile";
-import { toPaymentProductField } from "./PaymentProductField";
+import { toPaymentProductDisplayHints } from "./PaymentProductDisplayHints";
+import { toPaymentProductFields } from "./PaymentProductField";
 
 class BasicPaymentProductGroupImpl implements BasicPaymentProductGroup {
   readonly accountsOnFile: AccountOnFile[];
@@ -18,11 +19,11 @@ class BasicPaymentProductGroupImpl implements BasicPaymentProductGroup {
   readonly id: string;
   readonly type = "group";
 
-  constructor(json: api.PaymentProductGroup) {
-    this.accountsOnFile = json.accountsOnFile ? json.accountsOnFile.map(toAccountOnFile) : [];
+  constructor(json: api.PaymentProductGroup, assetUrl: string) {
+    this.accountsOnFile = json.accountsOnFile ? json.accountsOnFile.map((accountOnFile) => toAccountOnFile(accountOnFile, assetUrl)) : [];
     this.allowsInstallments = json.allowsInstallments;
     this.deviceFingerprintEnabled = json.deviceFingerprintEnabled;
-    this.displayHints = json.displayHints;
+    this.displayHints = toPaymentProductDisplayHints(json.displayHints, assetUrl);
     this.id = json.id;
   }
 
@@ -41,16 +42,18 @@ class BasicPaymentProductGroupImpl implements BasicPaymentProductGroup {
 
 Object.freeze(BasicPaymentProductGroupImpl.prototype);
 
-export function toBasicPaymentProductGroup(json: api.PaymentProductGroup): BasicPaymentProductGroup {
-  return new BasicPaymentProductGroupImpl(json);
+export function toBasicPaymentProductGroup(json: api.PaymentProductGroup, assetUrl: string): BasicPaymentProductGroup {
+  return new BasicPaymentProductGroupImpl(json, assetUrl);
 }
 
 class BasicPaymentProductGroupsImpl implements BasicPaymentProductGroups {
   readonly paymentProductGroups: BasicPaymentProductGroup[];
   readonly accountsOnFile: AccountOnFile[];
 
-  constructor(json: api.PaymentProductGroups) {
-    this.paymentProductGroups = json.paymentProductGroups.map(toBasicPaymentProductGroup);
+  constructor(json: api.PaymentProductGroups, assetUrl: string) {
+    this.paymentProductGroups = json.paymentProductGroups
+      .map((group) => toBasicPaymentProductGroup(group, assetUrl))
+      .sort((g1, g2) => g1.displayHints.displayOrder - g2.displayHints.displayOrder);
     this.accountsOnFile = this.paymentProductGroups.flatMap((group) => group.accountsOnFile);
   }
 
@@ -81,16 +84,16 @@ class BasicPaymentProductGroupsImpl implements BasicPaymentProductGroups {
 
 Object.freeze(BasicPaymentProductGroupsImpl.prototype);
 
-export function toBasicPaymentProductGroups(json: api.PaymentProductGroups): BasicPaymentProductGroups {
-  return new BasicPaymentProductGroupsImpl(json);
+export function toBasicPaymentProductGroups(json: api.PaymentProductGroups, assetUrl: string): BasicPaymentProductGroups {
+  return new BasicPaymentProductGroupsImpl(json, assetUrl);
 }
 
 class PaymentProductGroupImpl extends BasicPaymentProductGroupImpl implements PaymentProductGroup {
   readonly fields: PaymentProductField[];
 
-  constructor(json: api.PaymentProductGroup) {
-    super(json);
-    this.fields = json.fields ? json.fields.map(toPaymentProductField) : [];
+  constructor(json: api.PaymentProductGroup, assetUrl: string) {
+    super(json, assetUrl);
+    this.fields = json.fields ? toPaymentProductFields(json.fields, assetUrl) : [];
   }
 
   findField(id: string): PaymentProductField | undefined {
@@ -108,6 +111,6 @@ class PaymentProductGroupImpl extends BasicPaymentProductGroupImpl implements Pa
 
 Object.freeze(PaymentProductGroupImpl.prototype);
 
-export function toPaymentProductGroup(json: api.PaymentProductGroup) {
-  return new PaymentProductGroupImpl(json);
+export function toPaymentProductGroup(json: api.PaymentProductGroup, assetUrl: string) {
+  return new PaymentProductGroupImpl(json, assetUrl);
 }

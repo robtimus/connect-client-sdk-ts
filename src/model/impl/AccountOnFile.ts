@@ -9,9 +9,9 @@ class AccountOnFileImpl implements AccountOnFile {
   readonly id: number;
   readonly paymentProductId: number;
 
-  constructor(json: api.AccountOnFile) {
+  constructor(json: api.AccountOnFile, assetUrl: string) {
     this.attributes = json.attributes;
-    this.displayHints = toAccountOnFileDisplayHints(json.displayHints);
+    this.displayHints = toAccountOnFileDisplayHints(json.displayHints, assetUrl);
     this.id = json.id;
     this.paymentProductId = json.paymentProductId;
   }
@@ -73,6 +73,6 @@ class AccountOnFileImpl implements AccountOnFile {
 
 Object.freeze(AccountOnFileImpl.prototype);
 
-export function toAccountOnFile(json: api.AccountOnFile): AccountOnFile {
-  return new AccountOnFileImpl(json);
+export function toAccountOnFile(json: api.AccountOnFile, assetUrl: string): AccountOnFile {
+  return new AccountOnFileImpl(json, assetUrl);
 }

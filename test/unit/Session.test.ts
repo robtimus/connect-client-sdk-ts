@@ -508,17 +508,17 @@ describe("Session", () => {
           const result = await session.getBasicPaymentItems(false);
           expect(result.paymentItems).toHaveLength(4);
           expect(result.paymentItems[0].id).toBe(1);
-          expect(result.paymentItems[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/1.png`);
+          expect(result.paymentItems[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
           expect(result.paymentItems[0].accountsOnFile).toHaveLength(1);
-          expect(result.paymentItems[0].accountsOnFile[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/1.png`);
+          expect(result.paymentItems[0].accountsOnFile[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
           expect(result.paymentItems[1].id).toBe(2);
-          expect(result.paymentItems[1].displayHints.logo).toBe(`${sessionDetails.assetUrl}/2.png`);
+          expect(result.paymentItems[1].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/2.png`);
           expect(result.paymentItems[1].accountsOnFile).toStrictEqual([]);
           expect(result.paymentItems[2].id).toBe(809);
-          expect(result.paymentItems[2].displayHints.logo).toBe(`${sessionDetails.assetUrl}/809.png`);
+          expect(result.paymentItems[2].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/809.png`);
           expect(result.paymentItems[2].accountsOnFile).toStrictEqual([]);
           expect(result.paymentItems[3].id).toBe(3012);
-          expect(result.paymentItems[3].displayHints.logo).toBe(`${sessionDetails.assetUrl}/3012.png`);
+          expect(result.paymentItems[3].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/3012.png`);
           expect(result.paymentItems[3].accountsOnFile).toStrictEqual([]);
         });
 
@@ -534,20 +534,20 @@ describe("Session", () => {
           const result = await session.getBasicPaymentItems(false);
           expect(result.paymentItems).toHaveLength(5);
           expect(result.paymentItems[0].id).toBe(1);
-          expect(result.paymentItems[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/1.png`);
+          expect(result.paymentItems[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
           expect(result.paymentItems[0].accountsOnFile).toHaveLength(1);
-          expect(result.paymentItems[0].accountsOnFile[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/1.png`);
+          expect(result.paymentItems[0].accountsOnFile[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
           expect(result.paymentItems[1].id).toBe(2);
-          expect(result.paymentItems[1].displayHints.logo).toBe(`${sessionDetails.assetUrl}/2.png`);
+          expect(result.paymentItems[1].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/2.png`);
           expect(result.paymentItems[1].accountsOnFile).toStrictEqual([]);
           expect(result.paymentItems[2].id).toBe(320);
-          expect(result.paymentItems[2].displayHints.logo).toBe(`${sessionDetails.assetUrl}/320.png`);
+          expect(result.paymentItems[2].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/320.png`);
           expect(result.paymentItems[2].accountsOnFile).toStrictEqual([]);
           expect(result.paymentItems[3].id).toBe(809);
-          expect(result.paymentItems[3].displayHints.logo).toBe(`${sessionDetails.assetUrl}/809.png`);
+          expect(result.paymentItems[3].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/809.png`);
           expect(result.paymentItems[3].accountsOnFile).toStrictEqual([]);
           expect(result.paymentItems[4].id).toBe(3012);
-          expect(result.paymentItems[4].displayHints.logo).toBe(`${sessionDetails.assetUrl}/3012.png`);
+          expect(result.paymentItems[4].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/3012.png`);
           expect(result.paymentItems[4].accountsOnFile).toStrictEqual([]);
         });
 
@@ -563,20 +563,20 @@ describe("Session", () => {
           const result = await session.getBasicPaymentItems(false);
           expect(result.paymentItems).toHaveLength(5);
           expect(result.paymentItems[0].id).toBe(1);
-          expect(result.paymentItems[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/1.png`);
+          expect(result.paymentItems[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
           expect(result.paymentItems[0].accountsOnFile).toHaveLength(1);
-          expect(result.paymentItems[0].accountsOnFile[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/1.png`);
+          expect(result.paymentItems[0].accountsOnFile[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
           expect(result.paymentItems[1].id).toBe(2);
-          expect(result.paymentItems[1].displayHints.logo).toBe(`${sessionDetails.assetUrl}/2.png`);
+          expect(result.paymentItems[1].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/2.png`);
           expect(result.paymentItems[1].accountsOnFile).toStrictEqual([]);
           expect(result.paymentItems[2].id).toBe(302);
-          expect(result.paymentItems[2].displayHints.logo).toBe(`${sessionDetails.assetUrl}/302.png`);
+          expect(result.paymentItems[2].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/302.png`);
           expect(result.paymentItems[2].accountsOnFile).toStrictEqual([]);
           expect(result.paymentItems[3].id).toBe(809);
-          expect(result.paymentItems[3].displayHints.logo).toBe(`${sessionDetails.assetUrl}/809.png`);
+          expect(result.paymentItems[3].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/809.png`);
           expect(result.paymentItems[3].accountsOnFile).toStrictEqual([]);
           expect(result.paymentItems[4].id).toBe(3012);
-          expect(result.paymentItems[4].displayHints.logo).toBe(`${sessionDetails.assetUrl}/3012.png`);
+          expect(result.paymentItems[4].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/3012.png`);
           expect(result.paymentItems[4].accountsOnFile).toStrictEqual([]);
         });
 
@@ -594,17 +594,17 @@ describe("Session", () => {
             const result = await session.getBasicPaymentItems(false);
             expect(result.paymentItems).toHaveLength(4);
             expect(result.paymentItems[0].id).toBe(1);
-            expect(result.paymentItems[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/1.png`);
+            expect(result.paymentItems[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
             expect(result.paymentItems[0].accountsOnFile).toHaveLength(1);
-            expect(result.paymentItems[0].accountsOnFile[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/1.png`);
+            expect(result.paymentItems[0].accountsOnFile[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
             expect(result.paymentItems[1].id).toBe(2);
-            expect(result.paymentItems[1].displayHints.logo).toBe(`${sessionDetails.assetUrl}/2.png`);
+            expect(result.paymentItems[1].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/2.png`);
             expect(result.paymentItems[1].accountsOnFile).toStrictEqual([]);
             expect(result.paymentItems[2].id).toBe(809);
-            expect(result.paymentItems[2].displayHints.logo).toBe(`${sessionDetails.assetUrl}/809.png`);
+            expect(result.paymentItems[2].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/809.png`);
             expect(result.paymentItems[2].accountsOnFile).toStrictEqual([]);
             expect(result.paymentItems[3].id).toBe(3012);
-            expect(result.paymentItems[3].displayHints.logo).toBe(`${sessionDetails.assetUrl}/3012.png`);
+            expect(result.paymentItems[3].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/3012.png`);
             expect(result.paymentItems[3].accountsOnFile).toStrictEqual([]);
           });
 
@@ -621,23 +621,23 @@ describe("Session", () => {
             const result = await session.getBasicPaymentItems(false);
             expect(result.paymentItems).toHaveLength(6);
             expect(result.paymentItems[0].id).toBe(1);
-            expect(result.paymentItems[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/1.png`);
+            expect(result.paymentItems[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
             expect(result.paymentItems[0].accountsOnFile).toHaveLength(1);
-            expect(result.paymentItems[0].accountsOnFile[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/1.png`);
+            expect(result.paymentItems[0].accountsOnFile[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
             expect(result.paymentItems[1].id).toBe(2);
-            expect(result.paymentItems[1].displayHints.logo).toBe(`${sessionDetails.assetUrl}/2.png`);
+            expect(result.paymentItems[1].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/2.png`);
             expect(result.paymentItems[1].accountsOnFile).toStrictEqual([]);
             expect(result.paymentItems[2].id).toBe(302);
-            expect(result.paymentItems[2].displayHints.logo).toBe(`${sessionDetails.assetUrl}/302.png`);
+            expect(result.paymentItems[2].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/302.png`);
             expect(result.paymentItems[2].accountsOnFile).toStrictEqual([]);
             expect(result.paymentItems[3].id).toBe(320);
-            expect(result.paymentItems[3].displayHints.logo).toBe(`${sessionDetails.assetUrl}/320.png`);
+            expect(result.paymentItems[3].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/320.png`);
             expect(result.paymentItems[3].accountsOnFile).toStrictEqual([]);
             expect(result.paymentItems[4].id).toBe(809);
-            expect(result.paymentItems[4].displayHints.logo).toBe(`${sessionDetails.assetUrl}/809.png`);
+            expect(result.paymentItems[4].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/809.png`);
             expect(result.paymentItems[4].accountsOnFile).toStrictEqual([]);
             expect(result.paymentItems[5].id).toBe(3012);
-            expect(result.paymentItems[5].displayHints.logo).toBe(`${sessionDetails.assetUrl}/3012.png`);
+            expect(result.paymentItems[5].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/3012.png`);
             expect(result.paymentItems[5].accountsOnFile).toStrictEqual([]);
           });
         });
@@ -687,14 +687,14 @@ describe("Session", () => {
           const result = await session.getBasicPaymentItems();
           expect(result.paymentItems).toHaveLength(3);
           expect(result.paymentItems[0].id).toBe("cards");
-          expect(result.paymentItems[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/cards.png`);
+          expect(result.paymentItems[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/cards.png`);
           expect(result.paymentItems[0].accountsOnFile).toHaveLength(1);
-          expect(result.paymentItems[0].accountsOnFile[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/1.png`);
+          expect(result.paymentItems[0].accountsOnFile[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
           expect(result.paymentItems[1].id).toBe(809);
-          expect(result.paymentItems[1].displayHints.logo).toBe(`${sessionDetails.assetUrl}/809.png`);
+          expect(result.paymentItems[1].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/809.png`);
           expect(result.paymentItems[1].accountsOnFile).toStrictEqual([]);
           expect(result.paymentItems[2].id).toBe(3012);
-          expect(result.paymentItems[2].displayHints.logo).toBe(`${sessionDetails.assetUrl}/3012.png`);
+          expect(result.paymentItems[2].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/3012.png`);
           expect(result.paymentItems[2].accountsOnFile).toStrictEqual([]);
         });
 
@@ -715,17 +715,17 @@ describe("Session", () => {
           const result = await session.getBasicPaymentItems();
           expect(result.paymentItems).toHaveLength(4);
           expect(result.paymentItems[0].id).toBe("cards");
-          expect(result.paymentItems[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/cards.png`);
+          expect(result.paymentItems[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/cards.png`);
           expect(result.paymentItems[0].accountsOnFile).toHaveLength(1);
-          expect(result.paymentItems[0].accountsOnFile[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/1.png`);
+          expect(result.paymentItems[0].accountsOnFile[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
           expect(result.paymentItems[1].id).toBe(320);
-          expect(result.paymentItems[1].displayHints.logo).toBe(`${sessionDetails.assetUrl}/320.png`);
+          expect(result.paymentItems[1].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/320.png`);
           expect(result.paymentItems[1].accountsOnFile).toStrictEqual([]);
           expect(result.paymentItems[2].id).toBe(809);
-          expect(result.paymentItems[2].displayHints.logo).toBe(`${sessionDetails.assetUrl}/809.png`);
+          expect(result.paymentItems[2].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/809.png`);
           expect(result.paymentItems[2].accountsOnFile).toStrictEqual([]);
           expect(result.paymentItems[3].id).toBe(3012);
-          expect(result.paymentItems[3].displayHints.logo).toBe(`${sessionDetails.assetUrl}/3012.png`);
+          expect(result.paymentItems[3].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/3012.png`);
           expect(result.paymentItems[3].accountsOnFile).toStrictEqual([]);
         });
 
@@ -746,17 +746,17 @@ describe("Session", () => {
           const result = await session.getBasicPaymentItems();
           expect(result.paymentItems).toHaveLength(4);
           expect(result.paymentItems[0].id).toBe("cards");
-          expect(result.paymentItems[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/cards.png`);
+          expect(result.paymentItems[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/cards.png`);
           expect(result.paymentItems[0].accountsOnFile).toHaveLength(1);
-          expect(result.paymentItems[0].accountsOnFile[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/1.png`);
+          expect(result.paymentItems[0].accountsOnFile[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
           expect(result.paymentItems[1].id).toBe(302);
-          expect(result.paymentItems[1].displayHints.logo).toBe(`${sessionDetails.assetUrl}/302.png`);
+          expect(result.paymentItems[1].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/302.png`);
           expect(result.paymentItems[1].accountsOnFile).toStrictEqual([]);
           expect(result.paymentItems[2].id).toBe(809);
-          expect(result.paymentItems[2].displayHints.logo).toBe(`${sessionDetails.assetUrl}/809.png`);
+          expect(result.paymentItems[2].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/809.png`);
           expect(result.paymentItems[2].accountsOnFile).toStrictEqual([]);
           expect(result.paymentItems[3].id).toBe(3012);
-          expect(result.paymentItems[3].displayHints.logo).toBe(`${sessionDetails.assetUrl}/3012.png`);
+          expect(result.paymentItems[3].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/3012.png`);
           expect(result.paymentItems[3].accountsOnFile).toStrictEqual([]);
         });
 
@@ -779,14 +779,14 @@ describe("Session", () => {
             const result = await session.getBasicPaymentItems();
             expect(result.paymentItems).toHaveLength(3);
             expect(result.paymentItems[0].id).toBe("cards");
-            expect(result.paymentItems[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/cards.png`);
+            expect(result.paymentItems[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/cards.png`);
             expect(result.paymentItems[0].accountsOnFile).toHaveLength(1);
-            expect(result.paymentItems[0].accountsOnFile[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/1.png`);
+            expect(result.paymentItems[0].accountsOnFile[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
             expect(result.paymentItems[1].id).toBe(809);
-            expect(result.paymentItems[1].displayHints.logo).toBe(`${sessionDetails.assetUrl}/809.png`);
+            expect(result.paymentItems[1].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/809.png`);
             expect(result.paymentItems[1].accountsOnFile).toStrictEqual([]);
             expect(result.paymentItems[2].id).toBe(3012);
-            expect(result.paymentItems[2].displayHints.logo).toBe(`${sessionDetails.assetUrl}/3012.png`);
+            expect(result.paymentItems[2].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/3012.png`);
             expect(result.paymentItems[2].accountsOnFile).toStrictEqual([]);
           });
 
@@ -808,20 +808,20 @@ describe("Session", () => {
             const result = await session.getBasicPaymentItems();
             expect(result.paymentItems).toHaveLength(5);
             expect(result.paymentItems[0].id).toBe("cards");
-            expect(result.paymentItems[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/cards.png`);
+            expect(result.paymentItems[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/cards.png`);
             expect(result.paymentItems[0].accountsOnFile).toHaveLength(1);
-            expect(result.paymentItems[0].accountsOnFile[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/1.png`);
+            expect(result.paymentItems[0].accountsOnFile[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
             expect(result.paymentItems[1].id).toBe(302);
-            expect(result.paymentItems[1].displayHints.logo).toBe(`${sessionDetails.assetUrl}/302.png`);
+            expect(result.paymentItems[1].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/302.png`);
             expect(result.paymentItems[1].accountsOnFile).toStrictEqual([]);
             expect(result.paymentItems[2].id).toBe(320);
-            expect(result.paymentItems[2].displayHints.logo).toBe(`${sessionDetails.assetUrl}/320.png`);
+            expect(result.paymentItems[2].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/320.png`);
             expect(result.paymentItems[2].accountsOnFile).toStrictEqual([]);
             expect(result.paymentItems[3].id).toBe(809);
-            expect(result.paymentItems[3].displayHints.logo).toBe(`${sessionDetails.assetUrl}/809.png`);
+            expect(result.paymentItems[3].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/809.png`);
             expect(result.paymentItems[3].accountsOnFile).toStrictEqual([]);
             expect(result.paymentItems[4].id).toBe(3012);
-            expect(result.paymentItems[4].displayHints.logo).toBe(`${sessionDetails.assetUrl}/3012.png`);
+            expect(result.paymentItems[4].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/3012.png`);
             expect(result.paymentItems[4].accountsOnFile).toStrictEqual([]);
           });
         });
@@ -1205,17 +1205,17 @@ describe("Session", () => {
         const result = await session.getBasicPaymentProducts();
         expect(result.paymentProducts).toHaveLength(4);
         expect(result.paymentProducts[0].id).toBe(1);
-        expect(result.paymentProducts[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/1.png`);
+        expect(result.paymentProducts[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
         expect(result.paymentProducts[0].accountsOnFile).toHaveLength(1);
-        expect(result.paymentProducts[0].accountsOnFile[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/1.png`);
+        expect(result.paymentProducts[0].accountsOnFile[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
         expect(result.paymentProducts[1].id).toBe(2);
-        expect(result.paymentProducts[1].displayHints.logo).toBe(`${sessionDetails.assetUrl}/2.png`);
+        expect(result.paymentProducts[1].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/2.png`);
         expect(result.paymentProducts[1].accountsOnFile).toStrictEqual([]);
         expect(result.paymentProducts[2].id).toBe(809);
-        expect(result.paymentProducts[2].displayHints.logo).toBe(`${sessionDetails.assetUrl}/809.png`);
+        expect(result.paymentProducts[2].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/809.png`);
         expect(result.paymentProducts[2].accountsOnFile).toStrictEqual([]);
         expect(result.paymentProducts[3].id).toBe(3012);
-        expect(result.paymentProducts[3].displayHints.logo).toBe(`${sessionDetails.assetUrl}/3012.png`);
+        expect(result.paymentProducts[3].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/3012.png`);
         expect(result.paymentProducts[3].accountsOnFile).toStrictEqual([]);
       });
 
@@ -1242,17 +1242,17 @@ describe("Session", () => {
           const result = await session.getBasicPaymentProducts();
           expect(result.paymentProducts).toHaveLength(4);
           expect(result.paymentProducts[0].id).toBe(1);
-          expect(result.paymentProducts[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/1.png`);
+          expect(result.paymentProducts[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
           expect(result.paymentProducts[0].accountsOnFile).toHaveLength(1);
-          expect(result.paymentProducts[0].accountsOnFile[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/1.png`);
+          expect(result.paymentProducts[0].accountsOnFile[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
           expect(result.paymentProducts[1].id).toBe(2);
-          expect(result.paymentProducts[1].displayHints.logo).toBe(`${sessionDetails.assetUrl}/2.png`);
+          expect(result.paymentProducts[1].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/2.png`);
           expect(result.paymentProducts[1].accountsOnFile).toStrictEqual([]);
           expect(result.paymentProducts[2].id).toBe(809);
-          expect(result.paymentProducts[2].displayHints.logo).toBe(`${sessionDetails.assetUrl}/809.png`);
+          expect(result.paymentProducts[2].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/809.png`);
           expect(result.paymentProducts[2].accountsOnFile).toStrictEqual([]);
           expect(result.paymentProducts[3].id).toBe(3012);
-          expect(result.paymentProducts[3].displayHints.logo).toBe(`${sessionDetails.assetUrl}/3012.png`);
+          expect(result.paymentProducts[3].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/3012.png`);
           expect(result.paymentProducts[3].accountsOnFile).toStrictEqual([]);
         });
 
@@ -1269,17 +1269,17 @@ describe("Session", () => {
           const result = await session.getBasicPaymentProducts();
           expect(result.paymentProducts).toHaveLength(4);
           expect(result.paymentProducts[0].id).toBe(1);
-          expect(result.paymentProducts[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/1.png`);
+          expect(result.paymentProducts[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
           expect(result.paymentProducts[0].accountsOnFile).toHaveLength(1);
-          expect(result.paymentProducts[0].accountsOnFile[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/1.png`);
+          expect(result.paymentProducts[0].accountsOnFile[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
           expect(result.paymentProducts[1].id).toBe(2);
-          expect(result.paymentProducts[1].displayHints.logo).toBe(`${sessionDetails.assetUrl}/2.png`);
+          expect(result.paymentProducts[1].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/2.png`);
           expect(result.paymentProducts[1].accountsOnFile).toStrictEqual([]);
           expect(result.paymentProducts[2].id).toBe(809);
-          expect(result.paymentProducts[2].displayHints.logo).toBe(`${sessionDetails.assetUrl}/809.png`);
+          expect(result.paymentProducts[2].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/809.png`);
           expect(result.paymentProducts[2].accountsOnFile).toStrictEqual([]);
           expect(result.paymentProducts[3].id).toBe(3012);
-          expect(result.paymentProducts[3].displayHints.logo).toBe(`${sessionDetails.assetUrl}/3012.png`);
+          expect(result.paymentProducts[3].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/3012.png`);
           expect(result.paymentProducts[3].accountsOnFile).toStrictEqual([]);
         });
 
@@ -1295,20 +1295,20 @@ describe("Session", () => {
           const result = await session.getBasicPaymentProducts();
           expect(result.paymentProducts).toHaveLength(5);
           expect(result.paymentProducts[0].id).toBe(1);
-          expect(result.paymentProducts[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/1.png`);
+          expect(result.paymentProducts[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
           expect(result.paymentProducts[0].accountsOnFile).toHaveLength(1);
-          expect(result.paymentProducts[0].accountsOnFile[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/1.png`);
+          expect(result.paymentProducts[0].accountsOnFile[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
           expect(result.paymentProducts[1].id).toBe(2);
-          expect(result.paymentProducts[1].displayHints.logo).toBe(`${sessionDetails.assetUrl}/2.png`);
+          expect(result.paymentProducts[1].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/2.png`);
           expect(result.paymentProducts[1].accountsOnFile).toStrictEqual([]);
           expect(result.paymentProducts[2].id).toBe(320);
-          expect(result.paymentProducts[2].displayHints.logo).toBe(`${sessionDetails.assetUrl}/320.png`);
+          expect(result.paymentProducts[2].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/320.png`);
           expect(result.paymentProducts[2].accountsOnFile).toStrictEqual([]);
           expect(result.paymentProducts[3].id).toBe(809);
-          expect(result.paymentProducts[3].displayHints.logo).toBe(`${sessionDetails.assetUrl}/809.png`);
+          expect(result.paymentProducts[3].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/809.png`);
           expect(result.paymentProducts[3].accountsOnFile).toStrictEqual([]);
           expect(result.paymentProducts[4].id).toBe(3012);
-          expect(result.paymentProducts[4].displayHints.logo).toBe(`${sessionDetails.assetUrl}/3012.png`);
+          expect(result.paymentProducts[4].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/3012.png`);
           expect(result.paymentProducts[4].accountsOnFile).toStrictEqual([]);
         });
 
@@ -1324,20 +1324,20 @@ describe("Session", () => {
           const result = await session.getBasicPaymentProducts();
           expect(result.paymentProducts).toHaveLength(5);
           expect(result.paymentProducts[0].id).toBe(1);
-          expect(result.paymentProducts[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/1.png`);
+          expect(result.paymentProducts[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
           expect(result.paymentProducts[0].accountsOnFile).toHaveLength(1);
-          expect(result.paymentProducts[0].accountsOnFile[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/1.png`);
+          expect(result.paymentProducts[0].accountsOnFile[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
           expect(result.paymentProducts[1].id).toBe(2);
-          expect(result.paymentProducts[1].displayHints.logo).toBe(`${sessionDetails.assetUrl}/2.png`);
+          expect(result.paymentProducts[1].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/2.png`);
           expect(result.paymentProducts[1].accountsOnFile).toStrictEqual([]);
           expect(result.paymentProducts[2].id).toBe(302);
-          expect(result.paymentProducts[2].displayHints.logo).toBe(`${sessionDetails.assetUrl}/302.png`);
+          expect(result.paymentProducts[2].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/302.png`);
           expect(result.paymentProducts[2].accountsOnFile).toStrictEqual([]);
           expect(result.paymentProducts[3].id).toBe(809);
-          expect(result.paymentProducts[3].displayHints.logo).toBe(`${sessionDetails.assetUrl}/809.png`);
+          expect(result.paymentProducts[3].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/809.png`);
           expect(result.paymentProducts[3].accountsOnFile).toStrictEqual([]);
           expect(result.paymentProducts[4].id).toBe(3012);
-          expect(result.paymentProducts[4].displayHints.logo).toBe(`${sessionDetails.assetUrl}/3012.png`);
+          expect(result.paymentProducts[4].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/3012.png`);
           expect(result.paymentProducts[4].accountsOnFile).toStrictEqual([]);
         });
 
@@ -1354,23 +1354,23 @@ describe("Session", () => {
           const result = await session.getBasicPaymentProducts();
           expect(result.paymentProducts).toHaveLength(6);
           expect(result.paymentProducts[0].id).toBe(1);
-          expect(result.paymentProducts[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/1.png`);
+          expect(result.paymentProducts[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
           expect(result.paymentProducts[0].accountsOnFile).toHaveLength(1);
-          expect(result.paymentProducts[0].accountsOnFile[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/1.png`);
+          expect(result.paymentProducts[0].accountsOnFile[0].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
           expect(result.paymentProducts[1].id).toBe(2);
-          expect(result.paymentProducts[1].displayHints.logo).toBe(`${sessionDetails.assetUrl}/2.png`);
+          expect(result.paymentProducts[1].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/2.png`);
           expect(result.paymentProducts[1].accountsOnFile).toStrictEqual([]);
           expect(result.paymentProducts[2].id).toBe(302);
-          expect(result.paymentProducts[2].displayHints.logo).toBe(`${sessionDetails.assetUrl}/302.png`);
+          expect(result.paymentProducts[2].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/302.png`);
           expect(result.paymentProducts[2].accountsOnFile).toStrictEqual([]);
           expect(result.paymentProducts[3].id).toBe(320);
-          expect(result.paymentProducts[3].displayHints.logo).toBe(`${sessionDetails.assetUrl}/320.png`);
+          expect(result.paymentProducts[3].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/320.png`);
           expect(result.paymentProducts[3].accountsOnFile).toStrictEqual([]);
           expect(result.paymentProducts[4].id).toBe(809);
-          expect(result.paymentProducts[4].displayHints.logo).toBe(`${sessionDetails.assetUrl}/809.png`);
+          expect(result.paymentProducts[4].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/809.png`);
           expect(result.paymentProducts[4].accountsOnFile).toStrictEqual([]);
           expect(result.paymentProducts[5].id).toBe(3012);
-          expect(result.paymentProducts[5].displayHints.logo).toBe(`${sessionDetails.assetUrl}/3012.png`);
+          expect(result.paymentProducts[5].displayHints.logo.url).toBe(`${sessionDetails.assetUrl}/3012.png`);
           expect(result.paymentProducts[5].accountsOnFile).toStrictEqual([]);
         });
       });
@@ -1402,9 +1402,9 @@ describe("Session", () => {
       const json = result.json as api.PaymentProducts;
       expect(json.paymentProducts).toHaveLength(2);
       expect(json.paymentProducts[0].id).toBe(302);
-      expect(json.paymentProducts[0].displayHints.logo).toBe(`${sessionDetails.assetUrl}/302.png`);
+      expect(json.paymentProducts[0].displayHints.logo).toBe("302.png");
       expect(json.paymentProducts[1].id).toBe(320);
-      expect(json.paymentProducts[1].displayHints.logo).toBe(`${sessionDetails.assetUrl}/320.png`);
+      expect(json.paymentProducts[1].displayHints.logo).toBe("320.png");
     });
 
     test("HTTP error", async () => {
@@ -1574,7 +1574,7 @@ describe("Session", () => {
           expect(result.fields[0].id).toBe("cvv");
           expect(result.fields[1].id).toBe("cardHolder");
           expect(result.fields[2].id).toBe("cardNumber");
-          expect(result.fields[2].displayHints?.tooltip?.image).toBe(`${sessionDetails.assetUrl}/card.png`);
+          expect(result.fields[2].displayHints?.tooltip?.image.url).toBe(`${sessionDetails.assetUrl}/card.png`);
           expect(result.fields[3].id).toBe("expirationDate");
         });
       });
@@ -2928,7 +2928,7 @@ describe("Session", () => {
       test("wrong id", async () => {
         const device = new MockDevice().mockApplePayClient(true);
         const session = new Session(sessionDetails, minimalPaymentContext, device);
-        const product = toBasicPaymentProducts(products).getPaymentProduct(1);
+        const product = toBasicPaymentProducts(products, "http://localhost").getPaymentProduct(1);
         const onSuccess = jest.fn();
         const result = await session
           .ApplePay(product)
@@ -2943,7 +2943,7 @@ describe("Session", () => {
         const session = new Session(sessionDetails, minimalPaymentContext, device);
         const json = JSON.parse(JSON.stringify(products.paymentProducts[0]));
         json.id = PP_APPLE_PAY;
-        const product = toPaymentProduct(json);
+        const product = toPaymentProduct(json, "http://localhost");
         const onSuccess = jest.fn();
         const result = await session
           .ApplePay(product)
@@ -2957,7 +2957,7 @@ describe("Session", () => {
     test("Apple Pay not enabled", async () => {
       const device = new MockDevice().mockApplePayClient(true);
       const session = new Session(sessionDetails, minimalPaymentContext, device);
-      const product = toBasicPaymentProducts(products).getPaymentProduct(PP_APPLE_PAY);
+      const product = toBasicPaymentProducts(products, "http://localhost").getPaymentProduct(PP_APPLE_PAY);
       const onSuccess = jest.fn();
       const result = await session
         .ApplePay(product)
@@ -2988,7 +2988,7 @@ describe("Session", () => {
           })
           .mockApplePayClient(applePayClient);
         const session = new Session(sessionDetails, fullPaymentContext, device);
-        const product = toBasicPaymentProducts(products).getPaymentProduct(PP_APPLE_PAY);
+        const product = toBasicPaymentProducts(products, "http://localhost").getPaymentProduct(PP_APPLE_PAY);
         await session.ApplePay(product).then((applePay) => applePay.createPayment());
         expect(onSession).toHaveBeenCalledWith(createSessionResponse.paymentProductSession302SpecificOutput);
       });
@@ -2999,7 +2999,7 @@ describe("Session", () => {
         const device = new MockDevice();
         const spy = jest.spyOn(device, "getApplePayClient");
         const session = new Session(sessionDetails, fullPaymentContext, device);
-        const product = toBasicPaymentProducts(products).getPaymentProduct(PP_APPLE_PAY);
+        const product = toBasicPaymentProducts(products, "http://localhost").getPaymentProduct(PP_APPLE_PAY);
         await session.ApplePay(product).catch(jest.fn());
         await session.ApplePay(product).catch(jest.fn());
         expect(spy).toBeCalledTimes(1);
@@ -3009,7 +3009,7 @@ describe("Session", () => {
         const device = new MockDevice().mockApplePayClient(true);
         const spy = jest.spyOn(device, "getApplePayClient");
         const session = new Session(sessionDetails, fullPaymentContext, device);
-        const product = toBasicPaymentProducts(products).getPaymentProduct(PP_APPLE_PAY);
+        const product = toBasicPaymentProducts(products, "http://localhost").getPaymentProduct(PP_APPLE_PAY);
         await session.ApplePay(product).catch(jest.fn());
         await session.ApplePay(product).catch(jest.fn());
         expect(spy).toBeCalledTimes(1);
@@ -3019,7 +3019,7 @@ describe("Session", () => {
         const device = new MockDevice().mockApplePayClient(true);
         const spy = jest.spyOn(device, "getApplePayClient");
         const session = new Session(sessionDetails, fullPaymentContext, device);
-        const product = toBasicPaymentProducts(products).getPaymentProduct(PP_APPLE_PAY);
+        const product = toBasicPaymentProducts(products, "http://localhost").getPaymentProduct(PP_APPLE_PAY);
         await session.ApplePay(product).catch(jest.fn());
         session.updatePaymentContext({});
         await session.ApplePay(product).catch(jest.fn());
@@ -3033,7 +3033,7 @@ describe("Session", () => {
       test("wrong id", async () => {
         const device = new MockDevice().mockGooglePayClient(true);
         const session = new Session(sessionDetails, minimalPaymentContext, device);
-        const product = toBasicPaymentProducts(products).getPaymentProduct(1);
+        const product = toBasicPaymentProducts(products, "http://localhost").getPaymentProduct(1);
         const onSuccess = jest.fn();
         const result = await session
           .GooglePay(product)
@@ -3048,7 +3048,7 @@ describe("Session", () => {
         const session = new Session(sessionDetails, minimalPaymentContext, device);
         const json = JSON.parse(JSON.stringify(products.paymentProducts[0]));
         json.id = PP_GOOGLE_PAY;
-        const product = toPaymentProduct(json);
+        const product = toPaymentProduct(json, "http://localhost");
         const onSuccess = jest.fn();
         const result = await session
           .GooglePay(product)
@@ -3062,7 +3062,7 @@ describe("Session", () => {
     test("Google Pay not enabled", async () => {
       const device = new MockDevice().mockGooglePayClient(true);
       const session = new Session(sessionDetails, minimalPaymentContext, device);
-      const product = toBasicPaymentProducts(products).getPaymentProduct(PP_GOOGLE_PAY);
+      const product = toBasicPaymentProducts(products, "http://localhost").getPaymentProduct(PP_GOOGLE_PAY);
       const onSuccess = jest.fn();
       const result = await session
         .GooglePay(product)
@@ -3081,7 +3081,7 @@ describe("Session", () => {
         };
         const device = new MockDevice().mockGooglePayClient(googlePayClient);
         const session = new Session(sessionDetails, fullPaymentContext, device);
-        const product = toBasicPaymentProducts(products).getPaymentProduct(PP_GOOGLE_PAY);
+        const product = toBasicPaymentProducts(products, "http://localhost").getPaymentProduct(PP_GOOGLE_PAY);
         await session.GooglePay(product).then((googlePay) =>
           googlePay.createButton({
             onClick: jest.fn,
@@ -3098,7 +3098,7 @@ describe("Session", () => {
         };
         const device = new MockDevice().mockGooglePayClient(googlePayClient);
         const session = new Session(sessionDetails, fullPaymentContext, device);
-        const product = toBasicPaymentProducts(products).getPaymentProduct(PP_GOOGLE_PAY);
+        const product = toBasicPaymentProducts(products, "http://localhost").getPaymentProduct(PP_GOOGLE_PAY);
         await session.GooglePay(product).then((googlePay) => googlePay.prefetchPaymentData());
         expect(googlePayClient.prefetchPaymentData).toHaveBeenCalled();
       });
@@ -3111,7 +3111,7 @@ describe("Session", () => {
         };
         const device = new MockDevice().mockGooglePayClient(googlePayClient);
         const session = new Session(sessionDetails, fullPaymentContext, device);
-        const product = toBasicPaymentProducts(products).getPaymentProduct(PP_GOOGLE_PAY);
+        const product = toBasicPaymentProducts(products, "http://localhost").getPaymentProduct(PP_GOOGLE_PAY);
         await session.GooglePay(product).then((googlePay) => googlePay.createPayment());
         expect(googlePayClient.createPayment).toHaveBeenCalled();
       });
@@ -3122,7 +3122,7 @@ describe("Session", () => {
         const device = new MockDevice();
         const spy = jest.spyOn(device, "getGooglePayClient");
         const session = new Session(sessionDetails, fullPaymentContext, device);
-        const product = toBasicPaymentProducts(products).getPaymentProduct(PP_GOOGLE_PAY);
+        const product = toBasicPaymentProducts(products, "http://localhost").getPaymentProduct(PP_GOOGLE_PAY);
         await session.GooglePay(product).catch(jest.fn());
         await session.GooglePay(product).catch(jest.fn());
         expect(spy).toBeCalledTimes(1);
@@ -3132,7 +3132,7 @@ describe("Session", () => {
         const device = new MockDevice().mockGooglePayClient(true);
         const spy = jest.spyOn(device, "getGooglePayClient");
         const session = new Session(sessionDetails, fullPaymentContext, device);
-        const product = toBasicPaymentProducts(products).getPaymentProduct(PP_GOOGLE_PAY);
+        const product = toBasicPaymentProducts(products, "http://localhost").getPaymentProduct(PP_GOOGLE_PAY);
         await session.GooglePay(product).catch(jest.fn());
         await session.GooglePay(product).catch(jest.fn());
         expect(spy).toBeCalledTimes(1);
@@ -3142,7 +3142,7 @@ describe("Session", () => {
         const device = new MockDevice().mockGooglePayClient(true);
         const spy = jest.spyOn(device, "getGooglePayClient");
         const session = new Session(sessionDetails, fullPaymentContext, device);
-        const product = toBasicPaymentProducts(products).getPaymentProduct(PP_GOOGLE_PAY);
+        const product = toBasicPaymentProducts(products, "http://localhost").getPaymentProduct(PP_GOOGLE_PAY);
         await session.GooglePay(product).catch(jest.fn());
         session.updatePaymentContext({});
         await session.GooglePay(product).catch(jest.fn());
@@ -3182,7 +3182,7 @@ describe("Session", () => {
     expect(result.fields[0].id).toBe("cvv");
     expect(result.fields[1].id).toBe("cardHolder");
     expect(result.fields[2].id).toBe("cardNumber");
-    expect(result.fields[2].displayHints?.tooltip?.image).toBe(`${sessionDetails.assetUrl}/card.png`);
+    expect(result.fields[2].displayHints?.tooltip?.image.url).toBe(`${sessionDetails.assetUrl}/card.png`);
     expect(result.fields[3].id).toBe("expirationDate");
   });
 
@@ -3220,7 +3220,7 @@ describe("Session", () => {
     });
     const encryptor = await session.getEncryptor();
     const request = new PaymentRequest();
-    request.setPaymentProduct(toPaymentProduct(products.paymentProducts[0]));
+    request.setPaymentProduct(toPaymentProduct(products.paymentProducts[0], "http://localhost"));
     request.setValue("expirationDate", "1230");
     request.setValue("cardNumber", "4242424242424242");
     request.setValue("cvv", "123");

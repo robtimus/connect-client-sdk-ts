@@ -67,43 +67,6 @@ function clearCache(cache: Record<string, unknown>, filter: (key: string) => boo
   }
 }
 
-function prefixWithAssetURL(url: string, assetURL: string): string {
-  const baseUrl = assetURL.endsWith("/") ? assetURL : assetURL + "/";
-  return baseUrl + url;
-}
-
-function updateItem<T extends api.PaymentProduct | api.PaymentProductGroup>(item: T, assetURL: string) {
-  item.displayHints.logo = prefixWithAssetURL(item.displayHints.logo, assetURL);
-
-  if (item.accountsOnFile) {
-    for (const accountOnFile of item.accountsOnFile) {
-      accountOnFile.displayHints.logo = prefixWithAssetURL(accountOnFile.displayHints.logo, assetURL);
-    }
-  }
-
-  if (item.fields) {
-    for (const field of item.fields) {
-      if (field.displayHints?.tooltip?.image) {
-        field.displayHints.tooltip.image = prefixWithAssetURL(field.displayHints.tooltip.image, assetURL);
-      }
-    }
-
-    item.fields.sort((f1, f2) => {
-      const displayOrder1 = f1.displayHints?.displayOrder ?? 0;
-      const displayOrder2 = f2.displayHints?.displayOrder ?? 0;
-      return displayOrder1 - displayOrder2;
-    });
-  }
-}
-
-function updateItems<T extends api.PaymentProduct | api.PaymentProductGroup>(items: T[], assetURL: string): void {
-  for (const item of items) {
-    updateItem(item, assetURL);
-  }
-
-  items.sort((i1, i2) => i1.displayHints.displayOrder - i2.displayHints.displayOrder);
-}
-
 function productNotFoundError(): HttpResponse {
   return {
     statusCode: 404,
@@ -248,14 +211,12 @@ export class Session {
    */
   setProvidedPaymentItem(paymentItem?: api.PaymentProduct | api.PaymentProductGroup): void {
     if (paymentItem) {
-      paymentItem = JSON.parse(JSON.stringify(paymentItem)) as api.PaymentProduct | api.PaymentProductGroup;
-      updateItem(paymentItem, this.#sessionDetails.assetUrl);
       if (typeof paymentItem.id === "number") {
         // api.PaymentProduct
-        this.#providedPaymentItem = toPaymentProduct(paymentItem as api.PaymentProduct);
+        this.#providedPaymentItem = toPaymentProduct(paymentItem as api.PaymentProduct, this.#sessionDetails.assetUrl);
       } else {
         // api.PaymentProductGroup
-        this.#providedPaymentItem = toPaymentProductGroup(paymentItem as api.PaymentProductGroup);
+        this.#providedPaymentItem = toPaymentProductGroup(paymentItem as api.PaymentProductGroup, this.#sessionDetails.assetUrl);
       }
     } else {
       this.#providedPaymentItem = undefined;
@@ -342,12 +303,8 @@ export class Session {
       params.amount,
       params.isRecurring
     );
-    const json = await getValue(this.#cache, cacheKey, async () => {
-      const json = await this.#communicator.getPaymentProductGroups(params);
-      updateItems(json.paymentProductGroups, this.#sessionDetails.assetUrl);
-      return json;
-    });
-    return toBasicPaymentProductGroups(json);
+    const json = await getValue(this.#cache, cacheKey, () => this.#communicator.getPaymentProductGroups(params));
+    return toBasicPaymentProductGroups(json, this.#sessionDetails.assetUrl);
   }
 
   /**
@@ -375,12 +332,8 @@ export class Session {
       params.amount,
       params.isRecurring
     );
-    const json = await getValue(this.#cache, cacheKey, async () => {
-      const json = await this.#communicator.getPaymentProductGroup(paymentProductGroupId, params);
-      updateItem(json, this.#sessionDetails.assetUrl);
-      return json;
-    });
-    return toPaymentProductGroup(json);
+    const json = await getValue(this.#cache, cacheKey, () => this.#communicator.getPaymentProductGroup(paymentProductGroupId, params));
+    return toPaymentProductGroup(json, this.#sessionDetails.assetUrl);
   }
 
   /**
@@ -418,11 +371,7 @@ export class Session {
       params.amount,
       params.isRecurring
     );
-    const json = await getValue(this.#cache, cacheKey, async () => {
-      const json = await this.#communicator.getPaymentProducts(params);
-      updateItems(json.paymentProducts, this.#sessionDetails.assetUrl);
-      return json;
-    });
+    const json = await getValue(this.#cache, cacheKey, () => this.#communicator.getPaymentProducts(params));
 
     const checks: Promise<void>[] = [];
     const applePayProduct = json.paymentProducts.find((product) => product.id === PP_APPLE_PAY);
@@ -457,7 +406,7 @@ export class Session {
         json: json,
       });
     }
-    return toBasicPaymentProducts(filteredJson);
+    return toBasicPaymentProducts(filteredJson, this.#sessionDetails.assetUrl);
   }
 
   /**
@@ -497,11 +446,7 @@ export class Session {
       params.isRecurring,
       params.forceBasicFlow
     );
-    const json = await getValue(this.#cache, cacheKey, async () => {
-      const json = await this.#communicator.getPaymentProduct(paymentProductId, params);
-      updateItem(json, this.#sessionDetails.assetUrl);
-      return json;
-    });
+    const json = await getValue(this.#cache, cacheKey, () => this.#communicator.getPaymentProduct(paymentProductId, params));
 
     if (paymentProductId === PP_APPLE_PAY && this.#paymentProductAvailability[paymentProductId] === undefined) {
       const applePaySpecificData = toApplePaySpecificData(json);
@@ -509,7 +454,7 @@ export class Session {
       this.#paymentProductAvailability[paymentProductId] = available;
       console.debug(`Apple Pay is available: ${available}`);
       if (available) {
-        return toPaymentProduct(json);
+        return toPaymentProduct(json, this.#sessionDetails.assetUrl);
       }
       return Promise.reject(productNotFoundError());
     }
@@ -519,7 +464,7 @@ export class Session {
       this.#paymentProductAvailability[paymentProductId] = available;
       console.debug(`Google Pay is available: ${available}`);
       if (available) {
-        return toPaymentProduct(json);
+        return toPaymentProduct(json, this.#sessionDetails.assetUrl);
       }
       return Promise.reject(productNotFoundError());
     }
@@ -528,7 +473,7 @@ export class Session {
       return Promise.reject(productNotFoundError());
     }
 
-    return toPaymentProduct(json);
+    return toPaymentProduct(json, this.#sessionDetails.assetUrl);
   }
 
   /**

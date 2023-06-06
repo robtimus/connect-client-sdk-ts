@@ -13,7 +13,7 @@ const minimalJson: api.PaymentProduct = {
   deviceFingerprintEnabled: true,
   displayHints: {
     displayOrder: 0,
-    logo: "",
+    logo: "visa.png",
   },
   id: 1,
   mobileIntegrationLevel: "OPTIMIZED",
@@ -27,7 +27,7 @@ const fullJson: api.PaymentProduct = {
       attributes: [],
       displayHints: {
         labelTemplate: [],
-        logo: "",
+        logo: "visa.png",
       },
       id: 1,
       paymentProductId: 1,
@@ -46,7 +46,7 @@ const fullJson: api.PaymentProduct = {
   deviceFingerprintEnabled: true,
   displayHints: {
     displayOrder: 0,
-    logo: "",
+    logo: "visa.png",
   },
   fields: [
     {
@@ -83,8 +83,8 @@ const fullJson: api.PaymentProduct = {
 };
 
 describe("toBasicPaymentProduct", () => {
-  const minimalProduct = toBasicPaymentProduct(minimalJson);
-  const fullProduct = toBasicPaymentProduct(fullJson);
+  const minimalProduct = toBasicPaymentProduct(minimalJson, "http://localhost");
+  const fullProduct = toBasicPaymentProduct(fullJson, "http://localhost");
 
   describe("property mapping", () => {
     test("minimal", () => {
@@ -97,7 +97,10 @@ describe("toBasicPaymentProduct", () => {
       expect(minimalProduct.autoTokenized).toBe(minimalJson.autoTokenized);
       expect(minimalProduct.canBeIframed).toBeUndefined();
       expect(minimalProduct.deviceFingerprintEnabled).toBe(minimalJson.deviceFingerprintEnabled);
-      expect(minimalProduct.displayHints).toBe(minimalJson.displayHints);
+      expect(minimalProduct.displayHints.displayOrder).toBe(minimalJson.displayHints.displayOrder);
+      expect(minimalProduct.displayHints.label).toBe(minimalJson.displayHints.label);
+      expect(minimalProduct.displayHints.logo.path).toBe(minimalJson.displayHints.logo);
+      expect(minimalProduct.displayHints.logo.url).toBe("http://localhost/" + minimalJson.displayHints.logo);
       expect(minimalProduct.id).toBe(minimalJson.id);
       expect(minimalProduct.isJavaScriptRequired).toBeUndefined();
       expect(minimalProduct.maxAmount).toBeUndefined();
@@ -124,7 +127,10 @@ describe("toBasicPaymentProduct", () => {
       expect(fullProduct.autoTokenized).toBe(fullJson.autoTokenized);
       expect(fullProduct.canBeIframed).toBe(fullJson.canBeIframed);
       expect(fullProduct.deviceFingerprintEnabled).toBe(fullJson.deviceFingerprintEnabled);
-      expect(fullProduct.displayHints).toBe(fullJson.displayHints);
+      expect(fullProduct.displayHints.displayOrder).toBe(fullJson.displayHints.displayOrder);
+      expect(fullProduct.displayHints.label).toBe(fullJson.displayHints.label);
+      expect(fullProduct.displayHints.logo.path).toBe(fullJson.displayHints.logo);
+      expect(fullProduct.displayHints.logo.url).toBe("http://localhost/" + fullJson.displayHints.logo);
       expect(fullProduct.id).toBe(fullJson.id);
       expect(fullProduct.isJavaScriptRequired).toBe(fullJson.isJavaScriptRequired);
       expect(fullProduct.maxAmount).toBe(fullJson.maxAmount);
@@ -171,7 +177,7 @@ describe("toBasicPaymentProducts", () => {
       const json = {
         paymentProducts: [minimalJson],
       };
-      const products = toBasicPaymentProducts(json);
+      const products = toBasicPaymentProducts(json, "http://localhost");
       expect(products.accountsOnFile).toStrictEqual([]);
       expect(products.paymentProducts).toHaveLength(1);
       expect(products.paymentProducts[0].accountsOnFile).toStrictEqual([]);
@@ -183,7 +189,10 @@ describe("toBasicPaymentProducts", () => {
       expect(products.paymentProducts[0].autoTokenized).toBe(minimalJson.autoTokenized);
       expect(products.paymentProducts[0].canBeIframed).toBeUndefined();
       expect(products.paymentProducts[0].deviceFingerprintEnabled).toBe(minimalJson.deviceFingerprintEnabled);
-      expect(products.paymentProducts[0].displayHints).toBe(minimalJson.displayHints);
+      expect(products.paymentProducts[0].displayHints.displayOrder).toBe(minimalJson.displayHints.displayOrder);
+      expect(products.paymentProducts[0].displayHints.label).toBe(minimalJson.displayHints.label);
+      expect(products.paymentProducts[0].displayHints.logo.path).toBe(minimalJson.displayHints.logo);
+      expect(products.paymentProducts[0].displayHints.logo.url).toBe("http://localhost/" + minimalJson.displayHints.logo);
       expect(products.paymentProducts[0].id).toBe(minimalJson.id);
       expect(products.paymentProducts[0].isJavaScriptRequired).toBeUndefined();
       expect(products.paymentProducts[0].maxAmount).toBeUndefined();
@@ -203,7 +212,7 @@ describe("toBasicPaymentProducts", () => {
       const json = {
         paymentProducts: [fullJson],
       };
-      const products = toBasicPaymentProducts(json);
+      const products = toBasicPaymentProducts(json, "http://localhost");
       expect(products.accountsOnFile).toHaveLength(1);
       expect(products.accountsOnFile[0].id).toBe(1);
       expect(products.paymentProducts[0].accountsOnFile).toHaveLength(1);
@@ -216,7 +225,10 @@ describe("toBasicPaymentProducts", () => {
       expect(products.paymentProducts[0].autoTokenized).toBe(fullJson.autoTokenized);
       expect(products.paymentProducts[0].canBeIframed).toBe(fullJson.canBeIframed);
       expect(products.paymentProducts[0].deviceFingerprintEnabled).toBe(fullJson.deviceFingerprintEnabled);
-      expect(products.paymentProducts[0].displayHints).toBe(fullJson.displayHints);
+      expect(products.paymentProducts[0].displayHints.displayOrder).toBe(fullJson.displayHints.displayOrder);
+      expect(products.paymentProducts[0].displayHints.label).toBe(fullJson.displayHints.label);
+      expect(products.paymentProducts[0].displayHints.logo.path).toBe(fullJson.displayHints.logo);
+      expect(products.paymentProducts[0].displayHints.logo.url).toBe("http://localhost/" + fullJson.displayHints.logo);
       expect(products.paymentProducts[0].id).toBe(fullJson.id);
       expect(products.paymentProducts[0].isJavaScriptRequired).toBe(fullJson.isJavaScriptRequired);
       expect(products.paymentProducts[0].maxAmount).toBe(fullJson.maxAmount);
@@ -233,9 +245,12 @@ describe("toBasicPaymentProducts", () => {
     });
   });
 
-  const products = toBasicPaymentProducts({
-    paymentProducts: [fullJson],
-  });
+  const products = toBasicPaymentProducts(
+    {
+      paymentProducts: [fullJson],
+    },
+    "http://localhost"
+  );
 
   describe("findPaymentProduct", () => {
     test("non-matching", () => {
@@ -285,8 +300,8 @@ describe("toBasicPaymentProducts", () => {
 });
 
 describe("toPaymentProduct", () => {
-  const minimalProduct = toPaymentProduct(minimalJson);
-  const fullProduct = toPaymentProduct(fullJson);
+  const minimalProduct = toPaymentProduct(minimalJson, "http://localhost");
+  const fullProduct = toPaymentProduct(fullJson, "http://localhost");
 
   describe("property mapping", () => {
     test("minimal", () => {
@@ -299,7 +314,10 @@ describe("toPaymentProduct", () => {
       expect(minimalProduct.autoTokenized).toBe(minimalJson.autoTokenized);
       expect(minimalProduct.canBeIframed).toBeUndefined();
       expect(minimalProduct.deviceFingerprintEnabled).toBe(minimalJson.deviceFingerprintEnabled);
-      expect(minimalProduct.displayHints).toBe(minimalJson.displayHints);
+      expect(minimalProduct.displayHints.displayOrder).toBe(minimalJson.displayHints.displayOrder);
+      expect(minimalProduct.displayHints.label).toBe(minimalJson.displayHints.label);
+      expect(minimalProduct.displayHints.logo.path).toBe(minimalJson.displayHints.logo);
+      expect(minimalProduct.displayHints.logo.url).toBe("http://localhost/" + minimalJson.displayHints.logo);
       expect(minimalProduct.fields).toStrictEqual([]);
       expect(minimalProduct.fieldsWarning).toBeUndefined();
       expect(minimalProduct.id).toBe(minimalJson.id);
@@ -328,7 +346,10 @@ describe("toPaymentProduct", () => {
       expect(fullProduct.autoTokenized).toBe(fullJson.autoTokenized);
       expect(fullProduct.canBeIframed).toBe(fullJson.canBeIframed);
       expect(fullProduct.deviceFingerprintEnabled).toBe(fullJson.deviceFingerprintEnabled);
-      expect(fullProduct.displayHints).toBe(fullJson.displayHints);
+      expect(fullProduct.displayHints.displayOrder).toBe(fullJson.displayHints.displayOrder);
+      expect(fullProduct.displayHints.label).toBe(fullJson.displayHints.label);
+      expect(fullProduct.displayHints.logo.path).toBe(fullJson.displayHints.logo);
+      expect(fullProduct.displayHints.logo.url).toBe("http://localhost/" + fullJson.displayHints.logo);
       expect(fullProduct.fields).toHaveLength(1);
       expect(fullProduct.fields[0].id).toBe("cardNumber");
       expect(fullProduct.fieldsWarning).toBe(fullJson.fieldsWarning);

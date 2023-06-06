@@ -99,6 +99,17 @@ export interface SessionDetails {
   readonly customerId: string;
 }
 
+// Assets
+
+export interface Asset {
+  readonly url: string;
+  readonly path: string;
+}
+
+export interface SizeableAsset extends Asset {
+  sized(width: number, height: number): Asset;
+}
+
 // Crypto
 
 /**
@@ -187,7 +198,7 @@ export interface AccountOnFileAttribute extends KeyValuePair {
 
 export interface AccountOnFileDisplayHints {
   readonly labelTemplate: LabelTemplateElement[];
-  readonly logo: string;
+  readonly logo: SizeableAsset;
   /**
    * Finds a label template attribute based on the attribute key.
    * @param key The attribute key of the label template to look for.
@@ -484,7 +495,7 @@ export interface PaymentProduct863SpecificData {
 export interface PaymentProductDisplayHints {
   readonly displayOrder: number;
   readonly label?: string;
-  readonly logo: string;
+  readonly logo: SizeableAsset;
 }
 
 export interface PaymentProductField {
@@ -576,7 +587,7 @@ export interface PaymentProductFieldFormElement {
 }
 
 export interface PaymentProductFieldTooltip {
-  readonly image: string;
+  readonly image: SizeableAsset;
   readonly label?: string;
 }
 

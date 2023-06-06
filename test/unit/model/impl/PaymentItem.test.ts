@@ -6,93 +6,99 @@ import { toBasicPaymentItems } from "../../../../src/model/impl/PaymentItem";
 import { toBasicPaymentProducts } from "../../../../src/model/impl/PaymentProduct";
 import { toBasicPaymentProductGroups } from "../../../../src/model/impl/PaymentProductGroup";
 
-const products = toBasicPaymentProducts({
-  paymentProducts: [
-    {
-      accountsOnFile: [
-        {
-          attributes: [],
-          displayHints: {
-            labelTemplate: [],
-            logo: "",
+const products = toBasicPaymentProducts(
+  {
+    paymentProducts: [
+      {
+        accountsOnFile: [
+          {
+            attributes: [],
+            displayHints: {
+              labelTemplate: [],
+              logo: "visa.png",
+            },
+            id: 1,
+            paymentProductId: 1,
           },
-          id: 1,
-          paymentProductId: 1,
+        ],
+        allowsInstallments: false,
+        allowsRecurring: true,
+        allowsTokenization: true,
+        autoTokenized: false,
+        deviceFingerprintEnabled: true,
+        displayHints: {
+          displayOrder: 0,
+          logo: "visa.png",
         },
-      ],
-      allowsInstallments: false,
-      allowsRecurring: true,
-      allowsTokenization: true,
-      autoTokenized: false,
-      deviceFingerprintEnabled: true,
-      displayHints: {
-        displayOrder: 0,
-        logo: "",
+        id: 1,
+        mobileIntegrationLevel: "OPTIMIZED",
+        paymentMethod: "cards",
+        paymentProductGroup: "cards",
+        usesRedirectionTo3rdParty: false,
       },
-      id: 1,
-      mobileIntegrationLevel: "OPTIMIZED",
-      paymentMethod: "cards",
-      paymentProductGroup: "cards",
-      usesRedirectionTo3rdParty: false,
-    },
-    {
-      allowsInstallments: false,
-      allowsRecurring: true,
-      allowsTokenization: true,
-      autoTokenized: false,
-      deviceFingerprintEnabled: true,
-      displayHints: {
-        displayOrder: 0,
-        logo: "",
+      {
+        allowsInstallments: false,
+        allowsRecurring: true,
+        allowsTokenization: true,
+        autoTokenized: false,
+        deviceFingerprintEnabled: true,
+        displayHints: {
+          displayOrder: 0,
+          logo: "ideal.png",
+        },
+        id: 809,
+        mobileIntegrationLevel: "OPTIMIZED",
+        paymentMethod: "redirect",
+        usesRedirectionTo3rdParty: false,
       },
-      id: 809,
-      mobileIntegrationLevel: "OPTIMIZED",
-      paymentMethod: "redirect",
-      usesRedirectionTo3rdParty: false,
-    },
-    {
-      allowsInstallments: false,
-      allowsRecurring: true,
-      allowsTokenization: true,
-      autoTokenized: false,
-      deviceFingerprintEnabled: true,
-      displayHints: {
-        displayOrder: 0,
-        logo: "",
+      {
+        allowsInstallments: false,
+        allowsRecurring: true,
+        allowsTokenization: true,
+        autoTokenized: false,
+        deviceFingerprintEnabled: true,
+        displayHints: {
+          displayOrder: 0,
+          logo: "mastercard.png",
+        },
+        id: 2,
+        mobileIntegrationLevel: "OPTIMIZED",
+        paymentMethod: "cards",
+        paymentProductGroup: "cards",
+        usesRedirectionTo3rdParty: false,
       },
-      id: 2,
-      mobileIntegrationLevel: "OPTIMIZED",
-      paymentMethod: "cards",
-      paymentProductGroup: "cards",
-      usesRedirectionTo3rdParty: false,
-    },
-  ],
-});
+    ],
+  },
+  "http://localhost"
+);
 
-const groups = toBasicPaymentProductGroups({
-  paymentProductGroups: [
-    {
-      accountsOnFile: [
-        {
-          attributes: [],
-          displayHints: {
-            labelTemplate: [],
-            logo: "",
+const groups = toBasicPaymentProductGroups(
+  {
+    paymentProductGroups: [
+      {
+        accountsOnFile: [
+          {
+            attributes: [],
+            displayHints: {
+              labelTemplate: [],
+              logo: "visa.png",
+            },
+            id: 1,
+            paymentProductId: 1,
           },
-          id: 1,
-          paymentProductId: 1,
+        ],
+        allowsInstallments: false,
+        deviceFingerprintEnabled: true,
+        displayHints: {
+          displayOrder: 0,
+          logo: "cards.png",
         },
-      ],
-      allowsInstallments: false,
-      deviceFingerprintEnabled: true,
-      displayHints: {
-        displayOrder: 0,
-        logo: "",
+        id: "cards",
       },
-      id: "cards",
-    },
-  ],
-});
+    ],
+  },
+  "http://localhost"
+);
 
 describe("toBasicPaymentItems", () => {
   test("products only", () => {

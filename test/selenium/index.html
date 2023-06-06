@@ -61,7 +61,7 @@
           session.getPaymentProduct(result.paymentProductId).then((product) => {
             console.log('Product:', product);
             paymentRequest.setPaymentProduct(product);
-            $('#payment-product-field-cardNumber-logo').attr('src', product.displayHints.logo + '?size=37x37').show();
+            $('#payment-product-field-cardNumber-logo').attr('src', product.displayHints.logo.sized(37, 37)).show();
             product.fields.forEach((field) => {
               if ($('#payment-product-field-' + field.id).length === 0) {
                 const fieldsDiv = $('#payment-product-fields');
@@ -91,7 +91,7 @@
           const fieldImage = $('<img>').attr('id', fieldId + '-logo').hide();
           fieldInputDiv.append(fieldImage);
         } else if (field.displayHints.tooltip?.image) {
-          const fieldImage = $('<img>').attr('id', fieldId + '-tooltip').attr('src', field.displayHints.tooltip.image + '?size=240x160');
+          const fieldImage = $('<img>').attr('id', fieldId + '-tooltip').attr('src', field.displayHints.tooltip.image.sized(240, 160));
           fieldInputDiv.append(fieldImage);
         }
         const fieldDiv = $('<div>').addClass('mb-3').append(fieldLabel).append(fieldInputDiv);

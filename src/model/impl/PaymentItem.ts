@@ -26,7 +26,7 @@ function listPaymentItems(products: BasicPaymentProducts, groups?: BasicPaymentP
     }
     // else the product is part of an existing group that has already been added
   }
-  return result;
+  return result.sort((i1, i2) => i1.displayHints.displayOrder - i2.displayHints.displayOrder);
 }
 
 class BasicPaymentItemsImpl implements BasicPaymentItems {

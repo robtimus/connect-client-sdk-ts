@@ -14,53 +14,56 @@ describe("Encryptor", () => {
     publicKey:
       "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkiJlGL1QjUnGDLpMNBtZPYVtOU121jfFcV4WrZayfw9Ib/1AtPBHP/0ZPocdA23zDh6aB+QiOQEkHZlfnelBNnEzEu4ibda3nDdjSrKveSiQPyB5X+u/IS3CR48B/g4QJ+mcMV9hoFt6Hx3R99A0HWMs4um8elQsgB11MsLmGb1SuLo0S1pgL3EcckXfBDNMUBMQ9EtLC9zQW6Y0kx6GFXHgyjNb4yixXfjo194jfhei80sVQ49Y/SHBt/igATGN1l18IBDtO0eWmWeBckwbNkpkPLAvJfsfa3JpaxbXwg3rTvVXLrIRhvMYqTsQmrBIJDl7F6igPD98Y1FydbKe5QIDAQAB",
   };
-  const product = toPaymentProduct({
-    accountsOnFile: [
-      {
-        attributes: [],
-        displayHints: {
-          labelTemplate: [],
-          logo: "",
+  const product = toPaymentProduct(
+    {
+      accountsOnFile: [
+        {
+          attributes: [],
+          displayHints: {
+            labelTemplate: [],
+            logo: "visa.png",
+          },
+          id: 1,
+          paymentProductId: 1,
         },
-        id: 1,
-        paymentProductId: 1,
+      ],
+      allowsInstallments: false,
+      allowsRecurring: false,
+      allowsTokenization: false,
+      autoTokenized: false,
+      deviceFingerprintEnabled: false,
+      displayHints: {
+        displayOrder: 0,
+        logo: "visa.png",
       },
-    ],
-    allowsInstallments: false,
-    allowsRecurring: false,
-    allowsTokenization: false,
-    autoTokenized: false,
-    deviceFingerprintEnabled: false,
-    displayHints: {
-      displayOrder: 0,
-      logo: "",
+      fields: [
+        {
+          dataRestrictions: {
+            isRequired: true,
+            validators: {
+              expirationDate: {},
+            },
+          },
+          displayHints: {
+            alwaysShow: false,
+            displayOrder: 0,
+            formElement: {
+              type: "",
+            },
+            obfuscate: false,
+            mask: "{{99}}-{{99}}",
+          },
+          id: "expirationDate",
+          type: "",
+        },
+      ],
+      id: 1,
+      mobileIntegrationLevel: "",
+      paymentMethod: "",
+      usesRedirectionTo3rdParty: false,
     },
-    fields: [
-      {
-        dataRestrictions: {
-          isRequired: true,
-          validators: {
-            expirationDate: {},
-          },
-        },
-        displayHints: {
-          alwaysShow: false,
-          displayOrder: 0,
-          formElement: {
-            type: "",
-          },
-          obfuscate: false,
-          mask: "{{99}}-{{99}}",
-        },
-        id: "expirationDate",
-        type: "",
-      },
-    ],
-    id: 1,
-    mobileIntegrationLevel: "",
-    paymentMethod: "",
-    usesRedirectionTo3rdParty: false,
-  });
+    "http://localhost"
+  );
 
   test("not validated", async () => {
     const encryptor = newEncryptor(

@@ -57,9 +57,9 @@ const fullJson: api.PaymentProductField = {
 };
 
 describe("toPaymentProductField", () => {
-  const minimalField = toPaymentProductField(minimalJson);
-  const fieldWithoutMask = toPaymentProductField(jsonWithoutMask);
-  const fullField = toPaymentProductField(fullJson);
+  const minimalField = toPaymentProductField(minimalJson, "http://localhost");
+  const fieldWithoutMask = toPaymentProductField(jsonWithoutMask, "http://localhost");
+  const fullField = toPaymentProductField(fullJson, "http://localhost");
 
   describe("property mapping", () => {
     test("minimal", () => {

@@ -12,7 +12,8 @@ import {
 } from "..";
 import * as api from "../../communicator/model";
 import { toAccountOnFile } from "./AccountOnFile";
-import { toPaymentProductField } from "./PaymentProductField";
+import { toPaymentProductDisplayHints } from "./PaymentProductDisplayHints";
+import { toPaymentProductFields } from "./PaymentProductField";
 
 export const PP_APPLE_PAY = 302;
 export const PP_GOOGLE_PAY = 320;
@@ -43,8 +44,8 @@ class BasicPaymentProductImpl implements BasicPaymentProduct {
   readonly usesRedirectionTo3rdParty: boolean;
   readonly type = "product";
 
-  constructor(json: api.PaymentProduct) {
-    this.accountsOnFile = json.accountsOnFile ? json.accountsOnFile.map(toAccountOnFile) : [];
+  constructor(json: api.PaymentProduct, assetUrl: string) {
+    this.accountsOnFile = json.accountsOnFile ? json.accountsOnFile.map((accountOnFile) => toAccountOnFile(accountOnFile, assetUrl)) : [];
     this.acquirerCountry = json.acquirerCountry;
     this.allowsInstallments = json.allowsInstallments;
     this.allowsRecurring = json.allowsRecurring;
@@ -53,7 +54,7 @@ class BasicPaymentProductImpl implements BasicPaymentProduct {
     this.authenticationIndicator = json.authenticationIndicator;
     this.canBeIframed = json.canBeIframed;
     this.deviceFingerprintEnabled = json.deviceFingerprintEnabled;
-    this.displayHints = json.displayHints;
+    this.displayHints = toPaymentProductDisplayHints(json.displayHints, assetUrl);
     this.id = json.id;
     this.isJavaScriptRequired = json.isJavaScriptRequired;
     this.maxAmount = json.maxAmount;
@@ -83,16 +84,18 @@ class BasicPaymentProductImpl implements BasicPaymentProduct {
 
 Object.freeze(BasicPaymentProductImpl.prototype);
 
-export function toBasicPaymentProduct(json: api.PaymentProduct): BasicPaymentProduct {
-  return new BasicPaymentProductImpl(json);
+export function toBasicPaymentProduct(json: api.PaymentProduct, assetUrl: string): BasicPaymentProduct {
+  return new BasicPaymentProductImpl(json, assetUrl);
 }
 
 class BasicPaymentProductsImpl implements BasicPaymentProducts {
   readonly paymentProducts: BasicPaymentProduct[];
   readonly accountsOnFile: AccountOnFile[];
 
-  constructor(json: api.PaymentProducts) {
-    this.paymentProducts = json.paymentProducts.map(toBasicPaymentProduct);
+  constructor(json: api.PaymentProducts, assetUrl: string) {
+    this.paymentProducts = json.paymentProducts
+      .map((product) => toBasicPaymentProduct(product, assetUrl))
+      .sort((p1, p2) => p1.displayHints.displayOrder - p2.displayHints.displayOrder);
     this.accountsOnFile = this.paymentProducts.flatMap((product) => product.accountsOnFile);
   }
 
@@ -123,17 +126,17 @@ class BasicPaymentProductsImpl implements BasicPaymentProducts {
 
 Object.freeze(BasicPaymentProductsImpl.prototype);
 
-export function toBasicPaymentProducts(json: api.PaymentProducts): BasicPaymentProducts {
-  return new BasicPaymentProductsImpl(json);
+export function toBasicPaymentProducts(json: api.PaymentProducts, assetUrl: string): BasicPaymentProducts {
+  return new BasicPaymentProductsImpl(json, assetUrl);
 }
 
 class PaymentProductImpl extends BasicPaymentProductImpl implements PaymentProduct {
   readonly fields: PaymentProductField[];
   readonly fieldsWarning?: string;
 
-  constructor(json: api.PaymentProduct) {
-    super(json);
-    this.fields = json.fields ? json.fields.map(toPaymentProductField) : [];
+  constructor(json: api.PaymentProduct, assetUrl: string) {
+    super(json, assetUrl);
+    this.fields = json.fields ? toPaymentProductFields(json.fields, assetUrl) : [];
     this.fieldsWarning = json.fieldsWarning;
   }
 
@@ -152,6 +155,6 @@ class PaymentProductImpl extends BasicPaymentProductImpl implements PaymentProdu
 
 Object.freeze(PaymentProductImpl.prototype);
 
-export function toPaymentProduct(json: api.PaymentProduct) {
-  return new PaymentProductImpl(json);
+export function toPaymentProduct(json: api.PaymentProduct, assetUrl: string) {
+  return new PaymentProductImpl(json, assetUrl);
 }

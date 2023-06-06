@@ -38,12 +38,14 @@ const json: api.AccountOnFile = {
 };
 
 describe("toAccountOnFile", () => {
-  const accountOnFile = toAccountOnFile(json);
+  const accountOnFile = toAccountOnFile(json, "http://localhost");
 
   test("property mapping", () => {
     expect(accountOnFile.attributes).toStrictEqual(json.attributes);
     expect(accountOnFile.displayHints.labelTemplate).toHaveLength(1);
     expect(accountOnFile.displayHints.labelTemplate[0].wildcardMask).toBe("{{**}}-{{**}}");
+    expect(accountOnFile.displayHints.logo.path).toBe(json.displayHints.logo);
+    expect(accountOnFile.displayHints.logo.url).toBe("http://localhost/" + json.displayHints.logo);
     expect(accountOnFile.id).toBe(json.id);
     expect(accountOnFile.paymentProductId).toBe(json.paymentProductId);
   });

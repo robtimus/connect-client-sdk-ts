@@ -37,39 +37,42 @@ import * as api from "../../../../src/communicator/model";
 const fieldId = "testField";
 const fiscalNumberFieldId = "fiscalNumber";
 
-const product: PaymentProduct = toPaymentProduct({
-  allowsInstallments: false,
-  allowsRecurring: false,
-  allowsTokenization: false,
-  autoTokenized: false,
-  deviceFingerprintEnabled: false,
-  displayHints: {
-    displayOrder: 0,
-    logo: "",
+const product: PaymentProduct = toPaymentProduct(
+  {
+    allowsInstallments: false,
+    allowsRecurring: false,
+    allowsTokenization: false,
+    autoTokenized: false,
+    deviceFingerprintEnabled: false,
+    displayHints: {
+      displayOrder: 0,
+      logo: "",
+    },
+    fields: [
+      {
+        dataRestrictions: {
+          isRequired: true,
+          validators: {},
+        },
+        id: fieldId,
+        type: "",
+      },
+      {
+        dataRestrictions: {
+          isRequired: false,
+          validators: {},
+        },
+        id: fiscalNumberFieldId,
+        type: "",
+      },
+    ],
+    id: 1,
+    mobileIntegrationLevel: "",
+    paymentMethod: "",
+    usesRedirectionTo3rdParty: false,
   },
-  fields: [
-    {
-      dataRestrictions: {
-        isRequired: true,
-        validators: {},
-      },
-      id: fieldId,
-      type: "",
-    },
-    {
-      dataRestrictions: {
-        isRequired: false,
-        validators: {},
-      },
-      id: fiscalNumberFieldId,
-      type: "",
-    },
-  ],
-  id: 1,
-  mobileIntegrationLevel: "",
-  paymentMethod: "",
-  usesRedirectionTo3rdParty: false,
-});
+  "http://localhost"
+);
 
 describe("validation", () => {
   beforeEach(() => {

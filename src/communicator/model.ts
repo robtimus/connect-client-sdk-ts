@@ -6,75 +6,75 @@
 // Crypto
 
 export interface PublicKey {
-  keyId: string;
-  publicKey: string;
+  readonly keyId: string;
+  readonly publicKey: string;
 }
 
 // Payments
 
 export interface ThirdPartyStatusResponse {
-  thirdPartyStatus: string;
+  readonly thirdPartyStatus: string;
 }
 
 // Products / Product Groups
 
 export interface AccountOnFile {
-  attributes: AccountOnFileAttribute[];
-  displayHints: AccountOnFileDisplayHints;
-  id: number;
-  paymentProductId: number;
+  readonly attributes: AccountOnFileAttribute[];
+  readonly displayHints: AccountOnFileDisplayHints;
+  readonly id: number;
+  readonly paymentProductId: number;
 }
 
 export interface AccountOnFileAttribute extends KeyValuePair {
-  mustWriteReason?: string;
-  status: string;
+  readonly mustWriteReason?: string;
+  readonly status: string;
 }
 
 export interface AccountOnFileDisplayHints {
-  labelTemplate: LabelTemplateElement[];
-  logo: string;
+  readonly labelTemplate: LabelTemplateElement[];
+  readonly logo: string;
 }
 
 export interface AuthenticationIndicator {
-  name: string;
-  value: string;
+  readonly name: string;
+  readonly value: string;
 }
 
 export interface KeyValuePair {
-  key: string;
-  value: string;
+  readonly key: string;
+  readonly value: string;
 }
 
 export interface LabelTemplateElement {
-  attributeKey: string;
-  mask?: string;
+  readonly attributeKey: string;
+  readonly mask?: string;
 }
 
 export interface PaymentProduct {
-  accountsOnFile?: AccountOnFile[];
-  acquirerCountry?: string;
-  allowsInstallments: boolean;
-  allowsRecurring: boolean;
-  allowsTokenization: boolean;
-  authenticationIndicator?: AuthenticationIndicator;
-  autoTokenized: boolean;
-  canBeIframed?: boolean;
-  deviceFingerprintEnabled: boolean;
-  displayHints: PaymentProductDisplayHints;
-  fields?: PaymentProductField[];
-  fieldsWarning?: string;
-  id: number;
-  isJavaScriptRequired?: boolean;
-  maxAmount?: number;
-  minAmount?: number;
-  mobileIntegrationLevel: string;
-  paymentMethod: string;
-  paymentProduct302SpecificData?: PaymentProduct302SpecificData;
-  paymentProduct320SpecificData?: PaymentProduct320SpecificData;
-  paymentProduct863SpecificData?: PaymentProduct863SpecificData;
-  paymentProductGroup?: string;
-  supportsMandates?: boolean;
-  usesRedirectionTo3rdParty: boolean;
+  readonly accountsOnFile?: AccountOnFile[];
+  readonly acquirerCountry?: string;
+  readonly allowsInstallments: boolean;
+  readonly allowsRecurring: boolean;
+  readonly allowsTokenization: boolean;
+  readonly authenticationIndicator?: AuthenticationIndicator;
+  readonly autoTokenized: boolean;
+  readonly canBeIframed?: boolean;
+  readonly deviceFingerprintEnabled: boolean;
+  readonly displayHints: PaymentProductDisplayHints;
+  readonly fields?: PaymentProductField[];
+  readonly fieldsWarning?: string;
+  readonly id: number;
+  readonly isJavaScriptRequired?: boolean;
+  readonly maxAmount?: number;
+  readonly minAmount?: number;
+  readonly mobileIntegrationLevel: string;
+  readonly paymentMethod: string;
+  readonly paymentProduct302SpecificData?: PaymentProduct302SpecificData;
+  readonly paymentProduct320SpecificData?: PaymentProduct320SpecificData;
+  readonly paymentProduct863SpecificData?: PaymentProduct863SpecificData;
+  readonly paymentProductGroup?: string;
+  readonly supportsMandates?: boolean;
+  readonly usesRedirectionTo3rdParty: boolean;
 }
 
 export interface PaymentProductParams {
@@ -88,7 +88,7 @@ export interface PaymentProductParams {
 }
 
 export interface PaymentProducts {
-  paymentProducts: PaymentProduct[];
+  readonly paymentProducts: PaymentProduct[];
 }
 
 export interface PaymentProductsParams {
@@ -101,88 +101,88 @@ export interface PaymentProductsParams {
 }
 
 export interface PaymentProduct302SpecificData {
-  networks: string[];
+  readonly networks: string[];
 }
 
 export interface PaymentProduct320SpecificData {
-  gateway: string;
-  networks: string[];
+  readonly gateway: string;
+  readonly networks: string[];
 }
 
 export interface PaymentProduct863SpecificData {
-  integrationTypes: string[];
+  readonly integrationTypes: string[];
 }
 
 export interface PaymentProductDisplayHints {
-  displayOrder: number;
-  label?: string;
-  logo: string;
+  readonly displayOrder: number;
+  readonly label?: string;
+  readonly logo: string;
 }
 
 export interface PaymentProductField {
-  dataRestrictions: PaymentProductFieldDataRestrictions;
-  displayHints?: PaymentProductFieldDisplayHints;
-  id: string;
-  type: string;
-  usedForLookup?: boolean;
+  readonly dataRestrictions: PaymentProductFieldDataRestrictions;
+  readonly displayHints?: PaymentProductFieldDisplayHints;
+  readonly id: string;
+  readonly type: string;
+  readonly usedForLookup?: boolean;
 }
 
 export interface PaymentProductFieldDataRestrictions {
-  isRequired: boolean;
-  validators: PaymentProductFieldValidators;
+  readonly isRequired: boolean;
+  readonly validators: PaymentProductFieldValidators;
 }
 
 export interface PaymentProductFieldDisplayElement {
-  id: string;
-  label?: string;
-  type: string;
-  value: string;
+  readonly id: string;
+  readonly label?: string;
+  readonly type: string;
+  readonly value: string;
 }
 
 export interface PaymentProductFieldDisplayHints {
-  alwaysShow: boolean;
-  displayOrder: number;
-  formElement: PaymentProductFieldFormElement;
-  label?: string;
-  link?: string;
-  mask?: string;
-  obfuscate: boolean;
-  placeholderLabel?: string;
-  preferredInputType?: string;
-  tooltip?: PaymentProductFieldTooltip;
+  readonly alwaysShow: boolean;
+  readonly displayOrder: number;
+  readonly formElement: PaymentProductFieldFormElement;
+  readonly label?: string;
+  readonly link?: string;
+  readonly mask?: string;
+  readonly obfuscate: boolean;
+  readonly placeholderLabel?: string;
+  readonly preferredInputType?: string;
+  readonly tooltip?: PaymentProductFieldTooltip;
 }
 
 export interface PaymentProductFieldFormElement {
-  type: string;
-  valueMapping?: ValueMappingElement[];
+  readonly type: string;
+  readonly valueMapping?: ValueMappingElement[];
 }
 
 export interface PaymentProductFieldTooltip {
-  image: string;
-  label?: string;
+  readonly image: string;
+  readonly label?: string;
 }
 
 export interface PaymentProductFieldValidators {
-  boletoBancarioRequiredness?: BoletoBancarioRequirednessValidator;
-  emailAddress?: EmptyValidator;
-  expirationDate?: EmptyValidator;
-  fixedList?: FixedListValidator;
-  iban?: EmptyValidator;
-  length?: LengthValidator;
-  luhn?: EmptyValidator;
-  range?: RangeValidator;
-  regularExpression?: RegularExpressionValidator;
-  residentIdNumber?: EmptyValidator;
-  termsAndConditions?: EmptyValidator;
+  readonly boletoBancarioRequiredness?: BoletoBancarioRequirednessValidator;
+  readonly emailAddress?: EmptyValidator;
+  readonly expirationDate?: EmptyValidator;
+  readonly fixedList?: FixedListValidator;
+  readonly iban?: EmptyValidator;
+  readonly length?: LengthValidator;
+  readonly luhn?: EmptyValidator;
+  readonly range?: RangeValidator;
+  readonly regularExpression?: RegularExpressionValidator;
+  readonly residentIdNumber?: EmptyValidator;
+  readonly termsAndConditions?: EmptyValidator;
 }
 
 export interface PaymentProductGroup {
-  accountsOnFile?: AccountOnFile[];
-  allowsInstallments: boolean;
-  deviceFingerprintEnabled: boolean;
-  displayHints: PaymentProductDisplayHints;
-  fields?: PaymentProductField[];
-  id: string;
+  readonly accountsOnFile?: AccountOnFile[];
+  readonly allowsInstallments: boolean;
+  readonly deviceFingerprintEnabled: boolean;
+  readonly displayHints: PaymentProductDisplayHints;
+  readonly fields?: PaymentProductField[];
+  readonly id: string;
 }
 
 export interface PaymentProductGroupParams {
@@ -195,7 +195,7 @@ export interface PaymentProductGroupParams {
 }
 
 export interface PaymentProductGroups {
-  paymentProductGroups: PaymentProductGroup[];
+  readonly paymentProductGroups: PaymentProductGroup[];
 }
 
 export interface PaymentProductGroupsParams {
@@ -208,9 +208,9 @@ export interface PaymentProductGroupsParams {
 }
 
 export interface ValueMappingElement {
-  displayElements: PaymentProductFieldDisplayElement[];
-  displayName?: string;
-  value: string;
+  readonly displayElements: PaymentProductFieldDisplayElement[];
+  readonly displayName?: string;
+  readonly value: string;
 }
 
 // Products / Product Groups - customer details
@@ -221,16 +221,16 @@ export interface GetCustomerDetailsRequest {
 }
 
 export interface GetCustomerDetailsResponse {
-  city?: string;
-  country?: string;
-  emailAddress?: string;
-  firstName?: string;
-  fiscalNumber?: string;
-  languageCode?: string;
-  phoneNumber?: string;
-  street?: string;
-  surname?: string;
-  zip?: string;
+  readonly city?: string;
+  readonly country?: string;
+  readonly emailAddress?: string;
+  readonly firstName?: string;
+  readonly fiscalNumber?: string;
+  readonly languageCode?: string;
+  readonly phoneNumber?: string;
+  readonly street?: string;
+  readonly surname?: string;
+  readonly zip?: string;
 }
 
 // Products / Product Groups - device fingerprint
@@ -240,21 +240,21 @@ export interface DeviceFingerprintRequest {
 }
 
 export interface DeviceFingerprintResponse {
-  deviceFingerprintTransactionId: string;
-  html: string;
+  readonly deviceFingerprintTransactionId: string;
+  readonly html: string;
 }
 
 // Products / Product Groups - directory
 
 export interface Directory {
-  entries: DirectoryEntry[];
+  readonly entries: DirectoryEntry[];
 }
 
 export interface DirectoryEntry {
-  countryNames?: string[];
-  issuerId: string;
-  issuerList?: string;
-  issuerName: string;
+  readonly countryNames?: string[];
+  readonly issuerId: string;
+  readonly issuerList?: string;
+  readonly issuerName: string;
 }
 
 export interface DirectoryParams {
@@ -272,7 +272,7 @@ export interface PaymentProductNetworksParams {
 }
 
 export interface PaymentProductNetworksResponse {
-  networks: string[];
+  readonly networks: string[];
 }
 
 // Products / Product Groups - sessions
@@ -282,7 +282,7 @@ export interface CreatePaymentProductSessionRequest {
 }
 
 export interface CreatePaymentProductSessionResponse {
-  paymentProductSession302SpecificOutput?: MobilePaymentProductSession302SpecificOutput;
+  readonly paymentProductSession302SpecificOutput?: MobilePaymentProductSession302SpecificOutput;
 }
 
 export interface MobilePaymentProductSession302SpecificInput {
@@ -292,34 +292,34 @@ export interface MobilePaymentProductSession302SpecificInput {
 }
 
 export interface MobilePaymentProductSession302SpecificOutput {
-  sessionObject: string;
+  readonly sessionObject: string;
 }
 
 // Products / Product Groups - validators
 
 export interface BoletoBancarioRequirednessValidator {
-  fiscalNumberLength: number;
+  readonly fiscalNumberLength: number;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface EmptyValidator {}
 
 export interface FixedListValidator {
-  allowedValues: string[];
+  readonly allowedValues: string[];
 }
 
 export interface LengthValidator {
-  minLength: number;
-  maxLength: number;
+  readonly minLength: number;
+  readonly maxLength: number;
 }
 
 export interface RangeValidator {
-  minValue: number;
-  maxValue: number;
+  readonly minValue: number;
+  readonly maxValue: number;
 }
 
 export interface RegularExpressionValidator {
-  regularExpression: string;
+  readonly regularExpression: string;
 }
 
 // Services - convert amount
@@ -331,14 +331,14 @@ export interface ConvertAmountParams {
 }
 
 export interface ConvertAmountResponse {
-  convertedAmount: number;
+  readonly convertedAmount: number;
 }
 
 // Services - IIN detauls
 
 export interface AmountOfMoney {
-  amount: number;
-  currencyCode: string;
+  readonly amount: number;
+  readonly currencyCode: string;
 }
 
 export interface GetIINDetailsRequest {
@@ -347,15 +347,15 @@ export interface GetIINDetailsRequest {
 }
 
 export interface GetIINDetailsResponse {
-  coBrands?: IINDetail[];
-  countryCode: string;
-  isAllowedInContext?: boolean;
-  paymentProductId: number;
+  readonly coBrands?: IINDetail[];
+  readonly countryCode: string;
+  readonly isAllowedInContext?: boolean;
+  readonly paymentProductId: number;
 }
 
 export interface IINDetail {
-  isAllowedInContext: boolean;
-  paymentProductId: number;
+  readonly isAllowedInContext: boolean;
+  readonly paymentProductId: number;
 }
 
 export type GetIINDetailsSuccessStatus = "KNOWN";
@@ -381,22 +381,22 @@ export interface GetPrivacyPolicyParams {
 }
 
 export interface GetPrivacyPolicyResponse {
-  htmlContent: string;
+  readonly htmlContent: string;
 }
 
 // Errors
 
 export interface APIError {
-  category: string;
-  code: string;
-  httpStatusCode: number;
-  id: string;
-  message: string;
-  propertyName: string;
-  requestId: string;
+  readonly category: string;
+  readonly code: string;
+  readonly httpStatusCode: number;
+  readonly id: string;
+  readonly message: string;
+  readonly propertyName: string;
+  readonly requestId: string;
 }
 
 export interface ErrorResponse {
-  errorId: string;
-  errors: APIError[];
+  readonly errorId: string;
+  readonly errors: APIError[];
 }

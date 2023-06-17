@@ -68,7 +68,7 @@ describe("Encryptor", () => {
   test("not validated", async () => {
     const encryptor = newEncryptor(
       clientSessionId,
-      publicKey,
+      jest.fn(),
       {
         randomString: jest.fn(),
         encrypt: jest.fn(),
@@ -86,6 +86,31 @@ describe("Encryptor", () => {
     expect(result).toStrictEqual(new Error("PaymentRequest has not been successfully validated"));
   });
 
+  test("public key retrieve error", async () => {
+    const encryptor = newEncryptor(
+      clientSessionId,
+      () => Promise.reject("failure"),
+      {
+        randomString: jest.fn(),
+        encrypt: jest.fn(),
+      },
+      new MockDevice()
+    );
+    const request = new PaymentRequest();
+    request.setPaymentProduct(product);
+    request.setValue("expirationDate", "1230");
+    expect(request.isValid()).toBe(false);
+    expect(request.validate().valid).toBe(true);
+    expect(request.isValid()).toBe(true);
+    const onSuccess = jest.fn();
+    const result = await encryptor
+      .encrypt(request)
+      .then(onSuccess)
+      .catch((reason) => reason);
+    expect(onSuccess).not.toBeCalled();
+    expect(result).toStrictEqual("failure");
+  });
+
   describe("success", () => {
     interface EncryptInput {
       payload: string;
@@ -101,7 +126,7 @@ describe("Encryptor", () => {
       const device = new MockDevice();
       const encryptor = newEncryptor(
         clientSessionId,
-        publicKey,
+        () => Promise.resolve(publicKey),
         {
           randomString: () => "random-nonce",
           encrypt,
@@ -154,7 +179,7 @@ describe("Encryptor", () => {
       const device = new MockDevice();
       const encryptor = newEncryptor(
         clientSessionId,
-        publicKey,
+        () => Promise.resolve(publicKey),
         {
           randomString: () => "random-nonce",
           encrypt,

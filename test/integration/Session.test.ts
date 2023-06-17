@@ -116,7 +116,7 @@ describe("session", () => {
     paymentRequest.setValue("cardholderName", "John Doe");
     expect(paymentRequest.validate().valid).toBe(true);
 
-    const encryptedCustomerInput = await session.getEncryptor().then((encryptor) => encryptor.encrypt(paymentRequest));
+    const encryptedCustomerInput = await session.getEncryptor().encrypt(paymentRequest);
 
     // A 402 response is allowed; that means that the encryption / decryption mechanism works
     try {

@@ -225,16 +225,14 @@ export class Session {
 
   /**
    * Returns an object that can be used to encrypt {@link PaymentRequest} objects.
-   * @returns A promise containing an {@link Encryptor}.
    * @throws If {@link webCryptoCryptoEngine} is not available,
    *         and no other crypto engine has been set using either {@link defaultCryptoEngine} or {@link setCryptoEngine}.
    */
-  async getEncryptor(): Promise<Encryptor> {
+  getEncryptor(): Encryptor {
     if (!this.#cryptoEngine) {
       throw new Error("encryption not supported");
     }
-    const publicKey = await this.getPublicKey();
-    return newEncryptor(this.#sessionDetails.clientSessionId, publicKey, this.#cryptoEngine, this.#device);
+    return newEncryptor(this.#sessionDetails.clientSessionId, () => this.getPublicKey(), this.#cryptoEngine, this.#device);
   }
 
   /**

@@ -126,9 +126,7 @@
         $('#encrypted-payload-div').hide();
         $('#product-error').text("");
 
-        session.getEncryptor().then((encryptor) => {
-          return encryptor.encrypt(paymentRequest);
-        }).then((encryptedPayload) => {
+        session.getEncryptor().encrypt(paymentRequest).then((encryptedPayload) => {
           $('#encrypted-payload').val(encryptedPayload);
           $('#encrypted-payload-div').show();
         }).catch((reason) => {
@@ -156,7 +154,8 @@
         };
 
         session = new connectClientSdk.Session(sessionDetails, paymentContext);
-        session.getPublicKey().then(() => session.getEncryptor()).then((encryptor) => {
+        session.getPublicKey().then(() => {
+          const encryptor = session.getEncryptor();
           const req = new connectClientSdk.PaymentRequest();
           req.setPaymentProduct({
             fields: []

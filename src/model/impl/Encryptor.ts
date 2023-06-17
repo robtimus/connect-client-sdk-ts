@@ -74,13 +74,13 @@ function createEncryptedCustomerInput(
 
 class EncryptorImpl implements Encryptor {
   readonly #clientSessionId: string;
-  readonly #publicKey: PublicKey;
+  readonly #retrievePublicKey: () => Promise<PublicKey>;
   readonly #engine: CryptoEngine;
   readonly #device: Device;
 
-  constructor(clientSessionId: string, publicKey: PublicKey, engine: CryptoEngine, device: Device) {
+  constructor(clientSessionId: string, retrievePublicKey: () => Promise<PublicKey>, engine: CryptoEngine, device: Device) {
     this.#clientSessionId = clientSessionId;
-    this.#publicKey = publicKey;
+    this.#retrievePublicKey = retrievePublicKey;
     this.#engine = engine;
     this.#device = device;
   }
@@ -98,12 +98,13 @@ class EncryptorImpl implements Encryptor {
     const nonce = this.#engine.randomString();
     const encryptedCustomerInput = createEncryptedCustomerInput(this.#clientSessionId, nonce, paymentRequest, this.#device);
     const payload = JSON.stringify(encryptedCustomerInput);
-    return this.#engine.encrypt(payload, this.#publicKey.keyId, this.#publicKey.publicKey);
+    const publicKey = await this.#retrievePublicKey();
+    return this.#engine.encrypt(payload, publicKey.keyId, publicKey.publicKey);
   }
 }
 
 Object.freeze(EncryptorImpl.prototype);
 
-export function newEncryptor(clientSessionId: string, publicKey: PublicKey, engine: CryptoEngine, device: Device): Encryptor {
-  return new EncryptorImpl(clientSessionId, publicKey, engine, device);
+export function newEncryptor(clientSessionId: string, retrievePublicKey: () => Promise<PublicKey>, engine: CryptoEngine, device: Device): Encryptor {
+  return new EncryptorImpl(clientSessionId, retrievePublicKey, engine, device);
 }

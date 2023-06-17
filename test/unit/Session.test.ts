@@ -340,29 +340,13 @@ describe("Session", () => {
           randomString: jest.fn(),
           encrypt: jest.fn(),
         });
-        expect(async () => await session.getEncryptor()).not.toThrow();
+        expect(() => session.getEncryptor()).not.toThrow();
       });
 
       test("with SubleCrypto crypto engine", async () => {
         const session = new Session(sessionDetails, minimalPaymentContext, device);
-        expect(async () => await session.getEncryptor()).not.toThrow();
+        expect(() => session.getEncryptor()).not.toThrow();
       });
-    });
-
-    test("HTTP error", async () => {
-      // don't mock anything -> will lead to an error response
-      const session = new Session(sessionDetails, minimalPaymentContext, new MockDevice());
-      session.setCryptoEngine({
-        randomString: jest.fn(),
-        encrypt: jest.fn(),
-      });
-      const onSuccess = jest.fn();
-      const result = await session
-        .getEncryptor()
-        .then(onSuccess)
-        .catch((reason) => reason);
-      expect(onSuccess).not.toBeCalled();
-      expect(result).toStrictEqual(notImplementedResponse());
     });
 
     test("no crypto engine", async () => {
@@ -379,13 +363,7 @@ describe("Session", () => {
       // In Node.js environments (16+), crypto.subtle is always available, therefore the default crypto engine will always be set
       // Set it to undefined instead, to mock the case where crypto.subtle is not available
       session.setCryptoEngine(undefined);
-      const onSuccess = jest.fn();
-      const result = await session
-        .getEncryptor()
-        .then(onSuccess)
-        .catch((reason) => reason);
-      expect(onSuccess).not.toBeCalled();
-      expect(result).toStrictEqual(new Error("encryption not supported"));
+      expect(() => session.getEncryptor()).toThrowError("encryption not supported");
     });
   });
 
@@ -3218,7 +3196,7 @@ describe("Session", () => {
       randomString: jest.fn(),
       encrypt,
     });
-    const encryptor = await session.getEncryptor();
+    const encryptor = session.getEncryptor();
     const request = new PaymentRequest();
     request.setPaymentProduct(toPaymentProduct(products.paymentProducts[0], "http://localhost"));
     request.setValue("expirationDate", "1230");

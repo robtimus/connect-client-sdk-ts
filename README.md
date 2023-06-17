@@ -131,7 +131,7 @@ if (!result.valid) {
 9. Encrypt the contents of the `PaymentRequest` object:
 
 ```typescript
-const encryptor = await session.getEncryptor();
+const encryptor = session.getEncryptor();
 const payload = encryptor.encrypt(paymentRequest);
 ```
 

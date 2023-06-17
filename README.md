@@ -55,7 +55,7 @@ The SDK is available under global namespace `connectClientSdk`, and can be impor
 
 ## Getting started
 
-1. Use the Worldline Connect Server APi's [Create session](https://epayments-api.developer-ingenico.com/s2sapi/v1/en_US/json/sessions/create.html) call to create a session.
+1. Use the Worldline Connect Server APi's [Create session](https://apireference.connect.worldline-solutions.com/s2sapi/v1/en_US/json/sessions/create.html) call to create a session.
 
 2. Create a [SessionDetails](https://robtimus.github.io/connect-client-sdk-ts/interfaces/model.SessionDetails.html) object using the Create session response:
 
@@ -135,13 +135,13 @@ const encryptor = session.getEncryptor();
 const payload = encryptor.encrypt(paymentRequest);
 ```
 
-10. Send the payload to your server, where it can be used for the `encryptedCustomerInput` property of a [Create payment](https://epayments-api.developer-ingenico.com/s2sapi/v1/en_US/json/payments/create.html) call.
+10. Send the payload to your server, where it can be used for the `encryptedCustomerInput` property of a [Create payment](https://apireference.connect.worldline-solutions.com/s2sapi/v1/en_US/json/payments/create.html) call.
 
 ## Extended usage
 
 ### IIN details
 
-When using the `cards` payment product group, it's important to know which payment product a card belongs to. This can be done by retrieving the [IIN details](https://epayments-api.developer-ingenico.com/c2sapi/v1/en_US/json/services/getIINdetails.html), and checking the status property:
+When using the `cards` payment product group, it's important to know which payment product a card belongs to. This can be done by retrieving the [IIN details](https://apireference.connect.worldline-solutions.com/c2sapi/v1/en_US/json/services/getIINdetails.html), and checking the status property:
 
 ```typescript
 const iinDetails = await session.getIINDetails("4567 35");
@@ -257,7 +257,7 @@ const paymentContext: PaymentContext = {
 };
 ```
 
-See the details of the `forceBasicFlow` query parameter of the [Get payment product](https://epayments-api.developer-ingenico.com/c2sapi/v1/en_US/javascript/products/get.html) call for more information.
+See the details of the `forceBasicFlow` query parameter of the [Get payment product](https://apireference.connect.worldline-solutions.com/c2sapi/v1/en_US/javascript/products/get.html) call for more information.
 
 ### Masking field values
 
@@ -373,7 +373,7 @@ The API can be found [here](https://robtimus.github.io/connect-client-sdk-ts/mod
 * [PaymentProductFieldDisplayHints](https://robtimus.github.io/connect-client-sdk-ts/interfaces/model.PaymentProductFieldDisplayHints.html) adds property `wildcardMask` which is like the `mask` but using `*` instead of numbers.
 * [PaymentProductFieldTooltip](https://robtimus.github.io/connect-client-sdk-ts/interfaces/model.PaymentProductFieldTooltip.html) images are objects containing the path originally returned by the Worldline Connect Client API and an absolute URL starting with the asset URL. These objects also support creating URLs that specify dimensions.
 * [IINDetailsResult](https://robtimus.github.io/connect-client-sdk-ts/types/model.IINDetailsResult.html) combines an IIN details success response with input validation and an IIN-not-found response. It adds a `status` property to make the distinction.
-* Integration of [Create session for payment product](https://epayments-api.developer-ingenico.com/c2sapi/v1/en_US/javascript/products/sessions.html) inside `Session` is split for each separate payment product. Currently only method `createApplePaySession` exists.
+* Integration of [Create session for payment product](https://apireference.connect.worldline-solutions.com/c2sapi/v1/en_US/javascript/products/sessions.html) inside `Session` is split for each separate payment product. Currently only method `createApplePaySession` exists.
 
 ## Requirements
 

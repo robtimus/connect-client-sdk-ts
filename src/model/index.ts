@@ -200,13 +200,13 @@ export interface AccountOnFileDisplayHints {
   readonly labelTemplate: LabelTemplateElement[];
   readonly logo: SizeableAsset;
   /**
-   * Finds a label template attribute based on the attribute key.
+   * Finds a label template element based on the attribute key.
    * @param key The attribute key of the label template to look for.
    * @returns The matching label template, or undefined if there is no such label template.
    */
   findLabelTemplate(attributeKey: string): LabelTemplateElement | undefined;
   /**
-   * Finds a label template attribute based on the attribute key.
+   * Finds a label template element based on the attribute key.
    * @param key The attribute key of the label template to look for.
    * @returns The matching label template.
    * @throws If there is no such label template.

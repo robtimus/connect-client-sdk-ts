@@ -1946,6 +1946,321 @@ describe("Session", () => {
     });
   });
 
+  describe("getPaymentProductDisplayHints", () => {
+    async function expectProductNotFound(session: Session, paymentProductId: number): Promise<api.ErrorResponse> {
+      try {
+        const product = await session.getPaymentProductDisplayHints(paymentProductId);
+        fail(`Expected an error, got ${product}`);
+      } catch (e) {
+        expect(e).toHaveProperty("statusCode", 404);
+        expect(e).toHaveProperty("contentType", "application/json");
+        expect(e).toHaveProperty("body");
+        const httpResponse = e as HttpResponse;
+        expect(httpResponse.body).toHaveProperty("errorId");
+        expect(httpResponse.body).toHaveProperty("errors");
+        const errorResponse = httpResponse.body as api.ErrorResponse;
+        expect(errorResponse.errors).toStrictEqual([
+          {
+            category: "CONNECT_PLATFORM_ERROR",
+            code: "1007",
+            httpStatusCode: 404,
+            id: "UNKNOWN_PRODUCT_ID",
+            propertyName: "productId",
+            message: "UNKNOWN_PRODUCT_ID",
+          },
+        ]);
+        return errorResponse;
+      }
+    }
+
+    describe("success", () => {
+      describe("minimal payment context", () => {
+        test("Apple Pay", async () => {
+          const device = new MockDevice().mockGet(
+            `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products/${PP_APPLE_PAY}?`,
+            {
+              statusCode: 200,
+              contentType: "application/json",
+              body: JSON.parse(JSON.stringify(products.paymentProducts.find((product) => product.id === PP_APPLE_PAY))),
+            },
+            (request) =>
+              expectRequest(request, {
+                countryCode: minimalPaymentContext.countryCode,
+                currencyCode: minimalPaymentContext.amountOfMoney.currencyCode,
+                amount: minimalPaymentContext.amountOfMoney.amount,
+              })
+          );
+          const session = new Session(sessionDetails, minimalPaymentContext, device);
+          await expectProductNotFound(session, PP_APPLE_PAY);
+          await expectProductNotFound(session, PP_APPLE_PAY);
+          expect(device.capturedRequests()).toHaveLength(1);
+        });
+
+        test("Google Pay", async () => {
+          const device = new MockDevice().mockGet(
+            `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products/${PP_GOOGLE_PAY}?`,
+            {
+              statusCode: 200,
+              contentType: "application/json",
+              body: JSON.parse(JSON.stringify(products.paymentProducts.find((product) => product.id === PP_GOOGLE_PAY))),
+            },
+            (request) =>
+              expectRequest(request, {
+                countryCode: minimalPaymentContext.countryCode,
+                currencyCode: minimalPaymentContext.amountOfMoney.currencyCode,
+                amount: minimalPaymentContext.amountOfMoney.amount,
+              })
+          );
+          const session = new Session(sessionDetails, minimalPaymentContext, device);
+          await expectProductNotFound(session, PP_GOOGLE_PAY);
+          await expectProductNotFound(session, PP_GOOGLE_PAY);
+          expect(device.capturedRequests()).toHaveLength(1);
+        });
+
+        describe("other", () => {
+          test("from payment products cache", async () => {
+            const device = new MockDevice().mockGet(
+              `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products?`,
+              {
+                statusCode: 200,
+                contentType: "application/json",
+                body: JSON.parse(JSON.stringify(products)),
+              },
+              (request) =>
+                expectRequest(request, {
+                  countryCode: minimalPaymentContext.countryCode,
+                  currencyCode: minimalPaymentContext.amountOfMoney.currencyCode,
+                  amount: minimalPaymentContext.amountOfMoney.amount,
+                  hide: ["fields"],
+                })
+            );
+            const session = new Session(sessionDetails, minimalPaymentContext, device);
+            await session.getBasicPaymentProducts();
+            const result = await session.getPaymentProductDisplayHints(1);
+            expect(result.displayOrder).toBe(1);
+            expect(result.logo.path).toBe("1.png");
+            expect(result.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
+          });
+
+          test("from payment product", async () => {
+            const device = new MockDevice().mockGet(
+              `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products/1?`,
+              {
+                statusCode: 200,
+                contentType: "application/json",
+                body: JSON.parse(JSON.stringify(products.paymentProducts[0])),
+              },
+              (request) =>
+                expectRequest(request, {
+                  countryCode: minimalPaymentContext.countryCode,
+                  currencyCode: minimalPaymentContext.amountOfMoney.currencyCode,
+                  amount: minimalPaymentContext.amountOfMoney.amount,
+                })
+            );
+            const session = new Session(sessionDetails, minimalPaymentContext, device);
+            const result = await session.getPaymentProductDisplayHints(1);
+            expect(result.displayOrder).toBe(1);
+            expect(result.logo.path).toBe("1.png");
+            expect(result.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
+          });
+        });
+      });
+
+      describe("full payment context", () => {
+        describe("Apple Pay", () => {
+          test("not enabled", async () => {
+            const device = new MockDevice().mockGet(
+              `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products/${PP_APPLE_PAY}?`,
+              {
+                statusCode: 200,
+                contentType: "application/json",
+                body: JSON.parse(JSON.stringify(products.paymentProducts.find((product) => product.id === PP_APPLE_PAY))),
+              },
+              (request) =>
+                expectRequest(request, {
+                  countryCode: fullPaymentContext.countryCode,
+                  currencyCode: fullPaymentContext.amountOfMoney.currencyCode,
+                  amount: fullPaymentContext.amountOfMoney.amount,
+                  locale: fullPaymentContext.locale,
+                  isRecurring: fullPaymentContext.isRecurring,
+                })
+            );
+            const session = new Session(sessionDetails, fullPaymentContext, device);
+            await expectProductNotFound(session, PP_APPLE_PAY);
+            await expectProductNotFound(session, PP_APPLE_PAY);
+            expect(device.capturedRequests()).toHaveLength(1);
+          });
+
+          test("enabled", async () => {
+            const device = new MockDevice()
+              .mockGet(
+                `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products/${PP_APPLE_PAY}?`,
+                {
+                  statusCode: 200,
+                  contentType: "application/json",
+                  body: JSON.parse(JSON.stringify(products.paymentProducts.find((product) => product.id === PP_APPLE_PAY))),
+                },
+                (request) =>
+                  expectRequest(request, {
+                    countryCode: fullPaymentContext.countryCode,
+                    currencyCode: fullPaymentContext.amountOfMoney.currencyCode,
+                    amount: fullPaymentContext.amountOfMoney.amount,
+                    locale: fullPaymentContext.locale,
+                    isRecurring: fullPaymentContext.isRecurring,
+                  })
+              )
+              .mockApplePayClient(true);
+            const session = new Session(sessionDetails, fullPaymentContext, device);
+            const result = await session.getPaymentProductDisplayHints(PP_APPLE_PAY);
+            expect(result.displayOrder).toBe(PP_APPLE_PAY);
+            expect(result.logo.path).toBe(`${PP_APPLE_PAY}.png`);
+            expect(result.logo.url).toBe(`${sessionDetails.assetUrl}/${PP_APPLE_PAY}.png`);
+          });
+        });
+
+        describe("Google Pay", () => {
+          test("not enabled", async () => {
+            const device = new MockDevice().mockGet(
+              `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products/${PP_GOOGLE_PAY}?`,
+              {
+                statusCode: 200,
+                contentType: "application/json",
+                body: JSON.parse(JSON.stringify(products.paymentProducts.find((product) => product.id === PP_GOOGLE_PAY))),
+              },
+              (request) =>
+                expectRequest(request, {
+                  countryCode: fullPaymentContext.countryCode,
+                  currencyCode: fullPaymentContext.amountOfMoney.currencyCode,
+                  amount: fullPaymentContext.amountOfMoney.amount,
+                  locale: fullPaymentContext.locale,
+                  isRecurring: fullPaymentContext.isRecurring,
+                })
+            );
+            const session = new Session(sessionDetails, fullPaymentContext, device);
+            await expectProductNotFound(session, PP_GOOGLE_PAY);
+            await expectProductNotFound(session, PP_GOOGLE_PAY);
+            expect(device.capturedRequests()).toHaveLength(1);
+          });
+
+          test("enabled", async () => {
+            const device = new MockDevice()
+              .mockGet(
+                `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products/${PP_GOOGLE_PAY}?`,
+                {
+                  statusCode: 200,
+                  contentType: "application/json",
+                  body: JSON.parse(JSON.stringify(products.paymentProducts.find((product) => product.id === PP_GOOGLE_PAY))),
+                },
+                (request) =>
+                  expectRequest(request, {
+                    countryCode: fullPaymentContext.countryCode,
+                    currencyCode: fullPaymentContext.amountOfMoney.currencyCode,
+                    amount: fullPaymentContext.amountOfMoney.amount,
+                    locale: fullPaymentContext.locale,
+                    isRecurring: fullPaymentContext.isRecurring,
+                  })
+              )
+              .mockGooglePayClient(true);
+            const session = new Session(sessionDetails, fullPaymentContext, device);
+            const result = await session.getPaymentProductDisplayHints(PP_GOOGLE_PAY);
+            expect(result.displayOrder).toBe(PP_GOOGLE_PAY);
+            expect(result.logo.path).toBe(`${PP_GOOGLE_PAY}.png`);
+            expect(result.logo.url).toBe(`${sessionDetails.assetUrl}/${PP_GOOGLE_PAY}.png`);
+          });
+        });
+
+        describe("other", () => {
+          test("from payment products cache", async () => {
+            const device = new MockDevice().mockGet(
+              `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products?`,
+              {
+                statusCode: 200,
+                contentType: "application/json",
+                body: JSON.parse(JSON.stringify(products)),
+              },
+              (request) =>
+                expectRequest(request, {
+                  countryCode: fullPaymentContext.countryCode,
+                  currencyCode: fullPaymentContext.amountOfMoney.currencyCode,
+                  amount: fullPaymentContext.amountOfMoney.amount,
+                  locale: fullPaymentContext.locale,
+                  isRecurring: fullPaymentContext.isRecurring,
+                  hide: ["fields"],
+                })
+            );
+            const session = new Session(sessionDetails, fullPaymentContext, device);
+            await session.getBasicPaymentProducts();
+            const result = await session.getPaymentProductDisplayHints(1);
+            expect(result.displayOrder).toBe(1);
+            expect(result.logo.path).toBe("1.png");
+            expect(result.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
+          });
+
+          test("from payment product", async () => {
+            const device = new MockDevice().mockGet(
+              `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products/1?`,
+              {
+                statusCode: 200,
+                contentType: "application/json",
+                body: JSON.parse(JSON.stringify(products.paymentProducts[0])),
+              },
+              (request) =>
+                expectRequest(request, {
+                  countryCode: fullPaymentContext.countryCode,
+                  currencyCode: fullPaymentContext.amountOfMoney.currencyCode,
+                  amount: fullPaymentContext.amountOfMoney.amount,
+                  locale: fullPaymentContext.locale,
+                  isRecurring: fullPaymentContext.isRecurring,
+                })
+            );
+            const session = new Session(sessionDetails, fullPaymentContext, device);
+            const result = await session.getPaymentProductDisplayHints(1);
+            expect(result.displayOrder).toBe(1);
+            expect(result.logo.path).toBe("1.png");
+            expect(result.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
+          });
+        });
+      });
+
+      describe("provided", () => {
+        test("retrieve same", async () => {
+          const session = new Session(sessionDetails, minimalPaymentContext, new MockDevice());
+          session.setProvidedPaymentItem(products.paymentProducts[0]);
+          const result = await session.getPaymentProductDisplayHints(1);
+          expect(result.displayOrder).toBe(1);
+          expect(result.logo.path).toBe("1.png");
+          expect(result.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
+        });
+
+        test("retrieve other", async () => {
+          const device = new MockDevice().mockGet(`${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/products/1?`, {
+            statusCode: 200,
+            contentType: "application/json",
+            body: JSON.parse(JSON.stringify(products.paymentProducts[0])),
+          });
+          const session = new Session(sessionDetails, minimalPaymentContext, device);
+          session.setProvidedPaymentItem(products.paymentProducts[1]);
+          const result = await session.getPaymentProductDisplayHints(1);
+          expect(result.displayOrder).toBe(1);
+          expect(result.logo.path).toBe("1.png");
+          expect(result.logo.url).toBe(`${sessionDetails.assetUrl}/1.png`);
+        });
+      });
+    });
+
+    test("HTTP error", async () => {
+      // don't mock anything -> will lead to an error response
+      const session = new Session(sessionDetails, minimalPaymentContext, new MockDevice());
+      const onSuccess = jest.fn();
+      const result = await session
+        .getPaymentProductDisplayHints(1)
+        .then(onSuccess)
+        .catch((reason) => reason);
+      expect(onSuccess).not.toBeCalled();
+      expect(result).toStrictEqual(notImplementedResponse());
+    });
+  });
+
   describe("getPaymentProductDirectory", () => {
     const directory: api.Directory = {
       entries: [

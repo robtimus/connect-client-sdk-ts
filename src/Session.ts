@@ -28,6 +28,7 @@ import {
   PaymentProduct,
   PaymentProduct302SpecificData,
   PaymentProduct320SpecificData,
+  PaymentProductDisplayHints,
   PaymentProductGroup,
   PaymentProductNetworks,
   PrivacyPolicyResult,
@@ -38,6 +39,7 @@ import {
 import { newEncryptor } from "./model/impl/Encryptor";
 import { toBasicPaymentItems } from "./model/impl/PaymentItem";
 import { PP_APPLE_PAY, PP_BANCONTACT, PP_GOOGLE_PAY, toBasicPaymentProducts, toPaymentProduct } from "./model/impl/PaymentProduct";
+import { toPaymentProductDisplayHints } from "./model/impl/PaymentProductDisplayHints";
 import { toBasicPaymentProductGroups, toPaymentProductGroup } from "./model/impl/PaymentProductGroup";
 
 function constructCacheKey(base: string, ...params: unknown[]): string {
@@ -58,6 +60,14 @@ async function getValue<T>(cache: Record<string, unknown>, key: string, valueSup
   const value = await valueSupplier();
   cache[key] = value ?? UNDEFINED_VALUE;
   return value;
+}
+
+function getCurrentValue<T>(cache: Record<string, unknown>, key: string): T | undefined {
+  const existing = cache[key];
+  if (existing) {
+    return (existing !== UNDEFINED_VALUE ? existing : undefined) as T;
+  }
+  return undefined;
 }
 
 function clearCache(cache: Record<string, unknown>, filter: (key: string) => boolean): void {
@@ -472,6 +482,47 @@ export class Session {
     }
 
     return toPaymentProduct(json, this.#sessionDetails.assetUrl);
+  }
+
+  /**
+   * Retrieves a specific payment product using the current payment context.\
+   * Note that for Apple Pay and Google Pay, these need to be enabled in the device.
+   * Furthermore, the current payment context *must* contain the necessary payment product specific inputs.
+   * Otherwise, the returned promise will be rejected.
+   * @param paymentProductId The ID of the payment product.
+   * @returns A promise containing the payment product. It will be rejected if the payment product is not available for the current context.
+   */
+
+  /**
+   * Retrieves the display hints for a specific payment product using the current payment context.\
+   * This method can be used to retrieve the display hints for rendering cobrands as returned by {@link getIINDetails}.
+   * It will behave the same as calling {@link getPaymentProduct} and retrieving the display hints from the result,
+   * but may be more performant if the product has not been retrieved yet.
+   * @param paymentProductId The ID of the payment product.
+   * @returns A promise containing the payment product's display hints. It will be rejected if the payment product is not available for the current context.
+   */
+  async getPaymentProductDisplayHints(paymentProductId: number): Promise<PaymentProductDisplayHints> {
+    // For Apple Pay and Google Pay, always retrieve the product, to make use of its filtering
+    if (paymentProductId === PP_APPLE_PAY || paymentProductId === PP_GOOGLE_PAY) {
+      return this.getPaymentProduct(paymentProductId).then((product) => product.displayHints);
+    }
+
+    const productsCacheKey = constructCacheKey(
+      "BasicPaymentProducts",
+      this.#paymentContext.countryCode,
+      this.#paymentContext.amountOfMoney.currencyCode,
+      this.#paymentContext.locale,
+      this.#paymentContext.amountOfMoney.amount,
+      this.#paymentContext.isRecurring
+    );
+    const productsJson: api.PaymentProducts | undefined = getCurrentValue(this.#cache, productsCacheKey);
+    if (productsJson) {
+      const productJson = productsJson.paymentProducts.find((product) => product.id === paymentProductId);
+      if (productJson) {
+        return toPaymentProductDisplayHints(productJson.displayHints, this.#sessionDetails.assetUrl);
+      }
+    }
+    return this.getPaymentProduct(paymentProductId).then((product) => product.displayHints);
   }
 
   /**

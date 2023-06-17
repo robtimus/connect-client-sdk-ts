@@ -151,6 +151,8 @@ switch (iinDetails.status) {
     // iinDetails.isAllowedInContext is true, iinDetails.paymentProductId and iinDetails.countryCode are available.
     // If the card has multiple brands, iinDetails.coBrands contains the paymentProductId for each of them,
     // and an isAllowedInContext flag that determines whether or not the co-brand is allowed for the current context.
+    // To render the brands, session.getPaymentProductDisplayHints can be called with the paymentProductId field of
+    // each support cobrand for which isAllowedInContext is true.
     break;
   case "NOT_ALLOWED":
     // The card is known but not allowed within the current payment context.

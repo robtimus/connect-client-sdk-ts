@@ -78,7 +78,7 @@
       }
 
       function setEncryptEnabledStatus() {
-        const valid = paymentRequest && paymentRequest.getPaymentProduct() && paymentRequest.validate().valid && paymentRequest.isValid();
+        const valid = paymentRequest?.getPaymentProduct() && paymentRequest.validate().valid && paymentRequest.isValid();
         $('#encrypt').attr('disabled', !valid);
       }
 

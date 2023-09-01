@@ -253,7 +253,7 @@ export class Communicator {
         if (response.statusCode === 404) {
           const status: api.GetIINDetailsErrorStatus = "UNKNOWN";
           const json = response.body as api.ErrorResponse;
-          return Promise.resolve(Object.assign({ status }, json));
+          return Object.assign({ status }, json);
         }
         return Promise.reject(response);
       });

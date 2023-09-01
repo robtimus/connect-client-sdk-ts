@@ -147,15 +147,13 @@ class WebCryptoCryptoEngine implements CryptoEngine {
     const authenticationTag = calculatedHmac.substring(0, calculatedHmac.length / 2);
     const encodedAuthenticationTag = btoa(authenticationTag);
 
-    return Promise.resolve(
-      [
-        encodededProtectedHeader,
-        encodedEncryptedContentEncryptionKey,
-        encodededinitializationVector,
-        encodedCipherText,
-        encodedAuthenticationTag,
-      ].join(".")
-    );
+    return [
+      encodededProtectedHeader,
+      encodedEncryptedContentEncryptionKey,
+      encodededinitializationVector,
+      encodedCipherText,
+      encodedAuthenticationTag,
+    ].join(".");
   }
 }
 

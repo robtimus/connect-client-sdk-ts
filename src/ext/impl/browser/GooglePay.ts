@@ -138,7 +138,7 @@ class GooglePayClientImpl implements GooglePayClient {
   }
 
   createButton(options: GooglePayButtonOptions): HTMLElement {
-    const buttonOptions: google.payments.api.ButtonOptions = Object.assign({}, options);
+    const buttonOptions: google.payments.api.ButtonOptions = { ...options };
     buttonOptions.allowedPaymentMethods = constructAllowedPaymentMethods(this.#googlePaySpecificData);
     return this.#client.createButton(buttonOptions);
   }

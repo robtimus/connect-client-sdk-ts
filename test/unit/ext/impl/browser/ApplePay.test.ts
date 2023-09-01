@@ -227,7 +227,7 @@ describe("Apple Pay", () => {
         .createPayment(factory)
         .then(onSuccess)
         .catch((reason) => reason);
-      expect(result).toBe("Error authorizing payment");
+      expect(result).toStrictEqual(new Error("Error authorizing payment"));
       expect(capturedInput).toStrictEqual({
         displayName: applePaySpecificInput.merchantName,
         domainName: "localhost",

@@ -48,8 +48,8 @@
 
   <script>
     $(function () {
-      let session = undefined;
-      let paymentRequest = undefined;
+      let session;
+      let paymentRequest;
 
       function fetchProductForCardNumber(cardNumber) {
         session.getIINDetails(cardNumber).then((result) => {

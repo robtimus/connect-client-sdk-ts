@@ -248,12 +248,12 @@ export class Communicator {
         if (response.statusCode / 100 === 2) {
           const status: api.GetIINDetailsSuccessStatus = "KNOWN";
           const json = response.body as api.GetIINDetailsResponse;
-          return Object.assign({ status }, json);
+          return { ...json, status };
         }
         if (response.statusCode === 404) {
           const status: api.GetIINDetailsErrorStatus = "UNKNOWN";
           const json = response.body as api.ErrorResponse;
-          return Object.assign({ status }, json);
+          return { ...json, status };
         }
         return Promise.reject(response);
       });

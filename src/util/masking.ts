@@ -4,16 +4,14 @@ function fillBuffer(index: number, offset: number, buffer: string[], tempMask: s
   if (index + offset < valuec.length && index < tempMask.length) {
     if ((tempMask[index] === "9" && Number(valuec[index + offset]) > -1 && valuec[index + offset] !== " ") || tempMask[index] === "*") {
       buffer.push(valuec[index + offset]);
+    } else if (valuec[index + offset] === tempMask[index]) {
+      buffer.push(valuec[index + offset]);
+    } else if (tempMask[index] !== "9" && tempMask[index] !== "*") {
+      buffer.push(tempMask[index]);
+      offset--;
     } else {
-      if (valuec[index + offset] === tempMask[index]) {
-        buffer.push(valuec[index + offset]);
-      } else if (tempMask[index] !== "9" && tempMask[index] !== "*") {
-        buffer.push(tempMask[index]);
-        offset--;
-      } else {
-        valuec.splice(index + offset, 1);
-        index--;
-      }
+      valuec.splice(index + offset, 1);
+      index--;
     }
     fillBuffer(index + 1, offset, buffer, tempMask, valuec);
   }
@@ -68,10 +66,8 @@ export function removeMask(mask: string | undefined, value: string): string {
     if (c === "{" || c === "}") {
       valueIndex--;
       inMask = c === "{";
-    } else {
-      if (inMask && valuec[valueIndex]) {
-        buffer.push(valuec[valueIndex]);
-      }
+    } else if (inMask && valuec[valueIndex]) {
+      buffer.push(valuec[valueIndex]);
     }
   }
   return buffer.join("").trim();

@@ -63,7 +63,7 @@ class ApplePayClientImpl implements ApplePayClient {
           resolve(event.payment.token);
         } else {
           applePaySession.completePayment(ApplePaySession.STATUS_FAILURE);
-          reject("Error authorizing payment");
+          reject(new Error("Error authorizing payment"));
         }
       };
       applePaySession.begin();

@@ -107,7 +107,7 @@ function toApplePaySpecificData(applePayProduct: ApplePayProduct): ApplePaySpeci
   if (applePayProduct.id !== PP_APPLE_PAY || !applePayProduct.paymentProduct302SpecificData) {
     throw new Error("Not a valid Apple Pay product: " + JSON.stringify(applePayProduct));
   }
-  return Object.assign({ acquirerCountry: applePayProduct.acquirerCountry }, applePayProduct.paymentProduct302SpecificData);
+  return { ...applePayProduct.paymentProduct302SpecificData, acquirerCountry: applePayProduct.acquirerCountry };
 }
 
 /**
@@ -131,7 +131,7 @@ function toGooglePaySpecificData(googlePayProduct: GooglePayProduct): GooglePayS
   if (googlePayProduct.id !== PP_GOOGLE_PAY || !googlePayProduct.paymentProduct320SpecificData) {
     throw new Error("Not a valid Google Pay product: " + JSON.stringify(googlePayProduct));
   }
-  return Object.assign({ acquirerCountry: googlePayProduct.acquirerCountry }, googlePayProduct.paymentProduct320SpecificData);
+  return { ...googlePayProduct.paymentProduct320SpecificData, acquirerCountry: googlePayProduct.acquirerCountry };
 }
 
 /**
@@ -204,7 +204,7 @@ export class Session {
    * @param paymentContext A partial payment context.
    */
   updatePaymentContext(paymentContext: Partial<PaymentContext>): void {
-    this.#paymentContext = Object.assign({}, this.#paymentContext, paymentContext);
+    this.#paymentContext = { ...this.#paymentContext, ...paymentContext };
     // Invalidate cached Apple Pay and Google Pay clients
     clearCache(this.#cache, (key) => key.startsWith("ApplePayClient") || key.startsWith("GooglePayClient"));
     // Invalidate the Apple Pay and Google Pay availability
@@ -409,10 +409,9 @@ export class Session {
     };
 
     if (filteredJson.paymentProducts.length === 0) {
-      return Promise.reject({
-        message: "No payment products available",
-        json: json,
-      });
+      const error = new Error("No payment products available");
+      error["json"] = json;
+      return Promise.reject(error);
     }
     return toBasicPaymentProducts(filteredJson, this.#sessionDetails.assetUrl);
   }
@@ -683,7 +682,7 @@ export class Session {
         isAllowedInContext = false;
       }
     }
-    return Object.assign(json, { status, isAllowedInContext });
+    return { ...json, status, isAllowedInContext };
   }
 
   /**

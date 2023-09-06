@@ -15,7 +15,7 @@ jobs:
         node: ['16.0', '16.x', '18.x']
       fail-fast: false
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Node.js ${{matrix.node}}
         uses: actions/setup-node@v3
         with:
@@ -31,7 +31,7 @@ jobs:
   site:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Node.js 18
         uses: actions/setup-node@v3
         with:

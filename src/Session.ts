@@ -18,8 +18,10 @@ import {
   DeviceFingerprintResult,
   Directory,
   Encryptor,
+  GetInstallmentRequest,
   IINDetailsResult,
   IINDetailsSuccessStatus,
+  InstallmentOptionsResponse,
   KeyValuePair,
   MobilePaymentProductSession302SpecificInput,
   MobilePaymentProductSession302SpecificOutput,
@@ -37,6 +39,7 @@ import {
   ThirdPartyStatus,
 } from "./model";
 import { newEncryptor } from "./model/impl/Encryptor";
+import { toInstallmentOptionsResponse } from "./model/impl/InstallmentOptionsResponse";
 import { toBasicPaymentItems } from "./model/impl/PaymentItem";
 import { PP_APPLE_PAY, PP_BANCONTACT, PP_GOOGLE_PAY, toBasicPaymentProducts, toPaymentProduct } from "./model/impl/PaymentProduct";
 import { toPaymentProductDisplayHints } from "./model/impl/PaymentProductDisplayHints";
@@ -602,10 +605,29 @@ export class Session {
   }
 
   /**
+   * Retrieves information related to the available installment options.
+   * @param request The installment details request.
+   * @returns A promise containing the installment options.
+   */
+  async getInstallmentInfo(request: GetInstallmentRequest): Promise<InstallmentOptionsResponse> {
+    // Don't cache
+    const apiRequest: api.GetInstallmentRequest = {
+      amountOfMoney: request.amountOfMoney ?? this.#paymentContext.amountOfMoney,
+      countryCode: request.countryCode ?? this.#paymentContext.countryCode,
+    };
+    if (request.bin !== undefined) {
+      apiRequest.bin = request.bin;
+    }
+    if (request.paymentProductId !== undefined) {
+      apiRequest.paymentProductId = request.paymentProductId;
+    }
+    const json = await this.#communicator.getInstallmentInfo(apiRequest);
+    return toInstallmentOptionsResponse(json, this.#sessionDetails.assetUrl);
+  }
+
+  /**
    * Converts an amount from one currency to another.
-   * @param amount The amount to convert.
-   * @param source The source currency.
-   * @param target The target currency.
+   * @param request The convert amount request.
    * @returns A promise containing the convert amount result.
    */
   async convertAmount(request: ConvertAmountRequest): Promise<ConvertAmountResult> {

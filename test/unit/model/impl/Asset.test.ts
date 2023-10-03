@@ -5,6 +5,20 @@
 import { toAsset, toSizableAsset } from "../../../../src/model/impl/Asset";
 
 describe("toAsset", () => {
+  test("url starts with http://", () => {
+    const asset = toAsset("http://example.org/image.png", "http://localhost/");
+    expect(asset.path).toBe("http://example.org/image.png");
+    expect(asset.url).toBe("http://example.org/image.png");
+    expect(asset.toString()).toBe("http://example.org/image.png");
+  });
+
+  test("url starts with https://", () => {
+    const asset = toAsset("https://example.org/image.png", "http://localhost/");
+    expect(asset.path).toBe("https://example.org/image.png");
+    expect(asset.url).toBe("https://example.org/image.png");
+    expect(asset.toString()).toBe("https://example.org/image.png");
+  });
+
   test("assetUrl ends with /, url starts with /", () => {
     const asset = toAsset("/image.png", "http://localhost/");
     expect(asset.path).toBe("/image.png");

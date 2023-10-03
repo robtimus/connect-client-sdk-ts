@@ -2747,6 +2747,112 @@ describe("Session", () => {
     });
   });
 
+  describe("getInstallmentInfo", () => {
+    describe("successful", () => {
+      const installmentOptionsResponse: api.InstallmentOptionsResponse = {
+        installmentOptions: [
+          {
+            displayHints: {
+              displayOrder: 0,
+              label: "test",
+              logo: "somefile.png",
+            },
+            id: "test",
+            installmentPlans: [
+              {
+                amountOfMoneyPerInstallment: {
+                  amount: 1000,
+                  currencyCode: "EUR",
+                },
+                amountOfMoneyTotal: {
+                  amount: 10000,
+                  currencyCode: "EUR",
+                },
+                frequencyOfInstallments: "monthly",
+                installmentPlanCode: 1,
+                interestRate: "4.000",
+                numberOfInstallments: 10,
+              },
+            ],
+          },
+        ],
+      };
+
+      test("minimal request", async () => {
+        const device = new MockDevice().mockPost(
+          `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/installments/getInstallmentsInfo`,
+          {
+            statusCode: 200,
+            contentType: "application.json",
+            body: JSON.parse(JSON.stringify(installmentOptionsResponse)),
+          },
+          (request) =>
+            expectRequest(
+              request,
+              {},
+              {
+                amountOfMoney: minimalPaymentContext.amountOfMoney,
+                countryCode: minimalPaymentContext.countryCode,
+              }
+            )
+        );
+        const session = new Session(sessionDetails, minimalPaymentContext, device);
+        const result = await session.getInstallmentInfo({});
+        expect(result.installmentOptions).toHaveLength(installmentOptionsResponse.installmentOptions.length);
+        expect(result.installmentOptions[0].installmentPlans).toStrictEqual(installmentOptionsResponse.installmentOptions[0].installmentPlans);
+      });
+
+      test("full request", async () => {
+        const device = new MockDevice().mockPost(
+          `${sessionDetails.clientApiUrl}/v1/${sessionDetails.customerId}/installments/getInstallmentsInfo`,
+          {
+            statusCode: 200,
+            contentType: "application.json",
+            body: JSON.parse(JSON.stringify(installmentOptionsResponse)),
+          },
+          (request) =>
+            expectRequest(
+              request,
+              {},
+              {
+                amountOfMoney: {
+                  amount: 5000,
+                  currencyCode: "USD",
+                },
+                countryCode: "US",
+                bin: "123456",
+                paymentProductId: 1,
+              }
+            )
+        );
+        const session = new Session(sessionDetails, minimalPaymentContext, device);
+        const result = await session.getInstallmentInfo({
+          amountOfMoney: {
+            amount: 5000,
+            currencyCode: "USD",
+          },
+          bin: "123456",
+          countryCode: "US",
+          paymentProductId: 1,
+        });
+        expect(result.installmentOptions).toHaveLength(installmentOptionsResponse.installmentOptions.length);
+        expect(result.installmentOptions[0].installmentPlans).toStrictEqual(installmentOptionsResponse.installmentOptions[0].installmentPlans);
+      });
+    });
+
+    test("HTTP error", async () => {
+      // don't mock anything -> will lead to an error response
+      const session = new Session(sessionDetails, minimalPaymentContext, new MockDevice());
+      const onSuccess = jest.fn();
+      const result = await session
+        .getInstallmentInfo({})
+        .then(onSuccess)
+        .catch((reason) => reason);
+      expect(onSuccess).not.toBeCalled();
+      expect(result).toStrictEqual(notImplementedResponse());
+    });
+  });
+
   describe("convertAmount", () => {
     test("successful", async () => {
       const convertAmountResponse: api.ConvertAmountResponse = {

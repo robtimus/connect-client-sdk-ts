@@ -788,6 +788,40 @@ export interface MobilePaymentProductSession302SpecificOutput {
   readonly sessionObject: string;
 }
 
+// Installments
+
+export interface GetInstallmentRequest {
+  amountOfMoney?: AmountOfMoney;
+  bin?: string;
+  countryCode?: string;
+  paymentProductId?: number;
+}
+
+export interface InstallmentOptionsResponse {
+  readonly installmentOptions: InstallmentOptions[];
+}
+
+export interface InstallmentDisplayHints {
+  readonly displayOrder: number;
+  readonly label: string;
+  readonly logo: SizeableAsset;
+}
+
+export interface InstallmentOptions {
+  readonly displayHints: InstallmentDisplayHints;
+  readonly id: string;
+  readonly installmentPlans: Installments[];
+}
+
+export interface Installments {
+  readonly amountOfMoneyPerInstallment: AmountOfMoney;
+  readonly amountOfMoneyTotal: AmountOfMoney;
+  readonly frequencyOfInstallments: string;
+  readonly installmentPlanCode?: number;
+  readonly interestRate: string;
+  readonly numberOfInstallments: number;
+}
+
 // Services - convert amount
 
 export interface ConvertAmountRequest {

@@ -222,6 +222,17 @@ export class Communicator {
       .then((response) => processResponse(response));
   }
 
+  async getInstallmentInfo(request: api.GetInstallmentRequest): Promise<api.InstallmentOptionsResponse> {
+    const url = createURL(this.#config, "v1", "installments/getInstallmentsInfo");
+    return this.#device
+      .getHttpClient()
+      .post(url, request)
+      .header("X-GCS-ClientMetaInfo", createClientMetaInfo(this.#device))
+      .header("Authorization", createAuthorization(this.#config))
+      .send()
+      .then((response) => processResponse(response));
+  }
+
   async convertAmount(params: api.ConvertAmountParams): Promise<api.ConvertAmountResponse> {
     const url = createURL(this.#config, "v1", `services/convert/amount`);
     return this.#device

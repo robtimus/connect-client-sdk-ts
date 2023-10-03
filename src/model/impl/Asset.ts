@@ -1,6 +1,10 @@
 import { Asset, SizeableAsset } from "..";
 
 function prefixWithAssetUrl(url: string, assetUrl: string): string {
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    // an absolute URL
+    return url;
+  }
   if (assetUrl.endsWith("/") && url.startsWith("/")) {
     return assetUrl + url.substring(1);
   }

@@ -9,6 +9,7 @@
   "license": "MIT",
   "author": "Rob Spoor",
   "files": [
+    "NOTICE.txt",
     "dist"
   ],
   "main": "dist/index.js",

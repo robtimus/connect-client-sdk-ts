@@ -11,7 +11,7 @@ An SDK for the [Worldline Connect](https://epayments.developer-ingenico.com/) Cl
 * No custom code for functionality most modern browsers support like Base64 encoding/decoding.
 * Proper promises.
 * HTTP calls use the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) if available, with [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) available as fallback.
-* Native cryptography if available, through the [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API). [node-forge](https://www.npmjs.com/package/node-forge) can still be used as fallback.
+* Native cryptography if available, though the [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API). [node-forge](https://www.npmjs.com/package/node-forge) can still be used as fallback.
 * No deprecated legacy code.
 * More support for creating Apple Pay and Google Pay payments.
 
@@ -94,7 +94,8 @@ const session = new Session(sessionDetails, paymentContext);
 
 ```typescript
 const paymentItems = await session.getBasicPaymentItems();
-// Display the contents of paymentItems.paymentItems (the payment products and payment product groups) and paymentItems.accountsOnFile
+// Display the contents of paymentItems.paymentItems (the payment products and payment product groups)
+// and paymentItems.accountsOnFile
 ```
 
 6. When a payment product or payment product group is selected, use the `Session` object to retrieve more information about the payment product or payment product group. This contains the fields for the product. Display these fields and let your customer fill them in:
@@ -123,7 +124,8 @@ paymentRequest.setValue("cardholderName", "Wile E. Coyote");
 ```typescript
 const result = paymentRequest.validate();
 if (!result.valid) {
-  // result.errors contains each validation error, e.g. { fieldId: "cardNumber", ruleId: "luhn" } or { fieldId: "cvv", ruleId: "required" }
+  // result.errors contains each validation error, e.g. { fieldId: "cardNumber", ruleId: "luhn" }
+  // or { fieldId: "cvv", ruleId: "required" }
   // These can be be used to display error messages to your customer
 }
 ```
@@ -148,11 +150,13 @@ const iinDetails = await session.getIINDetails("4567 35");
 switch (iinDetails.status) {
   case "SUPPORTED":
     // The card is known and allowed within the current payment context.
-    // iinDetails.isAllowedInContext is true, iinDetails.paymentProductId and iinDetails.countryCode are available.
+    // iinDetails.isAllowedInContext is true, iinDetails.paymentProductId and iinDetails.countryCode
+    // are available.
     // If the card has multiple brands, iinDetails.coBrands contains the paymentProductId for each of them,
-    // and an isAllowedInContext flag that determines whether or not the co-brand is allowed for the current context.
-    // To render the brands, session.getPaymentProductDisplayHints can be called with the paymentProductId field of
-    // each support cobrand for which isAllowedInContext is true.
+    // and an isAllowedInContext flag that determines whether or not the co-brand is allowed for the
+    // current context.
+    // To render the brands, session.getPaymentProductDisplayHints can be called with the paymentProductId
+    // field of each support cobrand for which isAllowedInContext is true.
     break;
   case "NOT_ALLOWED":
     // The card is known but not allowed within the current payment context.
@@ -181,8 +185,9 @@ const paymentContext: PaymentContext = {
     applePay: {
       merchantName: "Your name",
       merchantCountryCode: "Your optional 2-letter ISO country code;\
-                            the acquirer country as returned by the Worldline Connect Client API will be used if available,\
-                            otherwise this value if specified, otherwise the country code from the payment context",
+                            the acquirer country as returned by the Worldline Connect Client API\
+                            will be used if available, otherwise this value if specified,\
+                            otherwise the country code from the payment context",
       lineItem: "Optional line item; if not set the merchant name will be used",
     }
   }
@@ -214,10 +219,13 @@ const paymentContext: PaymentContext = {
     googlePay: {
       connectMerchantId: "Your Connect merchant id",
       googlePayMerchantId: "Your Google Pay merchant id",
-      transactionCountryCode: "ISO 3166-1 alpha-2 country code for the country where the transaction will be completed/processed;\
-                               the acquirer country as returned by the Worldline Connect Client API will be used if available,\
-                               otherwise this value if specified, otherwise the country code from the payment context",
-      merchantName: "Your optional user visible merchant name; if not set the Business name in your Google Pay Developer Profile will be used",
+      transactionCountryCode: "ISO 3166-1 alpha-2 country code for the country where the transaction\
+                               will be completed/processed;\
+                               the acquirer country as returned by the Worldline Connect Client API\
+                               will be used if available, otherwise this value if specified,\
+                               otherwise the country code from the payment context",
+      merchantName: "Your optional user visible merchant name; if not set the Business name in your\
+                     Google Pay Developer Profile will be used",
       environment: "PRODUCTION", // or "TEST" for test purposes
     }
   }
@@ -269,7 +277,7 @@ const value = "4567350000427977";
 
 const maskedValue = cardNumberField.applyMask(value).formattedValue; // 4567 3500 0042 7977
 
-const unmaksedValue = cardNumberField.removeMask(maskedValue); // 4567350000427977
+const unmaskedValue = cardNumberField.removeMask(maskedValue); // 4567350000427977
 ```
 
 ### Accounts on file (tokens)

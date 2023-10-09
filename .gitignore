@@ -3,6 +3,7 @@ node_modules
 /docs
 /dist
 /src/util/metadata.ts
+robtimus-connect-client-sdk-*.tgz
 logfile.txt
 .vscode
 .idea

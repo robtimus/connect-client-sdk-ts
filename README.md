@@ -11,7 +11,7 @@ An SDK for the [Worldline Connect](https://epayments.developer-ingenico.com/) Cl
 * No custom code for functionality most modern browsers support like Base64 encoding/decoding.
 * Proper promises.
 * HTTP calls use the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) if available, with [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) available as fallback.
-* Native cryptography if available, though the [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API). [node-forge](https://www.npmjs.com/package/node-forge) can still be used as fallback.
+* Native cryptography if available, through the [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API). [node-forge](https://www.npmjs.com/package/node-forge) can still be used as fallback.
 * No deprecated legacy code.
 * More support for creating Apple Pay and Google Pay payments.
 

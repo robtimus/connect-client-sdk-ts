@@ -268,13 +268,26 @@ export function isMinNode(major: number, minor = 0): boolean {
   return currentVersion.major > major || (currentVersion.major === major && currentVersion.minor >= minor);
 }
 
-export interface MinNodeJest {
+export interface VersionedNodeJest {
   describe: jest.Describe;
   test: jest.It;
 }
 
-export function minNode(major: number, minor = 0): MinNodeJest {
+export function minNode(major: number, minor = 0): VersionedNodeJest {
   const condition = isMinNode(major, minor);
+  return {
+    describe: describeWhen(condition),
+    test: testWhen(condition),
+  };
+}
+
+export function isMaxNode(major: number, minor = 999): boolean {
+  const currentVersion = new SemVer(process.versions.node);
+  return currentVersion.major < major || (currentVersion.major === major && currentVersion.minor <= minor);
+}
+
+export function maxNode(major: number, minor = 999): VersionedNodeJest {
+  const condition = isMaxNode(major, minor);
   return {
     describe: describeWhen(condition),
     test: testWhen(condition),

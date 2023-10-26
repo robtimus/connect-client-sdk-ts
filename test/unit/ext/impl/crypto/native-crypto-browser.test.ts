@@ -6,7 +6,7 @@ import * as crypto from "crypto";
 import { expect } from "@jest/globals";
 import { MatcherFunction } from "expect";
 import { getRandomValues, isAvailable, randomUUID } from "../../../../../src/ext/impl/crypto/native-crypto-browser";
-import { Mocks, minNode } from "../../../test-util";
+import { Mocks, maxNode, minNode } from "../../../test-util";
 
 const toBeUUID: MatcherFunction<[]> = function (actual: unknown) {
   const expected = crypto.randomUUID().replace(/[a-z0-9]/gi, "x");
@@ -59,18 +59,20 @@ describe("native crypto", () => {
 
   afterEach(() => globalMocks.restore());
 
+  // Node.js 20 has added crypto in the global namespace including randomUUID and subtle
+
   describe("randomUUID", () => {
-    test("crypto not defined", () => {
+    maxNode(18).test("crypto not defined", () => {
       expect(() => randomUUID()).toThrow(new Error("Neither crypto.randomUUID nor crypto.getRandomValues is available"));
     });
 
-    test("crypto.randomUUID and crypto.getRandomValues not defined", () => {
+    maxNode(18).test("crypto.randomUUID and crypto.getRandomValues not defined", () => {
       globalMocks.mock("crypto", {});
 
       expect(() => randomUUID()).toThrow(new Error("Neither crypto.randomUUID nor crypto.getRandomValues is available"));
     });
 
-    test("crypto.randomUUID not defined", () => {
+    maxNode(18).test("crypto.randomUUID not defined", () => {
       globalMocks.mock("crypto", {
         getRandomValues: crypto.webcrypto.getRandomValues.bind(crypto.webcrypto),
       });
@@ -87,11 +89,11 @@ describe("native crypto", () => {
   });
 
   describe("getRandomValues", () => {
-    test("crypto not defined", () => {
+    maxNode(18).test("crypto not defined", () => {
       expect(() => getRandomValues(new Uint8Array(16))).toThrow(new Error("crypto.getRandomValues is not available"));
     });
 
-    test("crypto.getRandomValues not defined", () => {
+    maxNode(18).test("crypto.getRandomValues not defined", () => {
       globalMocks.mock("crypto", {});
 
       expect(() => getRandomValues(new Uint8Array(16))).toThrow(new Error("crypto.getRandomValues is not available"));
@@ -108,11 +110,11 @@ describe("native crypto", () => {
   });
 
   describe("isAvailable", () => {
-    test("crypto not defined", () => {
+    maxNode(18).test("crypto not defined", () => {
       expect(isAvailable()).toBe(false);
     });
 
-    test("crypto.getRandomValues not defined", () => {
+    maxNode(18).test("crypto.getRandomValues not defined", () => {
       globalMocks.mock("crypto", {
         subtle: crypto.webcrypto.subtle,
       });
@@ -120,7 +122,7 @@ describe("native crypto", () => {
       expect(isAvailable()).toBe(false);
     });
 
-    test("crypto.subtle not defined", () => {
+    maxNode(18).test("crypto.subtle not defined", () => {
       globalMocks.mock("crypto", {
         getRandomValues: crypto.webcrypto.getRandomValues.bind(crypto.webcrypto),
       });

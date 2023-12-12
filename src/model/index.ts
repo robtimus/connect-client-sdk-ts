@@ -302,6 +302,7 @@ export interface BasicPaymentProduct {
   readonly deviceFingerprintEnabled: boolean;
   readonly displayHints: PaymentProductDisplayHints;
   readonly id: number;
+  readonly isAuthenticationSupported?: boolean;
   readonly isJavaScriptRequired?: boolean;
   readonly maxAmount?: number;
   readonly minAmount?: number;

@@ -62,6 +62,7 @@ const fullJson: api.PaymentProduct = {
   ],
   fieldsWarning: "warning",
   id: 1,
+  isAuthenticationSupported: false,
   isJavaScriptRequired: false,
   maxAmount: 10000,
   minAmount: 10,
@@ -102,6 +103,7 @@ describe("toBasicPaymentProduct", () => {
       expect(minimalProduct.displayHints.logo.path).toBe(minimalJson.displayHints.logo);
       expect(minimalProduct.displayHints.logo.url).toBe("http://localhost/" + minimalJson.displayHints.logo);
       expect(minimalProduct.id).toBe(minimalJson.id);
+      expect(minimalProduct.isAuthenticationSupported).toBeUndefined();
       expect(minimalProduct.isJavaScriptRequired).toBeUndefined();
       expect(minimalProduct.maxAmount).toBeUndefined();
       expect(minimalProduct.minAmount).toBeUndefined();
@@ -132,6 +134,7 @@ describe("toBasicPaymentProduct", () => {
       expect(fullProduct.displayHints.logo.path).toBe(fullJson.displayHints.logo);
       expect(fullProduct.displayHints.logo.url).toBe("http://localhost/" + fullJson.displayHints.logo);
       expect(fullProduct.id).toBe(fullJson.id);
+      expect(fullProduct.isAuthenticationSupported).toBe(fullJson.isAuthenticationSupported);
       expect(fullProduct.isJavaScriptRequired).toBe(fullJson.isJavaScriptRequired);
       expect(fullProduct.maxAmount).toBe(fullJson.maxAmount);
       expect(fullProduct.minAmount).toBe(fullJson.minAmount);
@@ -194,6 +197,7 @@ describe("toBasicPaymentProducts", () => {
       expect(products.paymentProducts[0].displayHints.logo.path).toBe(minimalJson.displayHints.logo);
       expect(products.paymentProducts[0].displayHints.logo.url).toBe("http://localhost/" + minimalJson.displayHints.logo);
       expect(products.paymentProducts[0].id).toBe(minimalJson.id);
+      expect(products.paymentProducts[0].isAuthenticationSupported).toBeUndefined();
       expect(products.paymentProducts[0].isJavaScriptRequired).toBeUndefined();
       expect(products.paymentProducts[0].maxAmount).toBeUndefined();
       expect(products.paymentProducts[0].minAmount).toBeUndefined();
@@ -230,6 +234,7 @@ describe("toBasicPaymentProducts", () => {
       expect(products.paymentProducts[0].displayHints.logo.path).toBe(fullJson.displayHints.logo);
       expect(products.paymentProducts[0].displayHints.logo.url).toBe("http://localhost/" + fullJson.displayHints.logo);
       expect(products.paymentProducts[0].id).toBe(fullJson.id);
+      expect(products.paymentProducts[0].isAuthenticationSupported).toBe(fullJson.isAuthenticationSupported);
       expect(products.paymentProducts[0].isJavaScriptRequired).toBe(fullJson.isJavaScriptRequired);
       expect(products.paymentProducts[0].maxAmount).toBe(fullJson.maxAmount);
       expect(products.paymentProducts[0].minAmount).toBe(fullJson.minAmount);
@@ -321,6 +326,7 @@ describe("toPaymentProduct", () => {
       expect(minimalProduct.fields).toStrictEqual([]);
       expect(minimalProduct.fieldsWarning).toBeUndefined();
       expect(minimalProduct.id).toBe(minimalJson.id);
+      expect(minimalProduct.isAuthenticationSupported).toBeUndefined();
       expect(minimalProduct.isJavaScriptRequired).toBeUndefined();
       expect(minimalProduct.maxAmount).toBeUndefined();
       expect(minimalProduct.minAmount).toBeUndefined();
@@ -354,6 +360,7 @@ describe("toPaymentProduct", () => {
       expect(fullProduct.fields[0].id).toBe("cardNumber");
       expect(fullProduct.fieldsWarning).toBe(fullJson.fieldsWarning);
       expect(fullProduct.id).toBe(fullJson.id);
+      expect(fullProduct.isAuthenticationSupported).toBe(fullJson.isAuthenticationSupported);
       expect(fullProduct.isJavaScriptRequired).toBe(fullJson.isJavaScriptRequired);
       expect(fullProduct.maxAmount).toBe(fullJson.maxAmount);
       expect(fullProduct.minAmount).toBe(fullJson.minAmount);

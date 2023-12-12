@@ -31,6 +31,7 @@ class BasicPaymentProductImpl implements BasicPaymentProduct {
   readonly deviceFingerprintEnabled: boolean;
   readonly displayHints: PaymentProductDisplayHints;
   readonly id: number;
+  readonly isAuthenticationSupported?: boolean;
   readonly isJavaScriptRequired?: boolean;
   readonly maxAmount?: number;
   readonly minAmount?: number;
@@ -56,6 +57,7 @@ class BasicPaymentProductImpl implements BasicPaymentProduct {
     this.deviceFingerprintEnabled = json.deviceFingerprintEnabled;
     this.displayHints = toPaymentProductDisplayHints(json.displayHints, assetUrl);
     this.id = json.id;
+    this.isAuthenticationSupported = json.isAuthenticationSupported;
     this.isJavaScriptRequired = json.isJavaScriptRequired;
     this.maxAmount = json.maxAmount;
     this.minAmount = json.minAmount;

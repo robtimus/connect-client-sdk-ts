@@ -14,5 +14,5 @@
     "noImplicitAny": false
   },
   "include": ["src"],
-  "exclude": ["node_modules", ".npm", "dist", "**/__tests__/*"]
+  "exclude": ["node_modules", ".npm", "dist", "test"]
 }

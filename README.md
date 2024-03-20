@@ -134,7 +134,7 @@ if (!result.valid) {
 
 ```typescript
 const encryptor = session.getEncryptor();
-const payload = encryptor.encrypt(paymentRequest);
+const payload = await encryptor.encrypt(paymentRequest);
 ```
 
 10. Send the payload to your server, where it can be used for the `encryptedCustomerInput` property of a [Create payment](https://apireference.connect.worldline-solutions.com/s2sapi/v1/en_US/json/payments/create.html) call.
